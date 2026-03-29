@@ -1,0 +1,15 @@
+{
+  "name": "hohu-admin-docs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HoHu Admin 官方网站与文档",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs",
+    "preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}

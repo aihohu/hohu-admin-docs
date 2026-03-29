@@ -1,0 +1,56 @@
+/* Hero name gradient: green → blue */
+:root {
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(135deg, #18b882 10%, #0ea5e9 100%);
+  --vp-button-brand-bg: #18b882;
+  --vp-button-brand-hover-bg: #15a474;
+}
+
+.dark {
+  --vp-home-hero-name-background: linear-gradient(135deg, #34d399 10%, #38bdf8 100%);
+  --vp-button-brand-bg: #18b882;
+  --vp-button-brand-hover-bg: #34d399;
+}
+
+/* Hero image glow */
+.image-bg {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #18b882, #0ea5e9);
+  filter: blur(72px);
+  opacity: 0.2;
+  z-index: -1;
+}
+
+.dark .image-bg {
+  opacity: 0.15;
+}
+
+/* Feature card hover effect */
+.VPFeature {
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+
+.VPFeature:hover {
+  border-color: var(--vp-c-brand-2);
+  box-shadow: 0 2px 12px var(--vp-c-brand-soft);
+  transform: translateY(-2px);
+}
+
+/* Hero action button micro-interaction */
+.VPHero .action .VPLink .VPButton {
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.VPHero .action .VPLink .VPButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 184, 130, 0.25);
+}
+
+.VPHero .action .VPLink .VPButton:active {
+  transform: translateY(0);
+}
