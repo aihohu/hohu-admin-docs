@@ -1,56 +1,78 @@
-/* Hero name gradient: green → blue */
-:root {
-  --vp-home-hero-name-color: transparent;
-  --vp-home-hero-name-background: linear-gradient(135deg, #18b882 10%, #0ea5e9 100%);
-  --vp-button-brand-bg: #18b882;
-  --vp-button-brand-hover-bg: #15a474;
+/* ===================================
+   Landing Page Theme Variables
+   Supports both light and dark modes
+   =================================== */
+
+/* --- Light Mode (default) --- */
+html.landing-page {
+  --landing-bg: #ffffff;
+  --landing-bg-alt: #f8fafc;
+  --landing-bg-card: #f1f5f9;
+  --landing-bg-code: #f8fafc;
+  --landing-bg-nav: rgba(255, 255, 255, 0.85);
+  --landing-border: #e2e8f0;
+  --landing-text: #0f172a;
+  --landing-text-2: #475569;
+  --landing-text-3: #94a3b8;
+  --landing-preview-bg: #1e293b;
+  --landing-glow-1: rgba(16, 185, 129, 0.06);
+  --landing-glow-2: rgba(59, 130, 246, 0.04);
+  --landing-card-hover-shadow: rgba(0, 0, 0, 0.06);
+  --landing-cta-bg: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(59, 130, 246, 0.06));
+  --landing-cta-border: rgba(16, 185, 129, 0.15);
+  --landing-social-bg: rgba(0, 0, 0, 0.04);
+  --landing-btn-outline-border: #d1d5db;
+  --landing-btn-outline-text: #374151;
+  background-color: #ffffff;
 }
 
-.dark {
-  --vp-home-hero-name-background: linear-gradient(135deg, #34d399 10%, #38bdf8 100%);
-  --vp-button-brand-bg: #18b882;
-  --vp-button-brand-hover-bg: #34d399;
+/* --- Dark Mode --- */
+html.landing-page.dark {
+  --landing-bg: #0a0f1a;
+  --landing-bg-alt: #111827;
+  --landing-bg-card: rgba(255, 255, 255, 0.04);
+  --landing-bg-code: #0a0e17;
+  --landing-bg-nav: rgba(10, 15, 26, 0.92);
+  --landing-border: rgba(255, 255, 255, 0.08);
+  --landing-text: rgba(255, 255, 255, 0.9);
+  --landing-text-2: rgba(255, 255, 255, 0.6);
+  --landing-text-3: rgba(255, 255, 255, 0.3);
+  --landing-preview-bg: #1a1f2e;
+  --landing-glow-1: rgba(16, 185, 129, 0.12);
+  --landing-glow-2: rgba(59, 130, 246, 0.08);
+  --landing-card-hover-shadow: rgba(16, 185, 129, 0.08);
+  --landing-cta-bg: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(59, 130, 246, 0.08));
+  --landing-cta-border: rgba(16, 185, 129, 0.12);
+  --landing-social-bg: rgba(255, 255, 255, 0.06);
+  --landing-btn-outline-border: rgba(255, 255, 255, 0.2);
+  --landing-btn-outline-text: rgba(255, 255, 255, 0.85);
+  background-color: #0a0f1a;
 }
 
-/* Hero image glow */
-.image-bg {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: 240px;
-  height: 240px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #18b882, #0ea5e9);
-  filter: blur(72px);
-  opacity: 0.2;
-  z-index: -1;
+/* ===================================
+   Landing Page Layout Overrides
+   =================================== */
+
+html.landing-page body {
+  background-color: var(--landing-bg);
 }
 
-.dark .image-bg {
-  opacity: 0.15;
+/* Hide footer on landing page */
+html.landing-page .VPFooter {
+  display: none !important;
 }
 
-/* Feature card hover effect */
-.VPFeature {
-  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+/* Remove content constraints */
+html.landing-page .VPPage .content-container {
+  max-width: 100% !important;
+  padding: 0 !important;
 }
 
-.VPFeature:hover {
-  border-color: var(--vp-c-brand-2);
-  box-shadow: 0 2px 12px var(--vp-c-brand-soft);
-  transform: translateY(-2px);
+html.landing-page .VPPage .content {
+  padding: 0 !important;
 }
 
-/* Hero action button micro-interaction */
-.VPHero .action .VPLink .VPButton {
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.VPHero .action .VPLink .VPButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(24, 184, 130, 0.25);
-}
-
-.VPHero .action .VPLink .VPButton:active {
-  transform: translateY(0);
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
 }
