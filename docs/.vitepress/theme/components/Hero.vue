@@ -12,7 +12,7 @@
       <p class="hero-desc">对话式操作 · 自然语言管理业务 · 一个平台覆盖 ERP · CRM · OA · 电商 · IoT</p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="/guide/quick-start">快速开始 →</a>
-        <a class="btn btn-outline" href="https://admin.hohu.org" target="_blank">在线演示</a>
+        <!-- <a class="btn btn-outline" href="https://show.hohu.org" target="_blank">在线演示</a> -->
         <a class="btn btn-outline" href="https://github.com/aihohu/hohu-admin" target="_blank">查看源码</a>
       </div>
 
@@ -24,7 +24,7 @@
             <span class="dot dot-yellow"></span>
             <span class="dot dot-green"></span>
           </div>
-          <span class="browser-url">admin.hohu.org — 管理后台预览</span>
+          <span class="browser-url">show.hohu.org — 管理后台预览</span>
           <span class="live-badge">● Live Demo</span>
         </div>
         <div class="preview-body">

@@ -18,15 +18,15 @@
           </div>
           <span class="code-lang">bash</span>
         </div>
-        <pre class="code-body"><code><span class="comment"># 克隆项目</span>
-<span class="cmd">git clone https://github.com/aihohu/hohu-admin.git</span>
-<span class="cmd">cd hohu-admin</span>
+        <pre class="code-body"><code><span class="comment"># 安装 CLI</span>
+<span class="cmd">uv tool install hohu</span>
 
-<span class="comment"># 安装依赖 & 启动</span>
-<span class="cmd">uv sync && uv run python main.py</span>
+<span class="comment"># 创建项目 & 启动</span>
+<span class="cmd">hohu create my-project</span>
+<span class="cmd">cd my-project && hohu dev</span>
 
-<span class="success">✓ Server: http://localhost:8000</span>
-<span class="success">✓ API Docs: http://localhost:8000/docs</span></code></pre>
+<span class="success">✓ Backend:  http://localhost:8000</span>
+<span class="success">✓ Frontend: http://localhost:9527</span></code></pre>
       </div>
     </div>
   </section>

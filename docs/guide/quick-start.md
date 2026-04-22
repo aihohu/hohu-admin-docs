@@ -1,177 +1,87 @@
 # 快速开始
 
+hohu-admin 提供了官方 CLI 工具 `hohu`，内置项目创建、依赖安装、开发服务器、源码构建、一键部署等全生命周期管理能力。你无需关心各子项目的仓库地址、安装命令和启动方式——CLI 会自动处理一切。
 
+## 1. 安装 CLI
 
-## 总览
+```bash
+# uv（推荐）
+uv tool install hohu
 
-欢迎使用HoHu Admin！HoHu（鸿鹄）是一套**全栈系统快速开发框架**，能够快速提升项目开发体验。他主要由三端系统组成：
+# pip
+pip install hohu
+```
 
-- 服务端：基于FastAPI
-- 前端：基于Vue3
-- APP：基于UniAPP
+## 2. 创建项目
 
+```bash
+hohu create my-project
+cd my-project
+```
 
+交互式选择需要的组件（后端 / 前端 / App）。
 
-## 环境准备
+## 3. 安装依赖
 
-确保你的环境满足以下要求：
+```bash
+hohu init
+```
 
-- **git**: 你需要git来克隆和管理项目版本。
+自动识别项目配置，安装全部依赖（`uv sync` / `pnpm install`）。缺少 `uv` 时自动安装。
 
-  
+> **Windows 用户：** 如果遇到 `EPERM: operation not permitted, symlink` 错误，请开启 **Windows 开发者模式**（设置 → 更新和安全 → 开发者选项）。
 
-1. 后端环境：
-   - **Python** 3.10+ （推荐3.12或更高）
-   - **uv** ≥0.5.0（推荐最新版本）
-   - **PostgreSQL** 9.6+（推荐18.1）
-   - **Redis** 7.2+（推荐8.0或更高）
-2. 前端环境：
-   - **NodeJS**: >=v20（推荐 v22.19.0 或更高）
-   - **pnpm**: >= 9.0.0（推荐最新版本）
-3. APP环境：
-   - **NodeJS**: >=v20（推荐 18.19.0 或更高）
-   - **pnpm**: >= 9.0.0（推荐最新版本）
+## 4. 启动开发
 
+```bash
+hohu dev
+```
 
+一条命令启动全部服务，日志按颜色区分：
 
-## 运行系统
+| 前缀 | 颜色 | 服务 |
+|------|------|------|
+| `[Backend]` | 绿色 | FastAPI |
+| `[Frontend]` | 青色 | Vue 3 |
+| `[App]` | 黄色 | Uni-app |
 
-### 下载源码
+按 `Ctrl+C` 优雅退出。
 
-项目是前后端分离的，需要分别拉取前后端代码到本地，[全部源码](/guide/src)
+::: tip 其他启动方式
+```bash
+hohu dev -o be        # 仅后端
+hohu dev -o fe        # 仅前端
+hohu dev -t mp        # App 微信小程序模式
+hohu dev -s app       # 跳过 App
+```
+:::
 
-1. 下载**后端**源码：
+## 5. 部署上线
 
-   ```bash
-   git clone https://github.com/aihohu/hohu-admin.git
-   ```
+将项目部署到 Linux 服务器（需安装 Docker）：
 
-   
+```bash
+hohu build          # 构建镜像（自动初始化部署配置）
+hohu deploy         # 一键部署
+```
 
-2. 下载**前端**源码：
+部署完成后编辑 `.hohu/deploy/.env` 修改密码等配置。
 
-   ```bash
-   git clone https://github.com/aihohu/hohu-admin-web.git
-   ```
+::: details 不想从源码构建？
 
-   
+使用官方预构建镜像，无需本地源码：
 
-3. 下载**APP**源码：
+```bash
+hohu deploy init    # 初始化部署配置
+# 编辑 .hohu/deploy/.env
+hohu deploy         # 拉取镜像并部署
+```
+:::
 
-   ```bash
-   git clone https://github.com/aihohu/hohu-admin-app.git
-   ```
+[详细部署指南 →](/guide/deploy)
 
+## 下一步
 
-
-### 启动后端服务
-
-1. 准备数据库环境
-
-   克隆项目后，开发者需要在本地或服务器上先创建一个空的数据库
-
-   ```sql
-   CREATE DATABASE hohu_admin;
-   ```
-
-2. 安装依赖
-
-   安装所有依赖项:
-
-   ```bash
-   uv sync
-   ```
-   
-   激活虚拟环境:
-   
-   ```bash
-   source .venv/bin/activate
-   ```
-   
-4. 执行初始化脚本
-
-   ```bash
-   python scripts/init.py
-   ```
-   
-5. 启动
-
-   ```bash
-   fastapi dev app/main.py
-   ```
-
-   启动成功会输出下面的内容：
-
-   ```bash
-    ╭────────── FastAPI CLI - Development mode ───────────╮
-    │                                                     │
-    │  Serving at: http://127.0.0.1:8000                  │
-    │                                                     │
-    │  API docs: http://127.0.0.1:8000/docs               │
-    │                                                     │
-    │  Running in development mode, for production use:   │
-    │                                                     │
-    │  fastapi run                                        │
-    │                                                     │
-    ╰─────────────────────────────────────────────────────╯
-   
-   INFO:     Will watch for changes in these directories: ['/home/user/code/hohu-admin']
-   INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-   INFO:     Started reloader process [2248755] using WatchFiles
-   INFO:     Started server process [2248757]
-   INFO:     Waiting for application startup.
-   INFO:     Application startup complete.
-   ```
-
-   [更多后端文档](/guide/introduction)
-
-### 启动前端服务
-
-1. 安装项目依赖
-
-   ```bash
-   pnpm i
-   ```
-
-   
-
-2. 启动项目
-
-   ```bash
-   pnpm run dev
-   ```
-
-   [更多前端文档](/guide/introduction)
-
-### 启动APP服务
-
-1. 安装项目依赖
-
-   ```bash
-   pnpm i
-   ```
-
-   
-
-2. 启动项目
-
-   运行h5
-
-   ```
-   pnpm dev 
-   ```
-
-   运行微信小程序
-
-   ```
-   pnpm dev:mp
-   ```
-
-   运行App
-
-   ```
-   pnpm dev:app
-   ```
-
-​	[更多APP文档](/guide/introduction)
-
+- [部署指南](/guide/deploy) — SSL 证书、外部数据库、环境变量配置
+- [源码仓库](/guide/src) — 各子项目 GitHub 地址
+- [在线演示](/guide/show) — 体验完整功能

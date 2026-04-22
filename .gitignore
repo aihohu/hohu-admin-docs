@@ -24,3 +24,11 @@ yarn.lock
 
 docs/.vitepress/cache/*
 
+# Tool temp files
+.claude/
+.playwright-mcp/
+.superpowers/
+
+# Reference screenshots
+*-screenshot.png
+

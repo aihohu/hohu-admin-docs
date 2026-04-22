@@ -34,7 +34,7 @@
             <li><a href="/guide/quick-start">快速开始</a></li>
             <li><a href="/guide/introduction">使用指南</a></li>
             <li><a href="/guide/backend/introduction">后端架构</a></li>
-            <li><a href="https://admin.hohu.org/docs" target="_blank">API 参考</a></li>
+            <li><a href="https://show.hohu.org/docs" target="_blank">API 参考</a></li>
           </ul>
         </div>
         <div class="footer-col">

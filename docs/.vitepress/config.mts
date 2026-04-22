@@ -14,7 +14,7 @@ export default defineConfig({
     },
     nav: [
       { text: '首页', link: '/' },
-      { text: '功能', link: '/#features' },
+      // { text: '功能', link: '/#features' },
       { text: '文档', link: '/guide/quick-start' },
     ],
     sidebar: {
@@ -24,6 +24,7 @@ export default defineConfig({
           items: [
             { text: '介绍', link: '/guide/introduction' },
             { text: '快速上手', link: '/guide/quick-start' },
+            { text: '部署指南', link: '/guide/deploy' },
             { text: '在线演示', link: '/guide/show' },
             { text: '源码', link: '/guide/src' },
           ]
@@ -34,6 +35,8 @@ export default defineConfig({
             { text: 'AI 编程', link: '/guide/ai-coding' },
             { text: '权限控制', link: '/guide/auth' },
             { text: '分页', link: '/guide/page' },
+            { text: '文件上传', link: '/guide/file-upload' },
+            { text: '定时任务', link: '/guide/scheduled-job' },
           ]
         },
         {
@@ -41,6 +44,14 @@ export default defineConfig({
           items: [
             { text: '介绍', link: '/guide/backend/introduction' },
             { text: '目录结构', link: '/guide/backend/dir' },
+          ]
+        },
+        {
+          text: 'CLI 参考',
+          items: [
+            { text: '概览', link: '/guide/cli/index' },
+            { text: 'hohu build', link: '/guide/cli/build' },
+            { text: 'hohu deploy', link: '/guide/cli/deploy' },
           ]
         },
       ]
