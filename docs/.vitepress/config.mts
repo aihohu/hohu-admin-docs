@@ -34,6 +34,7 @@ export default defineConfig({
           items: [
             { text: 'AI 编程', link: '/guide/ai-coding' },
             { text: '权限控制', link: '/guide/auth' },
+            { text: '数据权限', link: '/guide/data-permission' },
             { text: '分页', link: '/guide/page' },
             { text: '文件上传', link: '/guide/file-upload' },
             { text: '定时任务', link: '/guide/scheduled-job' },
