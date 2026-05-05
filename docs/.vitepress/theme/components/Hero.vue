@@ -1,19 +1,21 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useI18n } from '../composables/useI18n';
+const { t, prefix } = useI18n();
+</script>
 
 <template>
   <section class="hero">
     <div class="hero-inner">
       <p class="hero-label">AI-FIRST ENTERPRISE ADMIN</p>
       <h1 class="hero-title">
-        AI 驱动的企业级
+        {{ t.heroTitle }}
         <br />
-        <span class="gradient-text">后台管理平台</span>
+        <span class="gradient-text">{{ t.heroTitleAccent }}</span>
       </h1>
-      <p class="hero-desc">对话式操作 · 自然语言管理业务 · 一个平台覆盖 ERP · CRM · OA · 电商 · IoT</p>
+      <p class="hero-desc">{{ t.heroDesc }}</p>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="/guide/quick-start">快速开始 →</a>
-        <!-- <a class="btn btn-outline" href="https://show.hohu.org" target="_blank">在线演示</a> -->
-        <a class="btn btn-outline" href="https://github.com/aihohu/hohu-admin" target="_blank">查看源码</a>
+        <a class="btn btn-primary" :href="`${prefix}/guide/quick-start`">{{ t.btnStart }}</a>
+        <a class="btn btn-outline" href="https://github.com/aihohu/hohu-admin" target="_blank">{{ t.btnSource }}</a>
       </div>
 
       <!-- Product screenshot mockup (always dark) -->
@@ -24,46 +26,46 @@
             <span class="dot dot-yellow"></span>
             <span class="dot dot-green"></span>
           </div>
-          <span class="browser-url">show.hohu.org — 管理后台预览</span>
+          <span class="browser-url">{{ t.browserUrl }}</span>
           <span class="live-badge">● Live Demo</span>
         </div>
         <div class="preview-body">
           <div class="preview-sidebar">
-            <div class="sidebar-item active">📊 仪表盘</div>
-            <div class="sidebar-item">👥 用户管理</div>
-            <div class="sidebar-item">🔐 权限控制</div>
-            <div class="sidebar-item">📦 订单管理</div>
-            <div class="sidebar-item">⚙️ 系统设置</div>
+            <div class="sidebar-item active">{{ t.sidebarDashboard }}</div>
+            <div class="sidebar-item">{{ t.sidebarUsers }}</div>
+            <div class="sidebar-item">{{ t.sidebarPermissions }}</div>
+            <div class="sidebar-item">{{ t.sidebarOrders }}</div>
+            <div class="sidebar-item">{{ t.sidebarSettings }}</div>
           </div>
           <div class="preview-main">
             <div class="stat-cards">
               <div class="stat-card stat-green">
                 <span class="stat-value">1,284</span>
-                <span class="stat-label">总用户</span>
+                <span class="stat-label">{{ t.statUsers }}</span>
               </div>
               <div class="stat-card stat-blue">
                 <span class="stat-value">328</span>
-                <span class="stat-label">今日订单</span>
+                <span class="stat-label">{{ t.statOrders }}</span>
               </div>
               <div class="stat-card stat-purple">
                 <span class="stat-value">99.9%</span>
-                <span class="stat-label">系统在线</span>
+                <span class="stat-label">{{ t.statUptime }}</span>
               </div>
               <div class="stat-card stat-yellow">
                 <span class="stat-value">42ms</span>
-                <span class="stat-label">平均响应</span>
+                <span class="stat-label">{{ t.statResponse }}</span>
               </div>
             </div>
             <div class="preview-bottom">
               <div class="chart-placeholder">
-                <span>📈 用户增长趋势</span>
+                <span>{{ t.chartLabel }}</span>
               </div>
               <div class="ai-chat">
                 <div class="ai-header">
                   <span class="ai-icon">🤖</span>
-                  <span class="ai-label">AI 助手</span>
+                  <span class="ai-label">{{ t.aiLabel }}</span>
                 </div>
-                <div class="ai-bubble">"帮我查看本月新增用户统计"</div>
+                <div class="ai-bubble">{{ t.aiBubble }}</div>
               </div>
             </div>
           </div>

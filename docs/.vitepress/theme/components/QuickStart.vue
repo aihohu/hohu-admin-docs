@@ -1,12 +1,15 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useI18n } from '../composables/useI18n';
+const { t, prefix } = useI18n();
+</script>
 
 <template>
   <section class="quickstart">
     <div class="quickstart-inner">
       <div class="quickstart-text">
-        <h2 class="section-title">3 分钟启动项目</h2>
-        <p class="section-desc">从零到完整后台管理系统，只需几条命令</p>
-        <a class="learn-more" href="/guide/quick-start">了解更多 →</a>
+        <h2 class="section-title">{{ t.qsTitle }}</h2>
+        <p class="section-desc">{{ t.qsDesc }}</p>
+        <a class="learn-more" :href="`${prefix}/guide/quick-start`">{{ t.qsLearnMore }}</a>
       </div>
       <div class="code-block">
         <div class="code-header">
@@ -17,10 +20,10 @@
           </div>
           <span class="code-lang">bash</span>
         </div>
-        <pre class="code-body"><code><span class="comment"># 安装 CLI</span>
+        <pre class="code-body"><code><span class="comment">{{ t.qsComment1 }}</span>
 <span class="cmd">uv tool install hohu</span>
 
-<span class="comment"># 创建项目 & 启动</span>
+<span class="comment">{{ t.qsComment2 }}</span>
 <span class="cmd">hohu create my-project</span>
 <span class="cmd">cd my-project && hohu dev</span>
 

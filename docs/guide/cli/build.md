@@ -1,96 +1,96 @@
 ---
 title: hohu build
-description: 使用 hohu build 从本地源码构建后端和前端 Docker 镜像，构建完成后通过 hohu deploy 部署
+description: Use hohu build to build backend and frontend Docker images from local source code, then deploy with hohu deploy
 ---
 
 # hohu build
 
-从本地源码构建 Docker 镜像。构建完成后，运行 `hohu deploy` 即可使用本地镜像部署。
+Build Docker images from local source code. After building, run `hohu deploy` to deploy using the local images.
 
-## 用法
+## Usage
 
 ```bash
-hohu build                  # 构建所有组件
-hohu build --only=backend   # 仅构建后端
-hohu build --only=frontend  # 仅构建前端
-hohu build --no-cache       # 不使用构建缓存
-hohu build --tag=v1.0.0     # 自定义镜像标签
-hohu build --reset          # 重置为官方 GHCR 镜像
+hohu build                  # Build all components
+hohu build --only=backend   # Build backend only
+hohu build --only=frontend  # Build frontend only
+hohu build --no-cache       # Build without cache
+hohu build --tag=v1.0.0     # Custom image tag
+hohu build --reset          # Reset to official GHCR images
 ```
 
-## 参数
+## Parameters
 
-| 参数         | 说明                                      | 默认值   |
-| ------------ | ----------------------------------------- | -------- |
-| `--only`     | 仅构建指定组件（`backend` 或 `frontend`） | 全部     |
-| `--tag`      | Docker 镜像标签                           | `source` |
-| `--no-cache` | 不使用 Docker 构建缓存                    | `false`  |
-| `--reset`    | 清除本地镜像配置，切回官方 GHCR 镜像      | `false`  |
+| Parameter    | Description                                                          | Default  |
+| ------------ | -------------------------------------------------------------------- | -------- |
+| `--only`     | Only build specified component (`backend` or `frontend`)             | All      |
+| `--tag`      | Docker image tag                                                     | `source` |
+| `--no-cache` | Do not use Docker build cache                                        | `false`  |
+| `--reset`    | Clear local image configuration, switch back to official GHCR images | `false`  |
 
-## 工作流程
+## Workflow
 
 ```
 hohu build
     │
-    ├─ 自动初始化 .hohu/deploy/（首次运行）
+    ├─ Auto-initialize .hohu/deploy/ (on first run)
     │   ├─ docker-compose.yml
-    │   ├─ .env（自动生成密码和密钥）
+    │   ├─ .env (auto-generated passwords and keys)
     │   └─ nginx/
     │
-    ├─ 构建镜像
-    │   ├─ hohu-admin:<tag>      （后端）
-    │   └─ hohu-admin-web:<tag>  （前端）
+    ├─ Build images
+    │   ├─ hohu-admin:<tag>      (backend)
+    │   └─ hohu-admin-web:<tag>  (frontend)
     │
-    └─ 更新 .hohu/deploy/.env
+    └─ Update .hohu/deploy/.env
         ├─ API_IMAGE=hohu-admin
         ├─ WEB_IMAGE=hohu-admin-web
         └─ IMAGE_TAG=<tag>
 ```
 
-首次运行时自动初始化 `.hohu/deploy/` 目录（配置文件、`.env`、密钥），无需手动执行 `hohu deploy init`。
+On first run, the `.hohu/deploy/` directory is automatically initialized (configuration files, `.env`, keys), so there is no need to run `hohu deploy init` manually.
 
-构建完成后 `.env` 中的镜像配置会自动切换为本地镜像名称（不带 `/`），`hohu deploy` 会识别并跳过远程拉取。
+After the build completes, the image configuration in `.env` is automatically updated to use local image names (without `/`), and `hohu deploy` will recognize them and skip remote pulling.
 
-## 切换回官方镜像
+## Switch Back to Official Images
 
 ```bash
 hohu build --reset
 ```
 
-清除 `.env` 中的 `API_IMAGE` 和 `WEB_IMAGE`，`IMAGE_TAG` 恢复为 `latest`。下次 `hohu deploy` 将拉取官方 GHCR 镜像。
+Clears `API_IMAGE` and `WEB_IMAGE` from `.env` and resets `IMAGE_TAG` to `latest`. The next `hohu deploy` will pull the official GHCR images.
 
-## 常用场景
+## Common Scenarios
 
-### 日常开发迭代
+### Daily Development Iteration
 
 ```bash
-# 修改源码后重新构建
-hohu build --only=backend    # 只改了后端
-hohu deploy                  # 重新部署
+# Rebuild after source code changes
+hohu build --only=backend    # Only backend changed
+hohu deploy                  # Redeploy
 
-# 完整重建
+# Full rebuild
 hohu build --no-cache
 hohu deploy
 ```
 
-### 版本发布
+### Version Release
 
 ```bash
 hohu build --tag=v1.2.0
 hohu deploy
 ```
 
-### 从官方镜像切换到本地开发
+### Switch from Official Images to Local Development
 
 ```bash
-hohu build          # 构建 + 自动初始化
-hohu deploy         # 部署本地镜像
+hohu build          # Build + auto-initialize
+hohu deploy         # Deploy local images
 ```
 
-### 从本地开发切回官方镜像
+### Switch from Local Development Back to Official Images
 
 ```bash
-hohu build --reset  # 重置配置
+hohu build --reset  # Reset configuration
 hohu deploy down
-hohu deploy         # 拉取官方镜像部署
+hohu deploy         # Pull and deploy official images
 ```

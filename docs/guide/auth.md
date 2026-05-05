@@ -1,57 +1,57 @@
 ---
-title: 权限控制
-description: HoHu Admin 采用 RBAC 模型实现从菜单路由到按钮级别的细粒度权限管理，包括角色、菜单、API 接口的权限控制
+title: Permission Control
+description: HoHu Admin implements fine-grained permission management from menu routes to button level using the RBAC model, including role, menu, and API endpoint permission control
 ---
 
-# 权限控制
+# Permission Control
 
-HoHu Admin 采用经典的 **RBAC（基于角色的访问控制）** 模型，实现从菜单路由到按钮级别的细粒度权限管理。
+HoHu Admin uses the classic **RBAC (Role-Based Access Control)** model to implement fine-grained permission management from menu routes down to the button level.
 
-## 权限模型
+## Permission Model
 
-系统通过 **用户 → 角色 → 菜单** 三层关系实现权限控制：
+The system implements permission control through a three-layer **User > Role > Menu** relationship:
 
 ```
-用户 (User) ──M2M──> 角色 (Role) ──M2M──> 菜单 (Menu)
-                                            ├── 目录 (M)
-                                            ├── 菜单 (C)
-                                            └── 按钮 (F) ← 携带 permission 权限码
+User ──M2M──> Role ──M2M──> Menu
+                               ├── Directory (M)
+                               ├── Menu (C)
+                               └── Button (F) ← carries permission code
 ```
 
-- **用户**：可分配多个角色
-- **角色**：可关联多个菜单/按钮权限
-- **菜单**：分为目录（M）、页面（C）、按钮（F）三种类型，按钮类型携带权限码
+- **User**: Can be assigned multiple roles
+- **Role**: Can be associated with multiple menu/button permissions
+- **Menu**: Divided into three types — Directory (M), Page (C), and Button (F). Button types carry permission codes.
 
-## 超级管理员
+## Super Admin
 
-超级管理员绕过所有权限检查，拥有以下特征的账户自动成为超级管理员：
+The super admin bypasses all permission checks. An account automatically becomes a super admin if it:
 
-- 用户名为 `admin`，**或**
-- 拥有角色编码为 `R_SUPER` 的角色
+- Has the username `admin`, **or**
+- Has a role with the role code `R_SUPER`
 
-## 后端权限控制
+## Backend Permission Control
 
-### 路由级别保护
+### Route-Level Protection
 
-通过 FastAPI 依赖注入保护 API 端点：
+Protect API endpoints through FastAPI dependency injection:
 
 ```python
 from app.core.auth import require_permissions
 
-# 需要指定权限才能访问
+# Requires specified permission to access
 @router.get("/users", dependencies=[Depends(require_permissions("sys:user:list"))])
 async def list_users(...):
     ...
 
-# 仅超级管理员可访问
+# Super admin only
 @router.delete("/users/{user_id}", dependencies=[Depends(require_permissions("sys:user:delete", super_admin_only=True))])
 async def delete_user(...):
     ...
 ```
 
-### 获取当前用户
+### Getting the Current User
 
-所有需要认证的接口通过 `get_current_user` 依赖获取当前登录用户：
+All authenticated endpoints retrieve the current logged-in user through the `get_current_user` dependency:
 
 ```python
 from app.modules.auth.service import get_current_user
@@ -61,47 +61,47 @@ async def get_profile(current_user: User = Depends(get_current_user)):
     return current_user
 ```
 
-`get_current_user` 会自动：
+`get_current_user` automatically:
 
-1. 从 `Authorization` 请求头提取 JWT Token
-2. 解码验证 Token（HS256）
-3. 查询用户并预加载角色和菜单（`selectinload`）
-4. 检查用户是否被禁用
+1. Extracts the JWT Token from the `Authorization` header
+2. Decodes and verifies the Token (HS256)
+3. Queries the user with eager-loaded roles and menus (`selectinload`)
+4. Checks if the user is disabled
 
-### 权限码命名规范
+### Permission Code Naming Convention
 
-按钮级权限码采用 `模块:资源:操作` 的三段式命名：
+Button-level permission codes follow a three-segment `module:resource:action` naming pattern:
 
 ```
-sys:user:list       # 用户列表
-sys:user:add        # 新增用户
-sys:user:edit       # 编辑用户
-sys:user:delete     # 删除用户
-system:role:list    # 角色列表
-system:menu:add     # 新增菜单
+sys:user:list       # User list
+sys:user:add        # Add user
+sys:user:edit       # Edit user
+sys:user:delete     # Delete user
+system:role:list    # Role list
+system:menu:add     # Add menu
 ```
 
-## 前端权限控制
+## Frontend Permission Control
 
-### 动态路由
+### Dynamic Routes
 
-前端支持两种路由模式（通过 `.env` 中 `VITE_AUTH_ROUTE_MODE` 配置）：
+The frontend supports two routing modes (configured via `VITE_AUTH_ROUTE_MODE` in `.env`):
 
-| 模式              | 说明                                         |
-| ----------------- | -------------------------------------------- |
-| `dynamic`（默认） | 路由由后端 API 返回，根据用户角色动态生成    |
-| `static`          | 路由由本地文件结构生成，按 `meta.roles` 过滤 |
+| Mode                | Description                                                                          |
+| ------------------- | ------------------------------------------------------------------------------------ |
+| `dynamic` (default) | Routes are returned by the backend API and dynamically generated based on user roles |
+| `static`            | Routes are generated from local file structure and filtered by `meta.roles`          |
 
-**动态模式流程**：
+**Dynamic mode flow:**
 
-1. 用户登录后，前端调用 `GET /auth/getUserRoutes`
-2. 后端根据用户的角色关联的菜单，构建菜单树返回
-3. 前端将菜单树转换为 Vue Router 路由，通过 `router.addRoute()` 动态注册
-4. 超级管理员看到所有菜单，普通用户只看到被授权的菜单
+1. After login, the frontend calls `GET /auth/getUserRoutes`
+2. The backend builds and returns the menu tree based on the user's role-associated menus
+3. The frontend converts the menu tree into Vue Router routes and dynamically registers them via `router.addRoute()`
+4. Super admins see all menus; regular users only see authorized menus
 
-### 按钮级权限
+### Button-Level Permissions
 
-使用 `useAuth()` hook 在模板中控制按钮显示：
+Use the `useAuth()` hook to control button visibility in templates:
 
 ```vue
 <script setup lang="ts">
@@ -111,75 +111,75 @@ const { hasAuth } = useAuth();
 </script>
 
 <template>
-  <!-- 只有拥有 sys:user:add 权限的用户才能看到新增按钮 -->
-  <NButton v-if="hasAuth('sys:user:add')" @click="handleAdd">新增用户</NButton>
+  <!-- Only users with the sys:user:add permission can see the Add button -->
+  <NButton v-if="hasAuth('sys:user:add')" @click="handleAdd">Add User</NButton>
 
-  <!-- 只有拥有 sys:user:delete 权限才能看到删除确认 -->
+  <!-- Only users with the sys:user:delete permission can see the delete confirmation -->
   <NPopconfirm v-if="hasAuth('sys:user:delete')" @positive-click="handleDelete(row.userId)">
     <template #trigger>
-      <NButton type="error">删除</NButton>
+      <NButton type="error">Delete</NButton>
     </template>
-    确定删除该用户吗？
+    Are you sure you want to delete this user?
   </NPopconfirm>
 </template>
 ```
 
-`hasAuth()` 也支持传入数组，任一权限匹配即返回 `true`：
+`hasAuth()` also accepts an array — returns `true` if any permission matches:
 
 ```ts
-// 拥有编辑或查看权限之一即可
+// Returns true if the user has either the edit or view permission
 hasAuth(['sys:user:edit', 'sys:user:list']);
 ```
 
-### 路由守卫
+### Route Guards
 
-导航守卫在每次路由跳转时执行权限检查：
+Navigation guards perform permission checks on every route transition:
 
-1. **未登录** → 访问受保护页面 → 重定向到登录页
-2. **已登录** → 访问无权限页面 → 重定向到 403 页面
-3. **已登录** → 访问登录页 → 重定向到首页
-4. **已登录** → 访问不存在的路由 → 检查是否后端有该路由（有则 403，无则 404）
+1. **Not logged in** > accessing a protected page > redirect to login page
+2. **Logged in** > accessing an unauthorized page > redirect to 403 page
+3. **Logged in** > accessing the login page > redirect to home page
+4. **Logged in** > accessing a non-existent route > check if the route exists in the backend (yes > 403, no > 404)
 
-## 认证流程
+## Authentication Flow
 
-完整的登录认证流程：
+The complete login authentication flow:
 
 ```
-1. 前端发送 POST /auth/login { userName, password }
+1. Frontend sends POST /auth/login { userName, password }
           ↓
-2. 后端验证密码（bcrypt），签发 JWT Token
+2. Backend verifies password (bcrypt), issues JWT Token
           ↓
-3. 前端存储 Token，调用 GET /auth/getUserInfo
+3. Frontend stores Token, calls GET /auth/getUserInfo
           ↓
-4. 后端返回 { userId, userName, roles, buttons }
+4. Backend returns { userId, userName, roles, buttons }
           ↓
-5. 前端调用 GET /auth/getUserRoutes 获取动态路由
+5. Frontend calls GET /auth/getUserRoutes to get dynamic routes
           ↓
-6. 前端注册路由，渲染菜单，页面就绪
+6. Frontend registers routes, renders menus, page is ready
 ```
 
-## 关键配置
+## Key Configuration
 
-| 配置项                        | 位置        | 说明                            |
-| ----------------------------- | ----------- | ------------------------------- |
-| `SECRET_KEY`                  | 后端 `.env` | JWT 签名密钥                    |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | 后端 `.env` | Token 有效期（默认 7 天）       |
-| `VITE_AUTH_ROUTE_MODE`        | 前端 `.env` | 路由模式：`dynamic` 或 `static` |
-| `VITE_STATIC_SUPER_ROLE`      | 前端 `.env` | 静态模式下的超级管理员角色编码  |
+| Setting                       | Location        | Description                             |
+| ----------------------------- | --------------- | --------------------------------------- |
+| `SECRET_KEY`                  | Backend `.env`  | JWT signing secret                      |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Backend `.env`  | Token validity period (default: 7 days) |
+| `VITE_AUTH_ROUTE_MODE`        | Frontend `.env` | Route mode: `dynamic` or `static`       |
+| `VITE_STATIC_SUPER_ROLE`      | Frontend `.env` | Super admin role code in static mode    |
 
-## 相关文件
+## Related Files
 
-### 后端
+### Backend
 
-- `app/core/auth.py` — `require_permissions()` 权限依赖
-- `app/modules/auth/service.py` — `get_current_user()`、`build_menu_tree()`
-- `app/modules/auth/api.py` — 登录、获取用户信息、获取路由等接口
-- `app/modules/system/models/` — User、Role、Menu、Dept 模型
+- `app/core/auth.py` — `require_permissions()` permission dependency
+- `app/modules/auth/service.py` — `get_current_user()`, `build_menu_tree()`
+- `app/modules/auth/api.py` — Login, get user info, get routes, and other endpoints
+- `app/modules/system/models/` — User, Role, Menu, Dept models
 
-### 前端
+### Frontend
 
-- `src/store/modules/auth/index.ts` — 认证状态管理
-- `src/store/modules/route/index.ts` — 动态路由初始化
-- `src/router/guard/route.ts` — 导航守卫
+- `src/store/modules/auth/index.ts` — Authentication state management
+- `src/store/modules/route/index.ts` — Dynamic route initialization
+- `src/router/guard/route.ts` — Navigation guards
 - `src/hooks/business/auth.ts` — `useAuth()` / `hasAuth()` hook
-- `src/service/request/index.ts` — 请求拦截器（自动附加 Token）
+- `src/service/request/index.ts` — Request interceptor (auto-attaches Token)

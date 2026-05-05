@@ -1,19 +1,22 @@
 <script setup lang="ts">
-const features = [
-  { icon: '🤖', title: 'AI 优先架构', desc: '自然语言操作后台<br>AI 辅助代码生成', color: 'green' },
-  { icon: '⚡', title: '极速开发', desc: '开箱即用的业务模块<br>分钟级部署上线', color: 'blue' },
-  { icon: '🔐', title: '权限体系', desc: 'RBAC + 数据级权限<br>多租户隔离', color: 'purple' },
-  { icon: '📦', title: '多模块业务', desc: 'ERP · CRM · OA · 电商<br>按需组合使用', color: 'yellow' },
-  { icon: '📱', title: '全端覆盖', desc: 'Web · H5 · 微信小程序<br>原生 App', color: 'pink' },
-  { icon: '🔓', title: '完全开源', desc: 'MIT 协议<br>自主可控 · 可商用', color: 'teal' }
-];
+import { computed } from 'vue';
+import { useI18n } from '../composables/useI18n';
+const { t } = useI18n();
+const features = computed(() => [
+  { icon: '🤖', title: t.value.f1Title, desc: t.value.f1Desc, color: 'green' },
+  { icon: '⚡', title: t.value.f2Title, desc: t.value.f2Desc, color: 'blue' },
+  { icon: '🔐', title: t.value.f3Title, desc: t.value.f3Desc, color: 'purple' },
+  { icon: '📦', title: t.value.f4Title, desc: t.value.f4Desc, color: 'yellow' },
+  { icon: '📱', title: t.value.f5Title, desc: t.value.f5Desc, color: 'pink' },
+  { icon: '🔓', title: t.value.f6Title, desc: t.value.f6Desc, color: 'teal' }
+]);
 </script>
 
 <template>
   <section class="features">
     <div class="features-inner">
-      <h2 class="section-title">为什么选择 HoHu Admin？</h2>
-      <p class="section-subtitle">六大核心能力，覆盖企业后台管理全场景</p>
+      <h2 class="section-title">{{ t.featureTitle }}</h2>
+      <p class="section-subtitle">{{ t.featureSubtitle }}</p>
       <div class="feature-grid">
         <div v-for="f in features" :key="f.title" :class="['feature-card', `card-${f.color}`]">
           <div class="feature-icon">{{ f.icon }}</div>
@@ -86,7 +89,7 @@ const features = [
   margin: 0;
 }
 
-/* Color variants — adapt to light/dark */
+/* Color variants */
 .card-green {
   background: rgba(16, 185, 129, 0.06);
   border: 1px solid rgba(16, 185, 129, 0.12);

@@ -1,66 +1,66 @@
 ---
-title: 在线演示
-description: HoHu Admin 在线演示环境，支持用户管理、角色权限、菜单配置、部门管理和系统监控等完整功能体验
+title: Online Demo
+description: HoHu Admin online demo environment with full feature experience including user management, role permissions, menu configuration, department management, and system monitoring
 ---
 
-# 在线演示
+# Online Demo
 
-我们提供了在线演示环境，让你无需安装即可体验 HoHu Admin 的完整功能。
+We provide an online demo environment so you can experience the full feature set of HoHu Admin without any installation.
 
-## 访问地址
+## Access URL
 
-**演示地址**：[https://show.hohu.org](https://show.hohu.org)
+**Demo URL**: [https://show.hohu.org](https://show.hohu.org)
 
-## 登录账号
+## Login Credentials
 
-| 项目   | 值       |
-| ------ | -------- |
-| 用户名 | `admin`  |
-| 密码   | `123456` |
+| Field    | Value    |
+| -------- | -------- |
+| Username | `admin`  |
+| Password | `123456` |
 
-::: warning 注意
-演示环境的数据会定期重置，请勿输入真实敏感信息。
+::: warning Note
+Demo environment data is periodically reset. Do not enter real sensitive information.
 :::
 
-## 功能预览
+## Feature Preview
 
-登录后你可以体验以下功能：
+After logging in, you can explore the following features:
 
-### 用户管理
+### User Management
 
-- 用户的增删改查
-- 用户状态启用/禁用
-- 分配角色
+- User CRUD operations
+- Enable/disable user status
+- Assign roles
 
-### 角色管理
+### Role Management
 
-- 角色的增删改查
-- 配置角色的菜单权限
-- 配置角色的数据权限
+- Role CRUD operations
+- Configure role menu permissions
+- Configure role data permissions
 
-### 菜单管理
+### Menu Management
 
-- 树形结构的菜单配置
-- 支持目录、菜单、按钮三种类型
-- 动态路由生成
+- Tree-structured menu configuration
+- Support for three types: directory, menu, and button
+- Dynamic route generation
 
-### 部门管理
+### Department Management
 
-- 树形结构的部门配置
-- 按部门划分数据权限
+- Tree-structured department configuration
+- Data permissions by department
 
-### 系统监控
+### System Monitoring
 
-- 在线用户查看
-- 操作日志审计
-- 登录日志查询
+- View online users
+- Operation log audit
+- Login log queries
 
-## 演示截图
+## Screenshots
 
 ![HoHu Admin](/images/home.jpeg)
 
-## 相关链接
+## Related Links
 
-- [快速上手](/guide/quick-start) — 本地搭建开发环境
-- [部署指南](/guide/deploy) — 部署到生产服务器
-- [源码仓库](/guide/src) — 获取完整源码
+- [Quick Start](/guide/quick-start) — Set up a local development environment
+- [Deployment Guide](/guide/deploy) — Deploy to a production server
+- [Source Repositories](/guide/src) — Get the full source code

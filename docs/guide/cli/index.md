@@ -1,23 +1,23 @@
 ---
-title: CLI 概览
-description: hohu 命令行工具概览，提供项目创建、依赖安装、开发服务器、源码构建和一键部署等全生命周期管理
+title: CLI Overview
+description: Overview of the hohu command-line tool providing full lifecycle management including project creation, dependency installation, dev server, source builds, and one-click deployment
 ---
 
-# CLI 概览
+# CLI Overview
 
-`hohu` 是 hohu-admin 的官方命令行工具，提供项目创建、依赖安装、开发服务器、源码构建、一键部署等全生命周期管理能力。
+`hohu` is the official command-line tool for hohu-admin, providing full lifecycle management capabilities including project creation, dependency installation, development servers, source builds, and one-click deployment.
 
-## 安装
+## Installation
 
 ```bash
-# uv（推荐）
+# uv (recommended)
 uv tool install hohu
 
 # pip
 pip install hohu
 ```
 
-## 更新
+## Update
 
 ```bash
 # uv
@@ -27,42 +27,42 @@ uv tool upgrade hohu
 pip install --upgrade hohu
 ```
 
-## 命令总览
+## Command Reference
 
-| 命令                  | 说明                       |
-| --------------------- | -------------------------- |
-| `hohu create [NAME]`  | 创建项目并克隆仓库模板     |
-| `hohu init`           | 安装所有子项目依赖         |
-| `hohu dev`            | 启动开发服务器             |
-| `hohu build`          | 从本地源码构建 Docker 镜像 |
-| `hohu deploy`         | 一键 Docker 部署           |
-| `hohu deploy init`    | 初始化部署目录和 .env      |
-| `hohu deploy pull`    | 拉取最新镜像并重启         |
-| `hohu deploy ps`      | 查看服务状态               |
-| `hohu deploy logs`    | 查看服务日志               |
-| `hohu deploy restart` | 重启服务                   |
-| `hohu deploy down`    | 停止所有服务               |
-| `hohu migrate`        | 运行数据库迁移             |
-| `hohu lang`           | 切换显示语言               |
-| `hohu info`           | 查看当前配置               |
-| `hohu --version`      | 显示版本号                 |
+| Command               | Description                                     |
+| --------------------- | ----------------------------------------------- |
+| `hohu create [NAME]`  | Create a project and clone repository templates |
+| `hohu init`           | Install dependencies for all sub-projects       |
+| `hohu dev`            | Start development servers                       |
+| `hohu build`          | Build Docker images from local source code      |
+| `hohu deploy`         | One-click Docker deployment                     |
+| `hohu deploy init`    | Initialize deployment directory and .env        |
+| `hohu deploy pull`    | Pull latest images and restart                  |
+| `hohu deploy ps`      | View service status                             |
+| `hohu deploy logs`    | View service logs                               |
+| `hohu deploy restart` | Restart services                                |
+| `hohu deploy down`    | Stop all services                               |
+| `hohu migrate`        | Run database migrations                         |
+| `hohu lang`           | Switch display language                         |
+| `hohu info`           | View current configuration                      |
+| `hohu --version`      | Display version number                          |
 
 ## hohu create
 
-创建新项目并交互式选择组件（后端 / 前端 / App）。
+Create a new project and interactively select components (backend / frontend / app).
 
 ```bash
 hohu create my-project
-hohu create              # 默认名称 hohu-admin
+hohu create              # Default name: hohu-admin
 hohu create my-app --repo https://github.com/your-org/your-template.git
 ```
 
-| 参数            | 说明                        |
-| --------------- | --------------------------- |
-| `NAME`          | 项目名称，默认 `hohu-admin` |
-| `--repo` / `-r` | 自定义模板仓库地址          |
+| Parameter       | Description                            |
+| --------------- | -------------------------------------- |
+| `NAME`          | Project name, defaults to `hohu-admin` |
+| `--repo` / `-r` | Custom template repository URL         |
 
-创建完成后执行：
+After creation, run:
 
 ```bash
 cd my-project
@@ -71,67 +71,67 @@ hohu init
 
 ## hohu init
 
-自动识别项目配置（`.hohu/project.json`），安装全部依赖。
+Automatically detects the project configuration (`.hohu/project.json`) and installs all dependencies.
 
 ```bash
 hohu init
 ```
 
-- 后端：执行 `uv sync`（缺少 `uv` 时自动安装）
-- 前端 / App：执行 `pnpm install`
-- 安装失败时会给出手动安装提示
+- Backend: runs `uv sync` (automatically installs `uv` if missing)
+- Frontend / App: runs `pnpm install`
+- Provides manual installation instructions if automatic installation fails
 
 ## hohu dev
 
-在单一终端内启动所有开发服务，日志按颜色区分输出。
+Starts all development services in a single terminal with color-coded log output.
 
 ```bash
-hohu dev          # 启动全部组件
-hohu dev -o be    # 仅后端
-hohu dev -o fe    # 仅前端
-hohu dev -s app   # 跳过 App
-hohu dev -t mp    # App 微信小程序模式
+hohu dev          # Start all components
+hohu dev -o be    # Backend only
+hohu dev -o fe    # Frontend only
+hohu dev -s app   # Skip the App
+hohu dev -t mp    # App in WeChat Mini Program mode
 ```
 
-### 参数
+### Parameters
 
-| 参数           | 短写 | 说明                              | 默认值 |
-| -------------- | ---- | --------------------------------- | ------ |
-| `--app-target` | `-t` | App 运行目标：`h5` / `mp` / `app` | `h5`   |
-| `--only`       | `-o` | 仅启动指定组件（可重复使用）      | 全部   |
-| `--skip`       | `-s` | 跳过指定组件（可重复使用）        | 无     |
+| Parameter      | Short | Description                                       | Default |
+| -------------- | ----- | ------------------------------------------------- | ------- |
+| `--app-target` | `-t`  | App run target: `h5` / `mp` / `app`               | `h5`    |
+| `--only`       | `-o`  | Only start specified components (can be repeated) | All     |
+| `--skip`       | `-s`  | Skip specified components (can be repeated)       | None    |
 
-组件别名（不区分大小写）：
+Component aliases (case-insensitive):
 
-| 别名              | 组件 |
-| ----------------- | ---- |
-| `be` / `backend`  | 后端 |
-| `fe` / `frontend` | 前端 |
-| `app`             | App  |
+| Alias             | Component |
+| ----------------- | --------- |
+| `be` / `backend`  | Backend   |
+| `fe` / `frontend` | Frontend  |
+| `app`             | App       |
 
-### 日志颜色
+### Log Colors
 
-| 前缀         | 颜色 | 服务    |
-| ------------ | ---- | ------- |
-| `[Backend]`  | 绿色 | FastAPI |
-| `[Frontend]` | 青色 | Vue 3   |
-| `[App]`      | 黄色 | Uni-app |
+| Prefix       | Color  | Service |
+| ------------ | ------ | ------- |
+| `[Backend]`  | Green  | FastAPI |
+| `[Frontend]` | Cyan   | Vue 3   |
+| `[App]`      | Yellow | Uni-app |
 
-按 `Ctrl+C` 优雅退出，所有子进程将被安全终止。
+Press `Ctrl+C` to gracefully exit. All child processes will be safely terminated.
 
 ## hohu lang
 
-切换 CLI 显示语言，支持中文、英文和跟随系统。
+Switch the CLI display language. Supports Chinese, English, and system default.
 
 ```bash
 hohu lang
 ```
 
-交互式选择：简体中文 / English / 跟随系统。
+Interactive selection: Simplified Chinese / English / System default.
 
 ## hohu info
 
-查看当前 CLI 配置信息，包括版本、语言、配置文件路径等。
+View current CLI configuration details, including version, language, and config file paths.
 
 ```bash
 hohu info

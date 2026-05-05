@@ -1,25 +1,25 @@
 ---
-title: 部署指南
-description: 通过 hohu build 和 hohu deploy 将全栈应用部署到 Linux 服务器，基于 Docker Compose 编排所有服务
+title: Deployment Guide
+description: Deploy the full-stack application to a Linux server using hohu build and hohu deploy, with Docker Compose orchestrating all services
 ---
 
-# 部署指南
+# Deployment Guide
 
-通过 `hohu build` 和 `hohu deploy` 将全栈应用部署到 Linux 服务器，基于 Docker Compose 编排所有服务。
+Deploy the full-stack application to a Linux server using `hohu build` and `hohu deploy`, with Docker Compose orchestrating all services.
 
-## 架构
+## Architecture
 
 ```
 Internet (:80/:443)
        │
        ▼
 ┌─────────────────┐
-│  Nginx (SSL)    │  SSL 终止，HTTP→HTTPS 重定向
+│  Nginx (SSL)    │  SSL termination, HTTP→HTTPS redirect
 └────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│  hohu-admin-web │  静态文件托管 + /api/ 反向代理
+│  hohu-admin-web │  Static file hosting + /api/ reverse proxy
 │  (nginx)        │
 └────────┬────────┘
          │ /api/
@@ -34,146 +34,146 @@ Internet (:80/:443)
 └───────┘ └───────┘
 ```
 
-**包含服务：**
+**Included services:**
 
-| 服务           | 镜像                 | 说明                                  |
-| -------------- | -------------------- | ------------------------------------- |
-| postgres       | `postgres:16-alpine` | PostgreSQL 数据库（可替换为外部实例） |
-| redis          | `redis:7-alpine`     | Redis 缓存（可替换为外部实例）        |
-| hohu-admin-api | 后端镜像             | FastAPI 应用                          |
-| hohu-admin-web | 前端镜像             | Vue 3 静态文件 + API 反代             |
-| nginx          | `nginx:alpine`       | SSL 反向代理（可选）                  |
-| certbot        | `certbot/certbot`    | Let's Encrypt 自动证书（可选）        |
+| Service        | Image                | Description                                                  |
+| -------------- | -------------------- | ------------------------------------------------------------ |
+| postgres       | `postgres:16-alpine` | PostgreSQL database (can be replaced with external instance) |
+| redis          | `redis:7-alpine`     | Redis cache (can be replaced with external instance)         |
+| hohu-admin-api | Backend image        | FastAPI application                                          |
+| hohu-admin-web | Frontend image       | Vue 3 static files + API reverse proxy                       |
+| nginx          | `nginx:alpine`       | SSL reverse proxy (optional)                                 |
+| certbot        | `certbot/certbot`    | Let's Encrypt auto-certificates (optional)                   |
 
-## 前置条件
+## Prerequisites
 
-- Linux 服务器（Ubuntu 22.04+ 推荐）
-- Docker 20.10+ 和 Docker Compose V2
-- 域名（如需 HTTPS）
-- 已安装 hohu-cli：`uv tool install hohu` 或 `pip install hohu`
+- Linux server (Ubuntu 22.04+ recommended)
+- Docker 20.10+ and Docker Compose V2
+- Domain name (if HTTPS is needed)
+- hohu-cli installed: `uv tool install hohu` or `pip install hohu`
 
-## 两种部署方式
+## Two Deployment Methods
 
-### 方式一：源码构建部署（适合二次开发）
+### Method 1: Build from Source (for Custom Development)
 
-从本地修改后的源码构建 Docker 镜像，然后部署。
+Build Docker images from your locally modified source code, then deploy.
 
 ```bash
-# 1. 创建并初始化项目
+# 1. Create and initialize the project
 hohu create my-project
 cd my-project
 hohu init
 
-# 2. 修改源码后构建镜像（自动初始化部署配置）
+# 2. Build images after modifying source code (auto-initializes deployment config)
 hohu build
 
-# 3. 按需编辑配置
+# 3. Edit configuration as needed
 nano .hohu/deploy/.env
 
-# 4. 部署
+# 4. Deploy
 hohu deploy
 ```
 
-### 方式二：官方镜像部署（适合直接使用）
+### Method 2: Official Image Deployment (for Direct Use)
 
-直接拉取官方预构建镜像部署，无需本地源码。
+Pull the official pre-built images for deployment — no local source code needed.
 
 ```bash
-# 1. 创建项目
+# 1. Create the project
 hohu create my-project
 cd my-project
 
-# 2. 初始化部署配置
+# 2. Initialize deployment config
 hohu deploy init
 
-# 3. 编辑配置
+# 3. Edit configuration
 nano .hohu/deploy/.env
 
-# 4. 部署
+# 4. Deploy
 hohu deploy
 ```
 
-## 构建镜像
+## Building Images
 
-`hohu build` 从本地源码构建 Docker 镜像。首次运行自动初始化 `.hohu/deploy/`（配置文件、`.env`、密钥），无需手动执行 `hohu deploy init`。
-
-```bash
-hohu build                  # 构建所有组件
-hohu build --only=backend   # 仅构建后端
-hohu build --only=frontend  # 仅构建前端
-hohu build --no-cache       # 不使用构建缓存
-hohu build --tag=v1.0.0     # 自定义镜像标签
-hohu build --reset          # 重置为官方镜像
-```
-
-| 参数         | 说明                                     |
-| ------------ | ---------------------------------------- |
-| `--only`     | 仅构建指定组件（`backend` / `frontend`） |
-| `--tag`      | 镜像标签，默认 `source`                  |
-| `--no-cache` | 不使用 Docker 构建缓存                   |
-| `--reset`    | 清除本地镜像配置，切回官方 GHCR 镜像     |
-
-## 部署命令
+`hohu build` builds Docker images from local source code. On first run, it automatically initializes `.hohu/deploy/` (config files, `.env`, secrets) — no need to run `hohu deploy init` manually.
 
 ```bash
-hohu deploy          # 一键部署（拉取 → 迁移 → 启动）
-hohu deploy init     # 初始化部署目录和 .env
-hohu deploy pull     # 拉取最新镜像并重启
-hohu deploy ps       # 查看服务状态
-hohu deploy logs     # 查看日志
-hohu deploy logs -f  # 实时跟踪日志
-hohu deploy restart  # 重启服务
-hohu deploy down     # 停止所有服务
-hohu migrate         # 仅运行数据库迁移
-hohu migrate --init  # 迁移 + 初始化数据（创建管理员用户和菜单）
+hohu build                  # Build all components
+hohu build --only=backend   # Build backend only
+hohu build --only=frontend  # Build frontend only
+hohu build --no-cache       # Build without cache
+hohu build --tag=v1.0.0     # Custom image tag
+hohu build --reset          # Reset to official images
 ```
 
-部署参数：
+| Parameter    | Description                                                      |
+| ------------ | ---------------------------------------------------------------- |
+| `--only`     | Build only the specified component (`backend` / `frontend`)      |
+| `--tag`      | Image tag, defaults to `source`                                  |
+| `--no-cache` | Disable Docker build cache                                       |
+| `--reset`    | Clear local image config and switch back to official GHCR images |
+
+## Deployment Commands
 
 ```bash
-hohu deploy --init          # 同时初始化数据库（创建管理员用户和菜单）
-hohu deploy --no-migrate    # 跳过数据库迁移
+hohu deploy          # One-click deploy (pull → migrate → start)
+hohu deploy init     # Initialize deployment directory and .env
+hohu deploy pull     # Pull latest images and restart
+hohu deploy ps       # View service status
+hohu deploy logs     # View logs
+hohu deploy logs -f  # Follow logs in real time
+hohu deploy restart  # Restart services
+hohu deploy down     # Stop all services
+hohu migrate         # Run database migrations only
+hohu migrate --init  # Migrate + initialize data (create admin user and menus)
 ```
 
-## 配置说明
+Deployment flags:
 
-所有配置通过 `.hohu/deploy/.env` 管理。首次部署时自动生成，密码和密钥已自动填充。
+```bash
+hohu deploy --init          # Also initialize the database (create admin user and menus)
+hohu deploy --no-migrate    # Skip database migrations
+```
 
-### 外部 PostgreSQL / Redis
+## Configuration Reference
 
-默认使用 Docker 容器运行 PostgreSQL 和 Redis。如需使用已有的外部实例，编辑 `.env`：
+All configuration is managed through `.hohu/deploy/.env`. It is auto-generated on first deployment, with passwords and secrets pre-filled.
+
+### External PostgreSQL / Redis
+
+By default, PostgreSQL and Redis run in Docker containers. To use existing external instances, edit `.env`:
 
 ```dotenv
-# 禁用内置 PostgreSQL
+# Disable built-in PostgreSQL
 ENABLE_POSTGRES=false
 DATABASE_URL=postgresql+asyncpg://user:password@your-pg-host:5432/dbname
 
-# 禁用内置 Redis
+# Disable built-in Redis
 ENABLE_REDIS=false
 REDIS_HOST=your-redis-host
 REDIS_PASSWORD=your-redis-password
 ```
 
-禁用后，对应容器不会启动，应用将连接到外部实例。
+When disabled, the corresponding container will not start, and the application will connect to the external instance.
 
-### 端口暴露
+### Port Exposure
 
-默认不暴露端口。按需在 `.env` 中配置：
+By default, no ports are exposed. Configure as needed in `.env`:
 
 ```dotenv
-WEB_PORT=0.0.0.0:9527     # 前端（绑定所有网卡）
-API_PORT=127.0.0.1:8000   # 后端（仅本地访问）
+WEB_PORT=0.0.0.0:9527     # Frontend (bind to all interfaces)
+API_PORT=127.0.0.1:8000   # Backend (local access only)
 PG_PORT=0.0.0.0:5433      # PostgreSQL
 REDIS_PORT=0.0.0.0:6379   # Redis
 ```
 
-留空或注释掉则不暴露。支持 `端口` 和 `IP:端口` 两种格式。
+Leave empty or comment out to not expose. Supports both `port` and `IP:port` formats.
 
-### Nginx 与 SSL
+### Nginx and SSL
 
-默认 `ENABLE_NGINX=false`，直接通过 `WEB_PORT` 访问前端。启用 Nginx 可获得 SSL 终止、域名绑定等能力。
+By default `ENABLE_NGINX=false`, and the frontend is accessed directly via `WEB_PORT`. Enabling Nginx provides SSL termination, domain binding, and more.
 
-编辑 `.env`：
+Edit `.env`:
 
 ```dotenv
 ENABLE_NGINX=true
@@ -181,27 +181,27 @@ DOMAIN=example.com
 ENABLE_SSL=true
 ```
 
-#### 方式一：Cloudflare Origin 证书（推荐）
+#### Option 1: Cloudflare Origin Certificate (Recommended)
 
-适合域名通过 Cloudflare 代理的场景。证书有效期最长 15 年，无需续期。
+Suitable when your domain is proxied through Cloudflare. Certificates are valid for up to 15 years with no renewal needed.
 
-1. Cloudflare Dashboard → **SSL/TLS** → **Origin Server** → **Create Certificate**
-2. 下载证书文件：
-   - **Origin Certificate** → 保存为 `.hohu/deploy/ssl/fullchain.pem`
-   - **Private Key** → 保存为 `.hohu/deploy/ssl/privkey.pem`
-3. Cloudflare Dashboard → **SSL/TLS** → **Overview** → 加密模式设为 **Full (Strict)**
+1. Cloudflare Dashboard > **SSL/TLS** > **Origin Server** > **Create Certificate**
+2. Download the certificate files:
+   - **Origin Certificate** > save as `.hohu/deploy/ssl/fullchain.pem`
+   - **Private Key** > save as `.hohu/deploy/ssl/privkey.pem`
+3. Cloudflare Dashboard > **SSL/TLS** > **Overview** > set encryption mode to **Full (Strict)**
 
-#### 方式二：Let's Encrypt（Certbot 自动证书）
+#### Option 2: Let's Encrypt (Certbot Auto-Certificate)
 
-适合直接暴露公网 IP 的服务器，证书自动申请和续期。
+Suitable for servers with a public IP directly exposed. Certificates are automatically requested and renewed.
 
-1. 在 `.env` 中设置域名：
+1. Set the domain in `.env`:
 
    ```dotenv
    DOMAIN=example.com
    ```
 
-2. 首次申请证书（确保域名已解析到服务器 IP）：
+2. Request the certificate for the first time (ensure the domain resolves to the server IP):
 
    ```bash
    cd .hohu/deploy
@@ -212,128 +212,128 @@ ENABLE_SSL=true
      --agree-tos --no-eff-email
    ```
 
-3. 修改 `.env` 指向 certbot 证书：
+3. Update `.env` to point to the certbot certificate:
 
    ```dotenv
    SSL_CERT_PATH=./certbot/live/example.com
    ```
 
-4. 启动部署 + 启用自动续期：
+4. Start the deployment + enable auto-renewal:
    ```bash
    hohu deploy
    cd .hohu/deploy && docker compose --profile certbot up -d certbot
    ```
 
-> Certbot 容器每 12 小时自动检查续期。Let's Encrypt 证书有效期 90 天，到期前 30 天自动续期。
+> The Certbot container checks for renewal every 12 hours. Let's Encrypt certificates are valid for 90 days and auto-renew 30 days before expiry.
 
-#### 方式三：手动证书
+#### Option 3: Manual Certificate
 
-适合已有证书文件的场景。将证书文件放入 `.hohu/deploy/ssl/`：
+Suitable when you already have certificate files. Place them in `.hohu/deploy/ssl/`:
 
 ```
 ssl/
-├── fullchain.pem   # 完整证书链
-└── privkey.pem     # 私钥
+├── fullchain.pem   # Full certificate chain
+└── privkey.pem     # Private key
 ```
 
-`.env` 保持默认：`SSL_CERT_PATH=./ssl`
+Keep `.env` at the default: `SSL_CERT_PATH=./ssl`
 
-### 使用自定义 Registry 镜像
+### Using a Custom Registry
 
-如果基于 hohu-admin 二次开发并推送到自己的 Registry，编辑 `.env`：
+If you are building on hohu-admin and pushing to your own registry, edit `.env`:
 
 ```dotenv
-# 使用 GHCR
+# Using GHCR
 API_IMAGE=ghcr.io/your-org/hohu-admin
 WEB_IMAGE=ghcr.io/your-org/hohu-admin-web
 
-# 或使用 Docker Hub
+# Or using Docker Hub
 API_IMAGE=your-user/hohu-admin
 WEB_IMAGE=your-user/hohu-admin-web
 
 IMAGE_TAG=v1.0.0
 ```
 
-然后执行 `hohu deploy pull` 拉取并重启。
+Then run `hohu deploy pull` to pull and restart.
 
-## 环境变量完整参考
+## Complete Environment Variable Reference
 
-| 变量                          | 默认值                          | 说明                                                     |
-| ----------------------------- | ------------------------------- | -------------------------------------------------------- |
-| `IMAGE_TAG`                   | `latest`                        | 镜像标签                                                 |
-| `API_IMAGE`                   | `ghcr.io/aihohu/hohu-admin`     | 后端镜像地址（源码构建时自动设为本地名称）               |
-| `WEB_IMAGE`                   | `ghcr.io/aihohu/hohu-admin-web` | 前端镜像地址（源码构建时自动设为本地名称）               |
-| `ENABLE_POSTGRES`             | `true`                          | 是否使用内置 PostgreSQL                                  |
-| `POSTGRES_USER`               | `hohu`                          | PostgreSQL 用户名                                        |
-| `POSTGRES_PASSWORD`           | 自动生成                        | PostgreSQL 密码                                          |
-| `POSTGRES_DB`                 | `hohu_admin`                    | 数据库名                                                 |
-| `DATABASE_URL`                | -                               | 外部 PostgreSQL 连接串（`ENABLE_POSTGRES=false` 时必填） |
-| `ENABLE_REDIS`                | `true`                          | 是否使用内置 Redis                                       |
-| `REDIS_PASSWORD`              | 自动生成                        | Redis 密码                                               |
-| `REDIS_HOST`                  | `127.0.0.1`                     | Redis 地址（`ENABLE_REDIS=false` 时必填）                |
-| `SECRET_KEY`                  | 自动生成                        | JWT 签名密钥                                             |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | `10080`                         | Token 有效期（分钟）                                     |
-| `WORKER_ID`                   | `1`                             | Snowflake Worker ID（多实例时需不同）                    |
-| `UVICORN_WORKERS`             | `4`                             | Uvicorn 进程数                                           |
-| `ENABLE_NGINX`                | `false`                         | 是否启用内置 Nginx                                       |
-| `DOMAIN`                      | `localhost`                     | 域名                                                     |
-| `HTTP_PORT`                   | `80`                            | HTTP 端口（启用 Nginx 后生效）                           |
-| `HTTPS_PORT`                  | `443`                           | HTTPS 端口（启用 Nginx 后生效）                          |
-| `WEB_PORT`                    | -                               | 前端端口暴露                                             |
-| `API_PORT`                    | -                               | 后端端口暴露                                             |
-| `PG_PORT`                     | -                               | PostgreSQL 端口暴露                                      |
-| `REDIS_PORT`                  | -                               | Redis 端口暴露                                           |
-| `SSL_CERT_PATH`               | `./ssl`                         | SSL 证书目录                                             |
-| `ENABLE_SSL`                  | `false`                         | 是否启用 HTTPS                                           |
+| Variable                      | Default                         | Description                                                                   |
+| ----------------------------- | ------------------------------- | ----------------------------------------------------------------------------- |
+| `IMAGE_TAG`                   | `latest`                        | Image tag                                                                     |
+| `API_IMAGE`                   | `ghcr.io/aihohu/hohu-admin`     | Backend image address (auto-set to local name when building from source)      |
+| `WEB_IMAGE`                   | `ghcr.io/aihohu/hohu-admin-web` | Frontend image address (auto-set to local name when building from source)     |
+| `ENABLE_POSTGRES`             | `true`                          | Whether to use the built-in PostgreSQL                                        |
+| `POSTGRES_USER`               | `hohu`                          | PostgreSQL username                                                           |
+| `POSTGRES_PASSWORD`           | Auto-generated                  | PostgreSQL password                                                           |
+| `POSTGRES_DB`                 | `hohu_admin`                    | Database name                                                                 |
+| `DATABASE_URL`                | -                               | External PostgreSQL connection string (required when `ENABLE_POSTGRES=false`) |
+| `ENABLE_REDIS`                | `true`                          | Whether to use the built-in Redis                                             |
+| `REDIS_PASSWORD`              | Auto-generated                  | Redis password                                                                |
+| `REDIS_HOST`                  | `127.0.0.1`                     | Redis address (required when `ENABLE_REDIS=false`)                            |
+| `SECRET_KEY`                  | Auto-generated                  | JWT signing secret                                                            |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | `10080`                         | Token validity period (minutes)                                               |
+| `WORKER_ID`                   | `1`                             | Snowflake Worker ID (must be unique across instances)                         |
+| `UVICORN_WORKERS`             | `4`                             | Number of Uvicorn processes                                                   |
+| `ENABLE_NGINX`                | `false`                         | Whether to enable the built-in Nginx                                          |
+| `DOMAIN`                      | `localhost`                     | Domain name                                                                   |
+| `HTTP_PORT`                   | `80`                            | HTTP port (effective when Nginx is enabled)                                   |
+| `HTTPS_PORT`                  | `443`                           | HTTPS port (effective when Nginx is enabled)                                  |
+| `WEB_PORT`                    | -                               | Frontend port exposure                                                        |
+| `API_PORT`                    | -                               | Backend port exposure                                                         |
+| `PG_PORT`                     | -                               | PostgreSQL port exposure                                                      |
+| `REDIS_PORT`                  | -                               | Redis port exposure                                                           |
+| `SSL_CERT_PATH`               | `./ssl`                         | SSL certificate directory                                                     |
+| `ENABLE_SSL`                  | `false`                         | Whether to enable HTTPS                                                       |
 
-## 数据持久化
+## Data Persistence
 
-Docker volumes 持久化以下数据，即使容器删除也不会丢失：
+Docker volumes persist the following data — it will not be lost even if containers are removed:
 
-| Volume              | 说明                   |
-| ------------------- | ---------------------- |
-| `hohu-pgdata`       | PostgreSQL 数据        |
-| `hohu-redisdata`    | Redis 数据             |
-| `hohu-certbot-www`  | Let's Encrypt 验证文件 |
-| `hohu-certbot-conf` | Let's Encrypt 证书     |
+| Volume              | Description                      |
+| ------------------- | -------------------------------- |
+| `hohu-pgdata`       | PostgreSQL data                  |
+| `hohu-redisdata`    | Redis data                       |
+| `hohu-certbot-www`  | Let's Encrypt verification files |
+| `hohu-certbot-conf` | Let's Encrypt certificates       |
 
-**清除所有数据（危险操作）：**
+**Clear all data (dangerous operation):**
 
 ```bash
 cd .hohu/deploy
 docker compose down -v
 ```
 
-## 常见问题
+## Troubleshooting
 
-### Nginx 启动失败
+### Nginx fails to start
 
-检查证书文件是否存在且路径正确：
+Check that the certificate files exist and the paths are correct:
 
 ```bash
 ls .hohu/deploy/ssl/fullchain.pem
 ls .hohu/deploy/ssl/privkey.pem
 ```
 
-不需要 SSL 时，保持 `ENABLE_NGINX=false`，通过 `WEB_PORT` 直接访问前端。
+If you don't need SSL, keep `ENABLE_NGINX=false` and access the frontend directly via `WEB_PORT`.
 
-### 数据库连接失败
+### Database connection failure
 
-确认 PostgreSQL 已就绪：
+Confirm PostgreSQL is ready:
 
 ```bash
 hohu deploy logs postgres
 ```
 
-使用外部 PostgreSQL 时，确认 `ENABLE_POSTGRES=false` 且 `DATABASE_URL` 配置正确。
+When using an external PostgreSQL, confirm that `ENABLE_POSTGRES=false` and `DATABASE_URL` is configured correctly.
 
-### 端口被占用
+### Port already in use
 
-修改 `.env` 中对应的端口配置。
+Change the corresponding port configuration in `.env`.
 
-### 查看完整日志
+### View full logs
 
 ```bash
-hohu deploy logs -f                # 全部服务
-hohu deploy logs -f hohu-admin-api # 仅后端
+hohu deploy logs -f                # All services
+hohu deploy logs -f hohu-admin-api # Backend only
 ```

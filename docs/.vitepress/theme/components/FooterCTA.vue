@@ -1,14 +1,17 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useI18n } from '../composables/useI18n';
+const { t, prefix, locale } = useI18n();
+</script>
 
 <template>
   <section class="footer-section">
     <div class="footer-inner">
       <!-- CTA Card -->
       <div class="cta-card">
-        <h2 class="cta-title">开始用 AI 构建你的后台系统</h2>
-        <p class="cta-desc">3 分钟部署 · 永久免费 · 完全开源</p>
+        <h2 class="cta-title">{{ t.ctaTitle }}</h2>
+        <p class="cta-desc">{{ t.ctaDesc }}</p>
         <div class="cta-actions">
-          <a class="btn btn-primary" href="/guide/quick-start">快速开始</a>
+          <a class="btn btn-primary" :href="`${prefix}/guide/quick-start`">{{ t.ctaStart }}</a>
           <a class="btn btn-github" href="https://github.com/aihohu/hohu-admin" target="_blank">Star on GitHub ⭐</a>
         </div>
       </div>
@@ -20,33 +23,43 @@
             <div class="logo-icon"></div>
             <span class="logo-text">HoHu Admin</span>
           </div>
-          <p class="footer-about">
-            AI 驱动的开源企业级后台管理平台
-            <br />
-            让开发像对话一样简单
-          </p>
+          <p class="footer-about" v-html="t.footerAbout"></p>
           <div class="social-links">
             <a class="social-icon" href="https://github.com/aihohu/hohu-admin" target="_blank" title="GitHub">GH</a>
-            <a class="social-icon" href="#" title="微信">微</a>
+            <a class="social-icon" href="#" title="WeChat">微</a>
             <a class="social-icon" href="#" title="Discord">DC</a>
           </div>
         </div>
         <div class="footer-col">
-          <h4 class="col-title">文档</h4>
+          <h4 class="col-title">{{ t.footerDocs }}</h4>
           <ul class="col-links">
-            <li><a href="/guide/quick-start">快速开始</a></li>
-            <li><a href="/guide/introduction">使用指南</a></li>
-            <li><a href="/guide/backend/introduction">后端架构</a></li>
-            <li><a href="https://show.hohu.org/docs" target="_blank">API 参考</a></li>
+            <li>
+              <a :href="`${prefix}/guide/quick-start`">{{ t.footerQuickStart }}</a>
+            </li>
+            <li>
+              <a :href="`${prefix}/guide/introduction`">{{ t.footerGuide }}</a>
+            </li>
+            <li>
+              <a :href="`${prefix}/guide/backend/introduction`">{{ t.footerBackend }}</a>
+            </li>
+            <li>
+              <a href="https://show.hohu.org/docs" target="_blank">{{ t.footerApiRef }}</a>
+            </li>
           </ul>
         </div>
         <div class="footer-col">
-          <h4 class="col-title">社区</h4>
+          <h4 class="col-title">{{ t.footerCommunity }}</h4>
           <ul class="col-links">
             <li><a href="https://github.com/aihohu/hohu-admin" target="_blank">GitHub</a></li>
-            <li><a href="#">微信交流群</a></li>
-            <li><a href="https://github.com/aihohu/hohu-admin/issues" target="_blank">问题反馈</a></li>
-            <li><a href="#">贡献指南</a></li>
+            <li>
+              <a href="#">{{ t.footerWechat }}</a>
+            </li>
+            <li>
+              <a href="https://github.com/aihohu/hohu-admin/issues" target="_blank">{{ t.footerFeedback }}</a>
+            </li>
+            <li>
+              <a href="#">{{ t.footerContributing }}</a>
+            </li>
           </ul>
         </div>
       </footer>
@@ -54,8 +67,10 @@
       <div class="footer-bottom">
         <span>© 2025 HoHu · MIT License</span>
         <div class="lang-switch">
-          <span class="lang-active">中文</span>
-          <a href="/en/">English</a>
+          <span v-if="locale === 'en'" class="lang-active">{{ t.langEn }}</span>
+          <a v-if="locale !== 'en'" href="/">{{ t.langEn }}</a>
+          <span v-if="locale === 'zh'" class="lang-active">{{ t.langZh }}</span>
+          <a v-if="locale !== 'zh'" href="/zh/">{{ t.langZh }}</a>
         </div>
       </div>
     </div>

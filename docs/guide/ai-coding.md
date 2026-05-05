@@ -1,226 +1,226 @@
 ---
-title: AI 编程
-description: 使用 Claude Code 等 AI 编程工具快速搭建和开发 HoHu Admin 项目，涵盖 CLAUDE.md 配置、开发流程和最佳实践
+title: AI Coding
+description: Use AI coding tools like Claude Code to rapidly build and develop HoHu Admin projects, covering CLAUDE.md configuration, development workflows, and best practices
 ---
 
-# AI 编程
+# AI Coding
 
-HoHu Admin 从设计之初就为 **AI 辅助开发** 做了深度优化。本文介绍如何借助 AI 编程工具（推荐 [Claude Code](https://claude.ai/code)）快速搭建和开发项目。
+HoHu Admin has been deeply optimized for **AI-assisted development** from the ground up. This guide covers how to leverage AI coding tools (recommended: [Claude Code](https://claude.ai/code)) to rapidly build and develop your project.
 
-## 推荐工具
+## Recommended Tools
 
-| 工具                    | 类型           | 适用场景                                   |
-| ----------------------- | -------------- | ------------------------------------------ |
-| **Claude Code**（推荐） | CLI / IDE 插件 | 全流程开发：代码生成、重构、调试、Git 操作 |
-| Cursor                  | IDE            | 实时代码补全和对话式编辑                   |
-| GitHub Copilot          | IDE 插件       | 行级代码补全                               |
+| Tool                          | Type             | Use Case                                                                        |
+| ----------------------------- | ---------------- | ------------------------------------------------------------------------------- |
+| **Claude Code** (recommended) | CLI / IDE plugin | Full-cycle development: code generation, refactoring, debugging, Git operations |
+| Cursor                        | IDE              | Real-time code completion and conversational editing                            |
+| GitHub Copilot                | IDE plugin       | Line-level code completion                                                      |
 
-**为什么推荐 Claude Code？**
+**Why recommend Claude Code?**
 
-- 直接读取整个项目上下文，理解模块间依赖关系
-- 内置 CLAUDE.md 支持，自动遵循项目编码规范
-- 支持终端操作：运行测试、Git 提交、代码搜索一体化
-- 对 Python (FastAPI) 和 TypeScript (Vue) 都有出色的理解能力
+- Reads the entire project context and understands inter-module dependencies
+- Built-in CLAUDE.md support — automatically follows project coding conventions
+- Supports terminal operations: run tests, Git commits, code search — all in one place
+- Excellent understanding of both Python (FastAPI) and TypeScript (Vue)
 
-## 快速开始
+## Quick Start
 
-### 1. 用 hohu CLI 创建项目
+### 1. Create a Project with hohu CLI
 
 ```bash
-# 安装 CLI
+# Install the CLI
 uv tool install hohu
 
-# 创建项目，交互式选择组件
+# Create a project with interactive component selection
 hohu create my-project
 cd my-project
 
-# 安装依赖
+# Install dependencies
 hohu init
 
-# 启动开发服务
+# Start development servers
 hohu dev
 ```
 
-项目创建后，每个子项目目录下已预置 `CLAUDE.md` 文件，AI 工具打开时会自动读取，无需额外配置。
+After the project is created, each sub-project directory includes a pre-configured `CLAUDE.md` file that AI tools automatically read when opened — no additional configuration needed.
 
-### 2. 用 Claude Code 开始开发
+### 2. Start Developing with Claude Code
 
 ```bash
-# 安装 Claude Code（需要 Node.js 18+）
+# Install Claude Code (requires Node.js 18+)
 npm install -g @anthropic-ai/claude-code
 
-# 进入后端目录，启动 Claude Code
+# Enter the backend directory and start Claude Code
 cd hohu-admin
 claude
 
-# 或进入前端目录
+# Or enter the frontend directory
 cd ../hohu-admin-web
 claude
 ```
 
-启动后直接用自然语言描述需求即可，例如：
+Once started, simply describe your requirements in natural language, for example:
 
 ```
-> 给用户模块添加一个"头像"字段，需要更新数据库模型、Schema 和 API
+> Add an "avatar" field to the user module. Update the database model, Schema, and API.
 ```
 
-Claude Code 会自动读取 `CLAUDE.md` 中的项目规范，按照正确的分层模式生成代码。
+Claude Code will automatically read the project conventions from `CLAUDE.md` and generate code following the correct layered pattern.
 
-## 项目约定（AI 自动识别）
+## Project Conventions (Auto-Detected by AI)
 
-HoHu Admin 的架构设计让 AI 能准确理解代码边界。以下是 AI 工具会自动遵循的关键约定：
+HoHu Admin's architecture design allows AI to accurately understand code boundaries. Here are the key conventions that AI tools will automatically follow:
 
-### 后端分层模式
-
-```
-API 层 (app/modules/<module>/api.py)
-  ↓ 调用
-Service 层 (app/modules/<module>/service.py)
-  ↓ 操作
-Model 层 (app/modules/<module>/models/)
-```
-
-- **API 层**：处理 HTTP 请求，调用 Service，负责 `await db.commit()`
-- **Service 层**：业务逻辑，抛出领域异常，**绝不自行 commit**
-- **Model 层**：`SQLAlchemy 2.0 Mapped[T]`，主键使用 Snowflake ID
-
-### 前端模块模式
+### Backend Layered Pattern
 
 ```
-页面 (src/views/<module>/index.vue)
-  ↓ 调用
-API 服务 (src/service/api/<module>.ts)
-  ↓ 使用
-类型定义 (src/typings/api/<module>.ts)
+API Layer (app/modules/<module>/api.py)
+  ↓ calls
+Service Layer (app/modules/<module>/service.py)
+  ↓ operates on
+Model Layer (app/modules/<module>/models/)
 ```
 
-- 新增页面后需执行 `pnpm gen-route` 重新生成路由
+- **API Layer**: Handles HTTP requests, calls Service, responsible for `await db.commit()`
+- **Service Layer**: Business logic, raises domain exceptions, **never commits on its own**
+- **Model Layer**: `SQLAlchemy 2.0 Mapped[T]`, primary keys use Snowflake ID
 
-### 命名规范
+### Frontend Module Pattern
 
-| 层级            | 规范         | 示例                            |
-| --------------- | ------------ | ------------------------------- |
-| 后端 Python     | `snake_case` | `user_name`, `get_user_list`    |
-| 前端 TypeScript | `camelCase`  | `userName`, `getUserList`       |
-| 数据库列        | `snake_case` | `user_name`                     |
-| API 字段传输    | `camelCase`  | `userName`（Pydantic 自动转换） |
+```
+Page (src/views/<module>/index.vue)
+  ↓ calls
+API Service (src/service/api/<module>.ts)
+  ↓ uses
+Type Definitions (src/typings/api/<module>.ts)
+```
 
-### 响应格式
+- After adding a new page, run `pnpm gen-route` to regenerate routes
 
-所有 API 统一返回：
+### Naming Conventions
+
+| Layer               | Convention   | Example                                 |
+| ------------------- | ------------ | --------------------------------------- |
+| Backend Python      | `snake_case` | `user_name`, `get_user_list`            |
+| Frontend TypeScript | `camelCase`  | `userName`, `getUserList`               |
+| Database columns    | `snake_case` | `user_name`                             |
+| API field transfer  | `camelCase`  | `userName` (auto-converted by Pydantic) |
+
+### Response Format
+
+All APIs uniformly return:
 
 ```json
 { "code": 200, "msg": "success", "data": {} }
 ```
 
-Snowflake ID 在 JSON 中序列化为**字符串**，防止 JavaScript BigInt 精度丢失。
+Snowflake IDs are serialized as **strings** in JSON to prevent JavaScript BigInt precision loss.
 
-## AI 辅助开发实战
+## AI-Assisted Development in Practice
 
-### 场景一：新增业务模块
+### Scenario 1: Adding a New Business Module
 
-向 AI 描述需求，它会按标准分层自动生成代码：
-
-```
-> 创建一个"商品管理"模块，包含商品名称、价格、库存、分类字段，
-> 需要完整的 CRUD 接口和分页查询。
-```
-
-AI 会自动：
-
-1. 在 `app/modules/` 下创建 `product/` 模块目录
-2. 定义 SQLAlchemy Model（含 Snowflake ID）
-3. 编写 Pydantic Schema（自动 `to_camel` 别名）
-4. 实现 Service 层业务逻辑
-5. 注册 API 路由
-
-### 场景二：前后端联调
+Describe the requirements to AI, and it will auto-generate code following the standard layers:
 
 ```
-> 后端已经有了商品管理接口，帮我在前端创建对应的管理页面，
-> 包含列表、新增、编辑、删除功能
+> Create a "product management" module with fields for product name, price, stock, and category.
+> Include full CRUD APIs and paginated queries.
 ```
 
-AI 会自动：
+AI will automatically:
 
-1. 创建 `src/typings/api/product.ts` 类型定义（匹配后端 Schema）
-2. 创建 `src/service/api/product.ts` 请求封装
-3. 创建 `src/views/product/index.vue` 页面（使用 NaiveUI 组件）
-4. 提示你执行 `pnpm gen-route` 注册路由
+1. Create a `product/` module directory under `app/modules/`
+2. Define the SQLAlchemy Model (with Snowflake ID)
+3. Write Pydantic Schemas (with auto `to_camel` aliases)
+4. Implement the Service layer business logic
+5. Register API routes
 
-### 场景三：数据库变更
+### Scenario 2: Frontend-Backend Integration
 
 ```
-> 给商品表添加"状态"字段，类型是枚举（上架/下架），默认上架
+> The backend already has product management APIs. Help me create the corresponding management page on the frontend,
+> including list, add, edit, and delete functionality.
 ```
 
-AI 会：
+AI will automatically:
 
-1. 修改 SQLAlchemy Model
-2. 更新对应 Schema
-3. 生成 Alembic 迁移：`alembic revision --autogenerate -m "add product status"`
-4. 提示你运行 `alembic upgrade head`
+1. Create `src/typings/api/product.ts` type definitions (matching backend Schemas)
+2. Create `src/service/api/product.ts` request wrappers
+3. Create `src/views/product/index.vue` page (using NaiveUI components)
+4. Prompt you to run `pnpm gen-route` to register the route
 
-## CLAUDE.md 配置说明
+### Scenario 3: Database Changes
 
-每个子项目的 `CLAUDE.md` 文件是 AI 工具的"项目说明书"。HoHu Admin 已预置完善的配置：
+```
+> Add a "status" field to the product table. It should be an enum (on sale / off sale), defaulting to on sale.
+```
 
-| 子项目         | CLAUDE.md 位置             | 包含内容                                   |
-| -------------- | -------------------------- | ------------------------------------------ |
-| hohu-admin     | `hohu-admin/CLAUDE.md`     | 后端分层规范、依赖注入、异常处理、测试命令 |
-| hohu-admin-web | `hohu-admin-web/CLAUDE.md` | 前端组件规范、路由生成、状态管理、构建命令 |
-| hohu-admin-app | `hohu-admin-app/CLAUDE.md` | 移动端组件规范、多端适配、构建命令         |
-| hohu-cli       | `hohu-cli/CLAUDE.md`       | CLI 开发规范、i18n、测试命令               |
+AI will:
 
-::: tip 自定义 CLAUDE.md
-你可以编辑各子项目的 `CLAUDE.md`，添加团队特有的约定（如业务术语、代码风格偏好）。AI 工具会在每次会话开始时自动读取。
+1. Modify the SQLAlchemy Model
+2. Update the corresponding Schema
+3. Generate an Alembic migration: `alembic revision --autogenerate -m "add product status"`
+4. Prompt you to run `alembic upgrade head`
+
+## CLAUDE.md Configuration Reference
+
+Each sub-project's `CLAUDE.md` file serves as the "project manual" for AI tools. HoHu Admin ships with comprehensive pre-configured files:
+
+| Sub-project    | CLAUDE.md location         | Contents                                                                           |
+| -------------- | -------------------------- | ---------------------------------------------------------------------------------- |
+| hohu-admin     | `hohu-admin/CLAUDE.md`     | Backend layering conventions, dependency injection, error handling, test commands  |
+| hohu-admin-web | `hohu-admin-web/CLAUDE.md` | Frontend component conventions, route generation, state management, build commands |
+| hohu-admin-app | `hohu-admin-app/CLAUDE.md` | Mobile component conventions, multi-platform adaptation, build commands            |
+| hohu-cli       | `hohu-cli/CLAUDE.md`       | CLI development conventions, i18n, test commands                                   |
+
+::: tip Customizing CLAUDE.md
+You can edit each sub-project's `CLAUDE.md` to add team-specific conventions (such as business terminology or code style preferences). AI tools will automatically read them at the start of each session.
 :::
 
-## 常用 AI 提示词参考
+## Common AI Prompt Reference
 
-### 后端开发
-
-```
-# 新增接口
-> 在用户模块添加一个修改密码的接口，需要验证旧密码
-
-# 修复 Bug
-> 启动后报错 "relation 'user' does not exist"，帮我排查
-
-# 代码审查
-> 审查 app/modules/product/service.py 的代码质量
-```
-
-### 前端开发
+### Backend Development
 
 ```
-# 新增页面
-> 创建一个商品管理页面，使用 NaiveUI 表格组件，支持搜索和分页
+# Add a new API endpoint
+> Add a change-password endpoint to the user module. It needs to verify the old password.
 
-# 样式调整
-> 把登录页面的表单居中显示，宽度改为 400px
+# Fix a bug
+> Getting "relation 'user' does not exist" error on startup. Help me troubleshoot.
 
-# 类型对接
-> 根据后端 ProductSchema 生成前端类型定义和 API 请求函数
+# Code review
+> Review the code quality of app/modules/product/service.py
 ```
 
-### 跨项目协作
+### Frontend Development
 
 ```
-> 后端新增了商品分类接口，帮我同步更新前端的类型定义和 API 调用
+# Add a new page
+> Create a product management page using NaiveUI table components with search and pagination support.
+
+# Style adjustment
+> Center the login page form and change its width to 400px.
+
+# Type integration
+> Generate frontend type definitions and API request functions based on the backend ProductSchema.
 ```
 
-## 效率提升建议
+### Cross-Project Collaboration
 
-1. **先读后改**：让 AI 先阅读相关代码再修改，避免脱离上下文
-2. **小步迭代**：一次描述一个小需求，逐步构建，而非一次性生成整个模块
-3. **利用 CLAUDE.md**：把团队约定写入 CLAUDE.md，让 AI 自动遵循
-4. **善用 CLI**：`hohu dev` 一键启动所有服务，随时验证 AI 生成的代码
-5. **及时验证**：AI 生成代码后，立即用 `hohu dev` 启动项目验证功能
+```
+> The backend has new product category APIs. Help me update the frontend type definitions and API calls accordingly.
+```
 
-## 相关资源
+## Productivity Tips
 
-- [快速开始](/guide/quick-start) — 用 hohu CLI 一键创建项目
-- [权限控制](/guide/auth) — RBAC 权限系统详解
-- [分页](/guide/page) — 后端分页工具和前端表格组件
-- [源码仓库](/guide/src) — 各子项目 GitHub 地址
+1. **Read before modifying**: Have AI read the relevant code before making changes to avoid operating without context.
+2. **Small iterations**: Describe one small requirement at a time and build incrementally, rather than generating an entire module at once.
+3. **Leverage CLAUDE.md**: Write team conventions into CLAUDE.md so AI follows them automatically.
+4. **Use the CLI**: `hohu dev` starts all services in one command — verify AI-generated code at any time.
+5. **Verify promptly**: After AI generates code, immediately start the project with `hohu dev` to verify the functionality.
+
+## Related Resources
+
+- [Quick Start](/guide/quick-start) — Create a project with hohu CLI in one click
+- [Permission Control](/guide/auth) — RBAC permission system explained
+- [Pagination](/guide/page) — Backend pagination utilities and frontend table components
+- [Source Repositories](/guide/src) — GitHub addresses for each sub-project

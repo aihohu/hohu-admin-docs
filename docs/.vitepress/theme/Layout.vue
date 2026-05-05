@@ -7,7 +7,8 @@ const { Layout } = DefaultTheme;
 const route = useRoute();
 
 function updateLandingClass() {
-  const isLanding = route.path === '/' || route.path === '/index.html';
+  const isLanding =
+    route.path === '/' || route.path === '/index.html' || route.path === '/zh/' || route.path === '/zh/index.html';
   if (isLanding) {
     document.documentElement.classList.add('landing-page');
   } else {

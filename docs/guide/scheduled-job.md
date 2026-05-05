@@ -1,35 +1,35 @@
 ---
-title: 定时任务
-description: HoHu Admin 基于 APScheduler 的定时任务模块，支持 Cron 表达式和固定间隔调度，提供可视化任务管理与执行日志
+title: Scheduled Jobs
+description: HoHu Admin scheduled job module based on APScheduler, supporting Cron expressions and fixed interval scheduling, with visual task management and execution logs
 ---
 
-# 定时任务
+# Scheduled Jobs
 
-HoHu Admin 内置通用定时任务模块，基于 APScheduler 实现任务的注册、调度、执行和日志记录。支持 Cron 表达式（5/6 字段）和固定间隔两种调度方式，提供可视化任务管理界面。
+HoHu Admin includes a built-in scheduled job module based on APScheduler for task registration, scheduling, execution, and logging. It supports two scheduling modes — Cron expressions (5/6 fields) and fixed intervals — and provides a visual task management interface.
 
-## 核心流程
+## Core Flow
 
 ```
-注册任务 (@register_task)  →  前端创建调度配置  →  调度器按计划触发
+Register task (@register_task)  →  Frontend creates schedule config  →  Scheduler triggers on schedule
                                                         ↓
-                                              job_runner 执行并记录日志
+                                              job_runner executes and logs
                                                         ↓
-                                              任务日志页面查看结果
+                                              View results on the task log page
 ```
 
-## 概念
+## Concepts
 
-| 术语                | 说明                                                           |
-| ------------------- | -------------------------------------------------------------- |
-| 任务标识（Job Key） | 任务函数的唯一标识，由后端 `@register_task` 装饰器注册         |
-| 调度类型            | `cron`（Cron 表达式）或 `interval`（固定间隔）                 |
-| 并发策略            | `允许`：同一任务可并行执行；`禁止`：上一次未完成时跳过本次触发 |
-| 状态                | `启用`（注册到调度器，按计划执行）/ `停用`（不执行）           |
-| 任务日志            | 每次执行自动记录：开始时间、结束时间、耗时、状态、异常信息     |
+| Term               | Description                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------- |
+| Job Key            | Unique identifier for the task function, registered via the backend `@register_task` decorator |
+| Schedule Type      | `cron` (Cron expression) or `interval` (fixed interval)                                        |
+| Concurrency Policy | `Allow`: same task can run in parallel; `Forbid`: skip trigger if previous run hasn't finished |
+| Status             | `Enabled` (registered to scheduler, runs on schedule) / `Disabled` (does not run)              |
+| Task Log           | Each execution is auto-logged: start time, end time, duration, status, error info              |
 
-## 注册任务
+## Registering Tasks
 
-后端使用 `@register_task` 装饰器将函数注册为可调度任务：
+The backend uses the `@register_task` decorator to register functions as schedulable tasks:
 
 ```python
 # app/modules/job/tasks/log_tasks.py
@@ -37,171 +37,171 @@ from app.modules.job.task_registry import register_task
 
 @register_task("clean_logs")
 async def clean_logs(args: dict | None = None):
-    """清理过期日志"""
+    """Clean expired logs"""
     ...
 ```
 
-- 装饰器参数即**任务标识**，前端创建任务时从下拉列表选择
-- 函数签名统一为 `async def xxx(args: dict | None = None)`
-- 任务参数通过 `args` 传入，前端以 JSON 格式配置
+- The decorator argument is the **Job Key** — selected from a dropdown when creating tasks on the frontend
+- The function signature is always `async def xxx(args: dict | None = None)`
+- Task parameters are passed in via `args`, configured as JSON on the frontend
 
 ::: tip
-新注册的任务需要**重启后端**才能在前端下拉列表中出现。
+Newly registered tasks require a **backend restart** before they appear in the frontend dropdown list.
 :::
 
-## 创建任务
+## Creating Tasks
 
-进入 **系统管理 → 定时任务**，点击"新增"按钮：
+Navigate to **System Management > Scheduled Jobs** and click the "Add" button:
 
-| 字段     | 说明                           | 示例           |
-| -------- | ------------------------------ | -------------- |
-| 任务名称 | 自定义显示名称                 | `清理过期日志` |
-| 任务标识 | 从下拉列表选择已注册的任务函数 | `clean_logs`   |
-| 调度类型 | Cron 表达式 或 固定间隔        | —              |
-| 任务参数 | JSON 格式的函数参数            | `{"days": 30}` |
-| 状态     | 创建时默认停用，需手动启用     | —              |
-| 并发策略 | 是否允许同一任务并行执行       | 禁止           |
-| 备注     | 备注信息                       | —              |
+| Field              | Description                                               | Example              |
+| ------------------ | --------------------------------------------------------- | -------------------- |
+| Task Name          | Custom display name                                       | `Clean Expired Logs` |
+| Job Key            | Select a registered task function from the dropdown       | `clean_logs`         |
+| Schedule Type      | Cron expression or fixed interval                         | —                    |
+| Task Parameters    | JSON-formatted function parameters                        | `{"days": 30}`       |
+| Status             | Disabled by default on creation, must be manually enabled | —                    |
+| Concurrency Policy | Whether to allow the same task to run in parallel         | Forbid               |
+| Remark             | Additional notes                                          | —                    |
 
-### Cron 模式
+### Cron Mode
 
-支持 5 字段和 6 字段两种 Cron 表达式：
+Supports both 5-field and 6-field Cron expressions:
 
-**5 字段**（分 时 日 月 周）：
-
-```
-* * * * *      # 每分钟
-0 * * * *      # 每小时
-0 0 * * *      # 每天 00:00
-0 0 * * 1      # 每周一 00:00
-0 0 1 * *      # 每月 1 日 00:00
-0 0 1 1 *      # 每年 1 月 1 日 00:00
-0 30 2 * *     # 每天凌晨 2:30
-```
-
-**6 字段**（秒 分 时 日 月 周）：
+**5 fields** (minute hour day month weekday):
 
 ```
-*/10 * * * * *  # 每 10 秒
-0 */5 * * * *   # 每 5 分钟的第 0 秒
-0 0 12 * * *    # 每天 12:00:00
-30 0 2 * * *    # 每天凌晨 2:00:30
+* * * * *      # Every minute
+0 * * * *      # Every hour
+0 0 * * *      # Every day at 00:00
+0 0 * * 1      # Every Monday at 00:00
+0 0 1 * *      # On the 1st of every month at 00:00
+0 0 1 1 *      # On January 1st at 00:00
+0 30 2 * *     # Every day at 2:30 AM
 ```
 
-前端提供常用预设按钮，点击即可自动填入。
+**6 fields** (second minute hour day month weekday):
 
-### 固定间隔模式
+```
+*/10 * * * * *  # Every 10 seconds
+0 */5 * * * *   # At second 0 of every 5th minute
+0 0 12 * * *    # Every day at 12:00:00
+30 0 2 * * *    # Every day at 2:00:30
+```
 
-选择"固定间隔"调度类型后，设置间隔值和单位：
+The frontend provides common preset buttons — click to auto-fill the expression.
 
-| 间隔值 | 单位 | 含义               |
-| ------ | ---- | ------------------ |
-| 10     | 秒   | 每 10 秒执行一次   |
-| 30     | 分钟 | 每 30 分钟执行一次 |
-| 1      | 小时 | 每 1 小时执行一次  |
-| 1      | 天   | 每 1 天执行一次    |
+### Fixed Interval Mode
 
-## 管理任务
+Select "Fixed Interval" as the schedule type, then set the interval value and unit:
 
-### 启用 / 停用
+| Interval Value | Unit    | Meaning              |
+| -------------- | ------- | -------------------- |
+| 10             | Seconds | Run every 10 seconds |
+| 30             | Minutes | Run every 30 minutes |
+| 1              | Hours   | Run every 1 hour     |
+| 1              | Days    | Run every 1 day      |
 
-- 点击操作列的 **启用** / **停用** 按钮切换状态
-- 启用后任务立即注册到调度器，按计划执行
-- 停用后从调度器移除，不再触发
+## Managing Tasks
 
-### 立即执行
+### Enable / Disable
 
-点击 **立即执行** 可无视任务状态，手动触发一次执行。适用于调试或临时运行。
+- Click the **Enable** / **Disable** button in the actions column to toggle status
+- When enabled, the task is immediately registered to the scheduler and runs on schedule
+- When disabled, it is removed from the scheduler and will no longer trigger
+
+### Run Immediately
+
+Click **Run Immediately** to manually trigger a one-time execution regardless of the task's status. Useful for debugging or ad-hoc runs.
 
 ::: tip
-立即执行不受启用/停用状态限制，停用的任务也可以手动触发。
+Running immediately is not restricted by enable/disable status — disabled tasks can also be manually triggered.
 :::
 
-### 删除
+### Delete
 
-- 只有**停用状态**的任务才能删除
-- 删除任务时会**级联删除**该任务的所有执行日志
+- Only tasks in **disabled status** can be deleted
+- Deleting a task will **cascade delete** all its execution logs
 
-### 批量删除
+### Batch Delete
 
-勾选多个任务后，点击顶部"批量删除"按钮。同样只删除已停用的任务。
+Select multiple tasks, then click the "Batch Delete" button at the top. Only disabled tasks will be deleted.
 
-## 任务日志
+## Task Logs
 
-进入 **系统管理 → 任务日志**，可查看所有任务的执行记录：
+Navigate to **System Management > Task Logs** to view execution records for all tasks:
 
-| 字段     | 说明                 |
-| -------- | -------------------- |
-| 任务名称 | 执行时的任务名称     |
-| 任务标识 | 执行时的任务标识     |
-| 执行状态 | 成功 / 失败 / 执行中 |
-| 异常信息 | 失败时的错误堆栈     |
-| 开始时间 | 执行开始时间         |
-| 结束时间 | 执行结束时间         |
-| 耗时     | 执行耗时（毫秒）     |
+| Field      | Description                       |
+| ---------- | --------------------------------- |
+| Task Name  | Task name at execution time       |
+| Job Key    | Job key at execution time         |
+| Status     | Success / Failed / Running        |
+| Error Info | Error stack trace on failure      |
+| Start Time | Execution start time              |
+| End Time   | Execution end time                |
+| Duration   | Execution duration (milliseconds) |
 
-### 搜索
+### Search
 
-支持按以下条件筛选：
+Filter by the following criteria:
 
-- **任务标识** — 模糊匹配
-- **执行状态** — 成功 / 失败 / 执行中
-- **时间范围** — 日期时间范围选择
+- **Job Key** — fuzzy match
+- **Status** — Success / Failed / Running
+- **Time Range** — date-time range picker
 
-### 清理日志
+### Clean Logs
 
-点击 **清理日志** 按钮，自动删除 30 天前的日志记录。
+Click the **Clean Logs** button to automatically delete log records older than 30 days.
 
-也可通过注册 `clean_logs` 任务设置定时自动清理。
+You can also set up automatic periodic cleanup by registering the `clean_logs` task.
 
-### 批量删除
+### Batch Delete
 
-勾选多条日志后，点击顶部"批量删除"按钮。
+Select multiple log entries, then click the "Batch Delete" button at the top.
 
-## API 参考
+## API Reference
 
-### 任务管理
+### Task Management
 
-| 方法   | 路径                       | 说明                      |
-| ------ | -------------------------- | ------------------------- |
-| GET    | `/system/job/list`         | 获取任务列表（分页）      |
-| GET    | `/system/job/registered`   | 获取已注册的任务标识列表  |
-| POST   | `/system/job/add`          | 创建任务                  |
-| PUT    | `/system/job/update`       | 更新任务                  |
-| PUT    | `/system/job/status`       | 更新任务状态（启用/停用） |
-| DELETE | `/system/job/{jobId}`      | 删除任务                  |
-| POST   | `/system/job/batch-delete` | 批量删除任务              |
-| POST   | `/system/job/run/{jobId}`  | 立即执行任务              |
+| Method | Path                       | Description                         |
+| ------ | -------------------------- | ----------------------------------- |
+| GET    | `/system/job/list`         | Get task list (paginated)           |
+| GET    | `/system/job/registered`   | Get list of registered job keys     |
+| POST   | `/system/job/add`          | Create a task                       |
+| PUT    | `/system/job/update`       | Update a task                       |
+| PUT    | `/system/job/status`       | Update task status (enable/disable) |
+| DELETE | `/system/job/{jobId}`      | Delete a task                       |
+| POST   | `/system/job/batch-delete` | Batch delete tasks                  |
+| POST   | `/system/job/run/{jobId}`  | Run a task immediately              |
 
-### 任务日志
+### Task Logs
 
-| 方法   | 路径                           | 说明                 |
-| ------ | ------------------------------ | -------------------- |
-| GET    | `/system/job-log/list`         | 获取日志列表（分页） |
-| DELETE | `/system/job-log/clean`        | 清理指定天数前的日志 |
-| POST   | `/system/job-log/batch-delete` | 批量删除日志         |
+| Method | Path                           | Description                          |
+| ------ | ------------------------------ | ------------------------------------ |
+| GET    | `/system/job-log/list`         | Get log list (paginated)             |
+| DELETE | `/system/job-log/clean`        | Clean logs older than specified days |
+| POST   | `/system/job-log/batch-delete` | Batch delete logs                    |
 
-## 相关文件
+## Related Files
 
-### 后端
+### Backend
 
-- `app/modules/job/models/job.py` — SysJob、SysJobLog 数据模型
-- `app/modules/job/schemas/job.py` — 请求/响应 Schema
-- `app/modules/job/service/job_service.py` — 任务管理服务
-- `app/modules/job/service/job_log_service.py` — 日志管理服务
-- `app/modules/job/api/job.py` — 任务 API 路由
-- `app/modules/job/api/job_log.py` — 日志 API 路由
-- `app/modules/job/job_runner.py` — 任务执行引擎
-- `app/modules/job/task_registry.py` — 任务注册中心
-- `app/modules/job/tasks/log_tasks.py` — 内置任务示例
-- `app/core/scheduler.py` — APScheduler 封装
+- `app/modules/job/models/job.py` — SysJob, SysJobLog data models
+- `app/modules/job/schemas/job.py` — Request/response Schemas
+- `app/modules/job/service/job_service.py` — Task management service
+- `app/modules/job/service/job_log_service.py` — Log management service
+- `app/modules/job/api/job.py` — Task API routes
+- `app/modules/job/api/job_log.py` — Log API routes
+- `app/modules/job/job_runner.py` — Task execution engine
+- `app/modules/job/task_registry.py` — Task registry
+- `app/modules/job/tasks/log_tasks.py` — Built-in task examples
+- `app/core/scheduler.py` — APScheduler wrapper
 
-### 前端
+### Frontend
 
-- `src/views/system/job/index.vue` — 任务管理页面
-- `src/views/system/job/modules/job-operate-drawer.vue` — 新增/编辑抽屉
-- `src/views/system/job/modules/job-search.vue` — 搜索表单
-- `src/views/system/job-log/index.vue` — 任务日志页面
-- `src/views/system/job-log/modules/job-log-search.vue` — 日志搜索表单
-- `src/service/api/system.ts` — API 函数
-- `src/typings/api/system-manage.d.ts` — 类型定义
+- `src/views/system/job/index.vue` — Task management page
+- `src/views/system/job/modules/job-operate-drawer.vue` — Add/edit drawer
+- `src/views/system/job/modules/job-search.vue` — Search form
+- `src/views/system/job-log/index.vue` — Task log page
+- `src/views/system/job-log/modules/job-log-search.vue` — Log search form
+- `src/service/api/system.ts` — API functions
+- `src/typings/api/system-manage.d.ts` — Type definitions

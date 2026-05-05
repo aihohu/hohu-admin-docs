@@ -1,33 +1,33 @@
 ---
-title: 目录结构
-description: HoHu Admin 后端项目目录结构说明，采用模块化分层设计，API、Service、Model 职责分离
+title: Directory Structure
+description: HoHu Admin backend project directory structure overview, featuring a modular layered design with separated responsibilities for API, Service, and Model layers
 ---
 
-# 目录结构
+# Directory Structure
 
-项目采用模块化组织方式，各模块职责明确、功能独立，结构清晰，便于维护与管理。
+The project follows a modular organization where each module has clear responsibilities and independent functionality, resulting in a clean structure that is easy to maintain and manage.
 
 ```text
 hohu-admin/
 ├── app/
-│   ├── core/              # 核心框架配置 (Security, JWT, Redis, Config)
-│   ├── db/                # 数据库连接与基础 Base 模型
+│   ├── core/              # Core framework configuration (Security, JWT, Redis, Config)
+│   ├── db/                # Database connection and base model
 │   │
-│   ├── modules/           # 🧩 模块化目录
-│   │   ├── auth/          # 认证模块 (登录、Token刷新)
-│   │   ├── system/        # 系统管理模块 (User, Role, Menu, Dict)
-│   │   │   ├── api/       # 系统接口
-│   │   │   ├── crud/      # 系统逻辑
-│   │   │   ├── models/    # 系统模型
-│   │   │   └── schemas/   # 系统 Schema
+│   ├── modules/           # 🧩 Modular directory
+│   │   ├── auth/          # Authentication module (login, token refresh)
+│   │   ├── system/        # System management module (User, Role, Menu, Dict)
+│   │   │   ├── api/       # System API endpoints
+│   │   │   ├── crud/      # System business logic
+│   │   │   ├── models/    # System models
+│   │   │   └── schemas/   # System schemas
 │   │   │
-│   │   └── business/      # 🚀 二次开发业务占位模块
-│   │       ├── api/       # 用户自己的接口
-│   │       └── models/    # 用户自己的模型
-│   │       └── schemas/   # 用户自己的Schema
+│   │   └── business/      # 🚀 Placeholder module for custom business logic
+│   │       ├── api/       # User-defined API endpoints
+│   │       └── models/    # User-defined models
+│   │       └── schemas/   # User-defined schemas
 │   │
-│   └── main.py            # 聚合所有模块的路由
-├── scripts/               # 数据初始化脚本
-├── alembic/               # 数据库迁移脚本
-└── .env                   # 环境变量配置
+│   └── main.py            # Aggregates all module routes
+├── scripts/               # Data initialization scripts
+├── alembic/               # Database migration scripts
+└── .env                   # Environment variable configuration
 ```

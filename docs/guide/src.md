@@ -1,20 +1,20 @@
 ---
-title: 源码
-description: HoHu Admin 全部源码仓库地址，包括后端 FastAPI、前端 Vue3 和移动端 uni-app，MIT 开源许可
+title: Source Code
+description: HoHu Admin source code repository addresses including the FastAPI backend, Vue3 frontend, and uni-app mobile app — MIT licensed open source
 ---
 
-# 源码
+# Source Code
 
-**HoHu Admin** 采用 MIT 许可的开源项目，使用完全免费。欢迎大家**Star**
+**HoHu Admin** is an MIT-licensed open source project, completely free to use. Stars are welcome!
 
-## 后端源码
+## Backend Source Code
 
 https://github.com/aihohu/hohu-admin
 
-## 前端源码
+## Frontend Source Code
 
 https://github.com/aihohu/hohu-admin-web
 
-## 移动端源码
+## Mobile App Source Code
 
 https://github.com/aihohu/hohu-admin-app

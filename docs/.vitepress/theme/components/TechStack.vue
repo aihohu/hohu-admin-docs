@@ -1,23 +1,26 @@
 <script setup lang="ts">
-const techs = [
-  { name: 'FastAPI', label: '后端框架', color: 'green' },
-  { name: 'Vue3', label: '前端框架', color: 'blue' },
-  { name: 'PostgreSQL', label: '数据库', color: 'purple' },
-  { name: 'Redis', label: '缓存', color: 'yellow' },
-  { name: 'UniApp', label: '移动端', color: 'teal' },
-  { name: 'NaiveUI', label: 'UI 组件库', color: 'pink' }
-];
+import { computed } from 'vue';
+import { useI18n } from '../composables/useI18n';
+const { t } = useI18n();
+const techs = computed(() => [
+  { name: 'FastAPI', label: t.value.tsBackend, color: 'green' },
+  { name: 'Vue3', label: t.value.tsFrontend, color: 'blue' },
+  { name: 'PostgreSQL', label: t.value.tsDatabase, color: 'purple' },
+  { name: 'Redis', label: t.value.tsCache, color: 'yellow' },
+  { name: 'UniApp', label: t.value.tsMobile, color: 'teal' },
+  { name: 'NaiveUI', label: t.value.tsUI, color: 'pink' }
+]);
 </script>
 
 <template>
   <section class="techstack">
     <div class="techstack-inner">
-      <h2 class="section-title">现代化技术栈</h2>
-      <p class="section-subtitle">前后端分离 · 异步优先 · 类型安全</p>
+      <h2 class="section-title">{{ t.tsTitle }}</h2>
+      <p class="section-subtitle">{{ t.tsSubtitle }}</p>
       <div class="tech-grid">
-        <div v-for="t in techs" :key="t.name" :class="['tech-card', `tech-${t.color}`]">
-          <div class="tech-name">{{ t.name }}</div>
-          <div class="tech-label">{{ t.label }}</div>
+        <div v-for="tech in techs" :key="tech.name" :class="['tech-card', `tech-${tech.color}`]">
+          <div class="tech-name">{{ tech.name }}</div>
+          <div class="tech-label">{{ tech.label }}</div>
         </div>
       </div>
     </div>

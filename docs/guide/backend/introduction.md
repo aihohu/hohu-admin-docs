@@ -1,6 +1,6 @@
 ---
-title: 后端介绍
-description: HoHu Admin 后端技术架构概览，基于 FastAPI 异步框架、SQLAlchemy 2.0、Pydantic V2 和 PostgreSQL
+title: Backend Introduction
+description: Overview of the HoHu Admin backend technology stack, built on FastAPI async framework, SQLAlchemy 2.0, Pydantic V2, and PostgreSQL
 ---
 
-# 介绍
+# Introduction

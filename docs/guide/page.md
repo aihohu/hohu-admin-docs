@@ -1,15 +1,15 @@
 ---
-title: 分页
-description: HoHu Admin 统一的后端分页查询与前端表格分页方案，使用 paginate() 和 useNaivePaginatedTable 快速接入
+title: Pagination
+description: HoHu Admin unified backend pagination query and frontend table pagination solution, using paginate() and useNaivePaginatedTable for quick integration
 ---
 
-# 分页
+# Pagination
 
-HoHu Admin 提供了统一的后端分页查询和前端表格分页方案，新增模块时只需遵循固定模式即可快速接入。
+HoHu Admin provides a unified backend pagination query and frontend table pagination solution. When adding a new module, simply follow the established pattern for quick integration.
 
-## API 响应格式
+## API Response Format
 
-所有分页接口统一返回 `PageResult` 结构：
+All paginated endpoints uniformly return the `PageResult` structure:
 
 ```json
 {
@@ -24,87 +24,87 @@ HoHu Admin 提供了统一的后端分页查询和前端表格分页方案，新
 }
 ```
 
-| 字段      | 类型   | 说明                  |
-| --------- | ------ | --------------------- |
-| `records` | `list` | 当前页数据            |
-| `total`   | `int`  | 总记录数              |
-| `current` | `int`  | 当前页码（从 1 开始） |
-| `size`    | `int`  | 每页条数              |
+| Field     | Type   | Description                   |
+| --------- | ------ | ----------------------------- |
+| `records` | `list` | Current page data             |
+| `total`   | `int`  | Total record count            |
+| `current` | `int`  | Current page number (1-based) |
+| `size`    | `int`  | Page size                     |
 
-## 后端分页
+## Backend Pagination
 
-### 核心工具
+### Core Utilities
 
-分页工具位于 `app/utils/pagination.py`，提供三个核心函数：
+Pagination utilities are located in `app/utils/pagination.py`, providing three core functions:
 
-#### `paginate()` — 标准分页查询
+#### `paginate()` — Standard Paginated Query
 
-适用于单表查询场景：
+Suitable for single-table query scenarios:
 
 ```python
 from app.utils.pagination import paginate
 
 page_data = await paginate(
     db=db,
-    model=User,                           # SQLAlchemy 模型
-    query_params=query,                   # 包含 current 和 size 的查询参数
-    filters=filters,                      # 过滤条件列表
-    order_by=User.create_time.desc(),     # 排序
-    eager_loads=[selectinload(User.roles)],  # 预加载关联
+    model=User,                           # SQLAlchemy model
+    query_params=query,                   # Query params containing current and size
+    filters=filters,                      # List of filter conditions
+    order_by=User.create_time.desc(),     # Ordering
+    eager_loads=[selectinload(User.roles)],  # Eager-loaded relationships
 )
-# 返回 PageResult(records=..., total=..., current=..., size=...)
+# Returns PageResult(records=..., total=..., current=..., size=...)
 ```
 
-#### `paginate_custom()` — 自定义 SQL 分页
+#### `paginate_custom()` — Custom SQL Pagination
 
-适用于复杂 JOIN 查询：
+Suitable for complex JOIN queries:
 
 ```python
 from app.utils.pagination import paginate_custom
 
 page_data = await paginate_custom(
     db=db,
-    query=stmt,               # 预构建的 Select 查询
-    count_query=count_stmt,   # 可选，自定义计数查询
+    query=stmt,               # Pre-built Select query
+    count_query=count_stmt,   # Optional, custom count query
     current=1,
     size=10,
 )
 ```
 
-#### `build_filters()` — 构建过滤条件
+#### `build_filters()` — Build Filter Conditions
 
-将查询参数映射为 SQLAlchemy 过滤表达式：
+Maps query parameters to SQLAlchemy filter expressions:
 
 ```python
 from app.utils.pagination import build_filters
 
 field_mapping = {
-    "user_name": ("user_name", "contains"),   # LIKE 模糊匹配
-    "status": ("status", "=="),                # 精确匹配
+    "user_name": ("user_name", "contains"),   # LIKE fuzzy match
+    "status": ("status", "=="),                # Exact match
     "user_gender": ("user_gender", "=="),
-    "role_id": (lambda model, val: Model.roles.any(role_id=val),),  # 自定义过滤
+    "role_id": (lambda model, val: Model.roles.any(role_id=val),),  # Custom filter
 }
 
 filters = build_filters(User, field_mapping, **query.model_dump())
 ```
 
-支持的操作类型：
+Supported operation types:
 
-| 操作            | 说明             | 示例                 |
-| --------------- | ---------------- | -------------------- |
-| `"contains"`    | 模糊匹配（LIKE） | `user_name` 字段搜索 |
-| `"=="`          | 精确匹配         | `status` 字段筛选    |
-| `"in_"`         | IN 查询          | 批量 ID 查询         |
-| `">="` / `"<="` | 范围比较         | 日期区间筛选         |
-| `Callable`      | 自定义逻辑       | 多表关联过滤         |
+| Operation       | Description        | Example                  |
+| --------------- | ------------------ | ------------------------ |
+| `"contains"`    | Fuzzy match (LIKE) | `user_name` field search |
+| `"=="`          | Exact match        | `status` field filter    |
+| `"in_"`         | IN query           | Batch ID query           |
+| `">="` / `"<="` | Range comparison   | Date range filter        |
+| `Callable`      | Custom logic       | Multi-table join filter  |
 
-`None` 和空字符串的参数会被自动跳过，无需手动判空。
+Parameters with `None` or empty string values are automatically skipped — no manual null checks needed.
 
-### 完整接入示例
+### Complete Integration Example
 
-以用户管理为例，展示新增分页接口的标准流程：
+Using user management as an example, here is the standard flow for adding a paginated endpoint:
 
-**1. 定义查询 Schema**
+**1. Define the Query Schema**
 
 ```python
 # app/modules/system/schemas/user.py
@@ -117,9 +117,9 @@ class UserQuery(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 ```
 
-`to_camel` 别名生成器让前端可以用 `?current=1&size=10&userName=foo` 的方式传参。
+The `to_camel` alias generator allows the frontend to pass parameters as `?current=1&size=10&userName=foo`.
 
-**2. Service 层查询**
+**2. Service Layer Query**
 
 ```python
 # app/modules/system/service/user_service.py
@@ -140,7 +140,7 @@ class UserService:
         )
 ```
 
-**3. API 层接入**
+**3. API Layer Integration**
 
 ```python
 # app/modules/system/api/user.py
@@ -154,11 +154,11 @@ async def get_user_list(
     return ResponseModel.success(data=page_data)
 ```
 
-通过 `Depends()` 自动解析 URL 查询参数为 `UserQuery` 对象。
+`Depends()` automatically parses URL query parameters into a `UserQuery` object.
 
-## 前端分页
+## Frontend Pagination
 
-### 类型定义
+### Type Definitions
 
 ```typescript
 // src/typings/api/common.d.ts
@@ -177,12 +177,12 @@ type CommonSearchParams = {
 
 ### useNaivePaginatedTable Hook
 
-前端通过 `useNaivePaginatedTable` hook 统一处理服务端分页，所有分页视图遵循相同模式：
+The frontend uses the `useNaivePaginatedTable` hook to uniformly handle server-side pagination. All paginated views follow the same pattern:
 
 ```typescript
 import { useNaivePaginatedTable, defaultTransform } from '@/hooks/common/table';
 
-// 1. 定义搜索参数
+// 1. Define search parameters
 const searchParams = reactive({
   current: 1,
   size: 10,
@@ -190,7 +190,7 @@ const searchParams = reactive({
   status: null
 });
 
-// 2. 初始化表格 hook
+// 2. Initialize table hook
 const { columns, data, loading, pagination, mobilePagination, getDataByPage } = useNaivePaginatedTable({
   api: () => fetchGetUserList(searchParams),
   transform: defaultTransform,
@@ -199,15 +199,15 @@ const { columns, data, loading, pagination, mobilePagination, getDataByPage } = 
     searchParams.size = params.pageSize;
   },
   columns: () => [
-    { title: '用户名', key: 'userName' },
-    { title: '状态', key: 'status' }
+    { title: 'Username', key: 'userName' },
+    { title: 'Status', key: 'status' }
   ]
 });
 ```
 
-### 模板渲染
+### Template Rendering
 
-使用 NaiveUI 的 `NDataTable` 组件，开启 `remote` 模式：
+Use NaiveUI's `NDataTable` component with `remote` mode enabled:
 
 ```html
 <NDataTable
@@ -220,37 +220,37 @@ const { columns, data, loading, pagination, mobilePagination, getDataByPage } = 
 />
 ```
 
-`remote` 表示分页由服务端处理，`pagination` 接收 hook 返回的响应式分页配置，用户切换页码时自动触发 API 请求。
+`remote` indicates that pagination is handled server-side. `pagination` receives the reactive pagination config returned by the hook. When the user changes pages, an API request is triggered automatically.
 
-### 数据流转
+### Data Flow
 
 ```
-用户切换页码 → pagination.page 更新
-     → watch 触发 onPaginationParamsChange → searchParams.current/size 同步
-     → api() 调用 fetchGetUserList(searchParams)
+User changes page → pagination.page updates
+     → watch triggers onPaginationParamsChange → searchParams.current/size sync
+     → api() calls fetchGetUserList(searchParams)
      → GET /system/user/list?current=2&size=10
-     → 后端 paginate() 查询并返回 PageResult
-     → defaultTransform 将 {records, current, size, total} 转为 {data, pageNum, pageSize, total}
-     → data 和 pagination.itemCount 更新 → 表格重新渲染
+     → Backend paginate() queries and returns PageResult
+     → defaultTransform converts {records, current, size, total} to {data, pageNum, pageSize, total}
+     → data and pagination.itemCount update → table re-renders
 ```
 
-### 搜索重置
+### Search Reset
 
-搜索时通过 `getDataByPage()` 重置到第一页：
+When searching, use `getDataByPage()` to reset to the first page:
 
 ```html
 <UserSearch v-model:model="searchParams" @search="getDataByPage" />
 ```
 
-## 相关文件
+## Related Files
 
-### 后端
+### Backend
 
-- `app/utils/pagination.py` — `paginate()`、`paginate_custom()`、`build_filters()`
-- `app/core/base_response.py` — `PageResult` 响应模型
+- `app/utils/pagination.py` — `paginate()`, `paginate_custom()`, `build_filters()`
+- `app/core/base_response.py` — `PageResult` response model
 
-### 前端
+### Frontend
 
-- `src/hooks/common/table.ts` — `useNaivePaginatedTable`、`defaultTransform`
-- `src/typings/api/common.d.ts` — 分页类型定义
-- `packages/hooks/src/use-table.ts` — 框架无关的 `useTable` 基础 hook
+- `src/hooks/common/table.ts` — `useNaivePaginatedTable`, `defaultTransform`
+- `src/typings/api/common.d.ts` — Pagination type definitions
+- `packages/hooks/src/use-table.ts` — Framework-agnostic `useTable` base hook
