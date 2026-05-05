@@ -1,5 +1,4 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <section class="quickstart">
@@ -46,7 +45,9 @@
   align-items: center;
 }
 
-.quickstart-text { flex: 1; }
+.quickstart-text {
+  flex: 1;
+}
 
 .section-title {
   font-size: 28px;
@@ -70,7 +71,9 @@
   transition: color 0.2s;
 }
 
-.learn-more:hover { color: #34d399; }
+.learn-more:hover {
+  color: #34d399;
+}
 
 .code-block {
   flex: 1;
@@ -90,11 +93,24 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.code-dots { display: flex; gap: 6px; }
-.dot { width: 10px; height: 10px; border-radius: 50%; }
-.dot.red { background: #ef4444; }
-.dot.yellow { background: #f59e0b; }
-.dot.green { background: #10b981; }
+.code-dots {
+  display: flex;
+  gap: 6px;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.dot.red {
+  background: #ef4444;
+}
+.dot.yellow {
+  background: #f59e0b;
+}
+.dot.green {
+  background: #10b981;
+}
 
 .code-lang {
   font-size: 11px;
@@ -110,13 +126,26 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
-.comment { color: #6b7280; }
-.cmd { color: #10b981; }
-.success { color: #3b82f6; }
+.comment {
+  color: #6b7280;
+}
+.cmd {
+  color: #10b981;
+}
+.success {
+  color: #3b82f6;
+}
 
 @media (max-width: 768px) {
-  .quickstart-inner { flex-direction: column; gap: 24px; }
-  .quickstart-text { text-align: center; }
-  .section-title { font-size: 22px; }
+  .quickstart-inner {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .quickstart-text {
+    text-align: center;
+  }
+  .section-title {
+    font-size: 22px;
+  }
 }
 </style>

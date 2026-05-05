@@ -1,3 +1,8 @@
+---
+title: 部署指南
+description: 通过 hohu build 和 hohu deploy 将全栈应用部署到 Linux 服务器，基于 Docker Compose 编排所有服务
+---
+
 # 部署指南
 
 通过 `hohu build` 和 `hohu deploy` 将全栈应用部署到 Linux 服务器，基于 Docker Compose 编排所有服务。
@@ -31,14 +36,14 @@ Internet (:80/:443)
 
 **包含服务：**
 
-| 服务 | 镜像 | 说明 |
-|------|------|------|
-| postgres | `postgres:16-alpine` | PostgreSQL 数据库（可替换为外部实例） |
-| redis | `redis:7-alpine` | Redis 缓存（可替换为外部实例） |
-| hohu-admin-api | 后端镜像 | FastAPI 应用 |
-| hohu-admin-web | 前端镜像 | Vue 3 静态文件 + API 反代 |
-| nginx | `nginx:alpine` | SSL 反向代理（可选） |
-| certbot | `certbot/certbot` | Let's Encrypt 自动证书（可选） |
+| 服务           | 镜像                 | 说明                                  |
+| -------------- | -------------------- | ------------------------------------- |
+| postgres       | `postgres:16-alpine` | PostgreSQL 数据库（可替换为外部实例） |
+| redis          | `redis:7-alpine`     | Redis 缓存（可替换为外部实例）        |
+| hohu-admin-api | 后端镜像             | FastAPI 应用                          |
+| hohu-admin-web | 前端镜像             | Vue 3 静态文件 + API 反代             |
+| nginx          | `nginx:alpine`       | SSL 反向代理（可选）                  |
+| certbot        | `certbot/certbot`    | Let's Encrypt 自动证书（可选）        |
 
 ## 前置条件
 
@@ -101,12 +106,12 @@ hohu build --tag=v1.0.0     # 自定义镜像标签
 hohu build --reset          # 重置为官方镜像
 ```
 
-| 参数 | 说明 |
-|------|------|
-| `--only` | 仅构建指定组件（`backend` / `frontend`） |
-| `--tag` | 镜像标签，默认 `source` |
-| `--no-cache` | 不使用 Docker 构建缓存 |
-| `--reset` | 清除本地镜像配置，切回官方 GHCR 镜像 |
+| 参数         | 说明                                     |
+| ------------ | ---------------------------------------- |
+| `--only`     | 仅构建指定组件（`backend` / `frontend`） |
+| `--tag`      | 镜像标签，默认 `source`                  |
+| `--no-cache` | 不使用 Docker 构建缓存                   |
+| `--reset`    | 清除本地镜像配置，切回官方 GHCR 镜像     |
 
 ## 部署命令
 
@@ -138,7 +143,7 @@ hohu deploy --no-migrate    # 跳过数据库迁移
 
 默认使用 Docker 容器运行 PostgreSQL 和 Redis。如需使用已有的外部实例，编辑 `.env`：
 
-```env
+```dotenv
 # 禁用内置 PostgreSQL
 ENABLE_POSTGRES=false
 DATABASE_URL=postgresql+asyncpg://user:password@your-pg-host:5432/dbname
@@ -155,7 +160,7 @@ REDIS_PASSWORD=your-redis-password
 
 默认不暴露端口。按需在 `.env` 中配置：
 
-```env
+```dotenv
 WEB_PORT=0.0.0.0:9527     # 前端（绑定所有网卡）
 API_PORT=127.0.0.1:8000   # 后端（仅本地访问）
 PG_PORT=0.0.0.0:5433      # PostgreSQL
@@ -170,7 +175,7 @@ REDIS_PORT=0.0.0.0:6379   # Redis
 
 编辑 `.env`：
 
-```env
+```dotenv
 ENABLE_NGINX=true
 DOMAIN=example.com
 ENABLE_SSL=true
@@ -191,11 +196,13 @@ ENABLE_SSL=true
 适合直接暴露公网 IP 的服务器，证书自动申请和续期。
 
 1. 在 `.env` 中设置域名：
-   ```env
+
+   ```dotenv
    DOMAIN=example.com
    ```
 
 2. 首次申请证书（确保域名已解析到服务器 IP）：
+
    ```bash
    cd .hohu/deploy
    docker compose run --rm certbot certonly \
@@ -206,7 +213,8 @@ ENABLE_SSL=true
    ```
 
 3. 修改 `.env` 指向 certbot 证书：
-   ```env
+
+   ```dotenv
    SSL_CERT_PATH=./certbot/live/example.com
    ```
 
@@ -234,7 +242,7 @@ ssl/
 
 如果基于 hohu-admin 二次开发并推送到自己的 Registry，编辑 `.env`：
 
-```env
+```dotenv
 # 使用 GHCR
 API_IMAGE=ghcr.io/your-org/hohu-admin
 WEB_IMAGE=ghcr.io/your-org/hohu-admin-web
@@ -250,44 +258,44 @@ IMAGE_TAG=v1.0.0
 
 ## 环境变量完整参考
 
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `IMAGE_TAG` | `latest` | 镜像标签 |
-| `API_IMAGE` | `ghcr.io/aihohu/hohu-admin` | 后端镜像地址（源码构建时自动设为本地名称） |
-| `WEB_IMAGE` | `ghcr.io/aihohu/hohu-admin-web` | 前端镜像地址（源码构建时自动设为本地名称） |
-| `ENABLE_POSTGRES` | `true` | 是否使用内置 PostgreSQL |
-| `POSTGRES_USER` | `hohu` | PostgreSQL 用户名 |
-| `POSTGRES_PASSWORD` | 自动生成 | PostgreSQL 密码 |
-| `POSTGRES_DB` | `hohu_admin` | 数据库名 |
-| `DATABASE_URL` | - | 外部 PostgreSQL 连接串（`ENABLE_POSTGRES=false` 时必填） |
-| `ENABLE_REDIS` | `true` | 是否使用内置 Redis |
-| `REDIS_PASSWORD` | 自动生成 | Redis 密码 |
-| `REDIS_HOST` | `127.0.0.1` | Redis 地址（`ENABLE_REDIS=false` 时必填） |
-| `SECRET_KEY` | 自动生成 | JWT 签名密钥 |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | `10080` | Token 有效期（分钟） |
-| `WORKER_ID` | `1` | Snowflake Worker ID（多实例时需不同） |
-| `UVICORN_WORKERS` | `4` | Uvicorn 进程数 |
-| `ENABLE_NGINX` | `false` | 是否启用内置 Nginx |
-| `DOMAIN` | `localhost` | 域名 |
-| `HTTP_PORT` | `80` | HTTP 端口（启用 Nginx 后生效） |
-| `HTTPS_PORT` | `443` | HTTPS 端口（启用 Nginx 后生效） |
-| `WEB_PORT` | - | 前端端口暴露 |
-| `API_PORT` | - | 后端端口暴露 |
-| `PG_PORT` | - | PostgreSQL 端口暴露 |
-| `REDIS_PORT` | - | Redis 端口暴露 |
-| `SSL_CERT_PATH` | `./ssl` | SSL 证书目录 |
-| `ENABLE_SSL` | `false` | 是否启用 HTTPS |
+| 变量                          | 默认值                          | 说明                                                     |
+| ----------------------------- | ------------------------------- | -------------------------------------------------------- |
+| `IMAGE_TAG`                   | `latest`                        | 镜像标签                                                 |
+| `API_IMAGE`                   | `ghcr.io/aihohu/hohu-admin`     | 后端镜像地址（源码构建时自动设为本地名称）               |
+| `WEB_IMAGE`                   | `ghcr.io/aihohu/hohu-admin-web` | 前端镜像地址（源码构建时自动设为本地名称）               |
+| `ENABLE_POSTGRES`             | `true`                          | 是否使用内置 PostgreSQL                                  |
+| `POSTGRES_USER`               | `hohu`                          | PostgreSQL 用户名                                        |
+| `POSTGRES_PASSWORD`           | 自动生成                        | PostgreSQL 密码                                          |
+| `POSTGRES_DB`                 | `hohu_admin`                    | 数据库名                                                 |
+| `DATABASE_URL`                | -                               | 外部 PostgreSQL 连接串（`ENABLE_POSTGRES=false` 时必填） |
+| `ENABLE_REDIS`                | `true`                          | 是否使用内置 Redis                                       |
+| `REDIS_PASSWORD`              | 自动生成                        | Redis 密码                                               |
+| `REDIS_HOST`                  | `127.0.0.1`                     | Redis 地址（`ENABLE_REDIS=false` 时必填）                |
+| `SECRET_KEY`                  | 自动生成                        | JWT 签名密钥                                             |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | `10080`                         | Token 有效期（分钟）                                     |
+| `WORKER_ID`                   | `1`                             | Snowflake Worker ID（多实例时需不同）                    |
+| `UVICORN_WORKERS`             | `4`                             | Uvicorn 进程数                                           |
+| `ENABLE_NGINX`                | `false`                         | 是否启用内置 Nginx                                       |
+| `DOMAIN`                      | `localhost`                     | 域名                                                     |
+| `HTTP_PORT`                   | `80`                            | HTTP 端口（启用 Nginx 后生效）                           |
+| `HTTPS_PORT`                  | `443`                           | HTTPS 端口（启用 Nginx 后生效）                          |
+| `WEB_PORT`                    | -                               | 前端端口暴露                                             |
+| `API_PORT`                    | -                               | 后端端口暴露                                             |
+| `PG_PORT`                     | -                               | PostgreSQL 端口暴露                                      |
+| `REDIS_PORT`                  | -                               | Redis 端口暴露                                           |
+| `SSL_CERT_PATH`               | `./ssl`                         | SSL 证书目录                                             |
+| `ENABLE_SSL`                  | `false`                         | 是否启用 HTTPS                                           |
 
 ## 数据持久化
 
 Docker volumes 持久化以下数据，即使容器删除也不会丢失：
 
-| Volume | 说明 |
-|--------|------|
-| `hohu-pgdata` | PostgreSQL 数据 |
-| `hohu-redisdata` | Redis 数据 |
-| `hohu-certbot-www` | Let's Encrypt 验证文件 |
-| `hohu-certbot-conf` | Let's Encrypt 证书 |
+| Volume              | 说明                   |
+| ------------------- | ---------------------- |
+| `hohu-pgdata`       | PostgreSQL 数据        |
+| `hohu-redisdata`    | Redis 数据             |
+| `hohu-certbot-www`  | Let's Encrypt 验证文件 |
+| `hohu-certbot-conf` | Let's Encrypt 证书     |
 
 **清除所有数据（危险操作）：**
 

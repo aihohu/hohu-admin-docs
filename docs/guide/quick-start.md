@@ -1,3 +1,8 @@
+---
+title: 快速上手
+description: 使用 hohu CLI 一键创建项目、安装依赖并启动开发服务器，快速搭建 HoHu Admin 开发环境
+---
+
 # 快速开始
 
 hohu-admin 提供了官方 CLI 工具 `hohu`，内置项目创建、依赖安装、开发服务器、源码构建、一键部署等全生命周期管理能力。你无需关心各子项目的仓库地址、安装命令和启动方式——CLI 会自动处理一切。
@@ -39,21 +44,23 @@ hohu dev
 
 一条命令启动全部服务，日志按颜色区分：
 
-| 前缀 | 颜色 | 服务 |
-|------|------|------|
-| `[Backend]` | 绿色 | FastAPI |
-| `[Frontend]` | 青色 | Vue 3 |
-| `[App]` | 黄色 | Uni-app |
+| 前缀         | 颜色 | 服务    |
+| ------------ | ---- | ------- |
+| `[Backend]`  | 绿色 | FastAPI |
+| `[Frontend]` | 青色 | Vue 3   |
+| `[App]`      | 黄色 | Uni-app |
 
 按 `Ctrl+C` 优雅退出。
 
 ::: tip 其他启动方式
+
 ```bash
 hohu dev -o be        # 仅后端
 hohu dev -o fe        # 仅前端
 hohu dev -t mp        # App 微信小程序模式
 hohu dev -s app       # 跳过 App
 ```
+
 :::
 
 ## 5. 部署上线
@@ -76,6 +83,7 @@ hohu deploy init    # 初始化部署配置
 # 编辑 .hohu/deploy/.env
 hohu deploy         # 拉取镜像并部署
 ```
+
 :::
 
 [详细部署指南 →](/guide/deploy)

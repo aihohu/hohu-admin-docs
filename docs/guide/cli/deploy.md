@@ -1,3 +1,8 @@
+---
+title: hohu deploy
+description: 使用 hohu deploy 通过 Docker Compose 将全栈服务部署到 Linux 服务器，包含环境初始化和服务编排
+---
+
 # hohu deploy
 
 通过 Docker Compose 将全栈服务部署到 Linux 服务器。
@@ -12,10 +17,10 @@ hohu deploy
 
 ### 参数
 
-| 参数 | 说明 |
-|------|------|
-| `--init` | 迁移后额外运行初始化脚本（创建管理员用户和菜单） |
-| `--no-migrate` | 跳过数据库迁移 |
+| 参数           | 说明                                             |
+| -------------- | ------------------------------------------------ |
+| `--init`       | 迁移后额外运行初始化脚本（创建管理员用户和菜单） |
+| `--no-migrate` | 跳过数据库迁移                                   |
 
 ```bash
 hohu deploy --init          # 部署并初始化数据
@@ -80,10 +85,10 @@ hohu deploy logs hohu-admin-api     # 仅后端
 hohu deploy logs -f postgres        # 跟踪数据库
 ```
 
-| 参数 | 说明 |
-|------|------|
-| `-f` / `--follow` | 实时跟踪日志输出 |
-| `SERVICE...` | 指定服务名称（可选） |
+| 参数              | 说明                 |
+| ----------------- | -------------------- |
+| `-f` / `--follow` | 实时跟踪日志输出     |
+| `SERVICE...`      | 指定服务名称（可选） |
 
 ## hohu deploy restart
 
@@ -118,8 +123,8 @@ hohu migrate           # 仅迁移
 hohu migrate --init    # 迁移 + 初始化（创建管理员用户和菜单）
 ```
 
-| 参数 | 说明 |
-|------|------|
+| 参数     | 说明                 |
+| -------- | -------------------- |
 | `--init` | 迁移后运行初始化脚本 |
 
 ::: tip
@@ -130,18 +135,18 @@ hohu migrate --init    # 迁移 + 初始化（创建管理员用户和菜单）
 
 部署配置通过 `.hohu/deploy/.env` 管理。关键配置项：
 
-| 变量 | 说明 |
-|------|------|
-| `IMAGE_TAG` | 镜像标签（`latest` 或 `source`） |
-| `API_IMAGE` | 后端镜像地址（源码构建时自动设为本地名称） |
-| `WEB_IMAGE` | 前端镜像地址（源码构建时自动设为本地名称） |
+| 变量              | 说明                                        |
+| ----------------- | ------------------------------------------- |
+| `IMAGE_TAG`       | 镜像标签（`latest` 或 `source`）            |
+| `API_IMAGE`       | 后端镜像地址（源码构建时自动设为本地名称）  |
+| `WEB_IMAGE`       | 前端镜像地址（源码构建时自动设为本地名称）  |
 | `ENABLE_POSTGRES` | 是否使用内置 PostgreSQL（`true` / `false`） |
-| `DATABASE_URL` | 外部 PostgreSQL 连接串 |
-| `ENABLE_REDIS` | 是否使用内置 Redis（`true` / `false`） |
-| `REDIS_HOST` | 外部 Redis 地址 |
-| `SECRET_KEY` | JWT 签名密钥 |
-| `ENABLE_NGINX` | 是否启用内置 Nginx |
-| `WEB_PORT` | 前端端口暴露（如 `0.0.0.0:9527`） |
-| `API_PORT` | 后端端口暴露 |
+| `DATABASE_URL`    | 外部 PostgreSQL 连接串                      |
+| `ENABLE_REDIS`    | 是否使用内置 Redis（`true` / `false`）      |
+| `REDIS_HOST`      | 外部 Redis 地址                             |
+| `SECRET_KEY`      | JWT 签名密钥                                |
+| `ENABLE_NGINX`    | 是否启用内置 Nginx                          |
+| `WEB_PORT`        | 前端端口暴露（如 `0.0.0.0:9527`）           |
+| `API_PORT`        | 后端端口暴露                                |
 
 完整配置参考见 [部署指南 →](/guide/deploy)

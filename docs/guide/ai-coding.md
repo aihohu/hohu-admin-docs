@@ -1,14 +1,19 @@
+---
+title: AI 编程
+description: 使用 Claude Code 等 AI 编程工具快速搭建和开发 HoHu Admin 项目，涵盖 CLAUDE.md 配置、开发流程和最佳实践
+---
+
 # AI 编程
 
 HoHu Admin 从设计之初就为 **AI 辅助开发** 做了深度优化。本文介绍如何借助 AI 编程工具（推荐 [Claude Code](https://claude.ai/code)）快速搭建和开发项目。
 
 ## 推荐工具
 
-| 工具 | 类型 | 适用场景 |
-| ---- | ---- | -------- |
+| 工具                    | 类型           | 适用场景                                   |
+| ----------------------- | -------------- | ------------------------------------------ |
 | **Claude Code**（推荐） | CLI / IDE 插件 | 全流程开发：代码生成、重构、调试、Git 操作 |
-| Cursor | IDE | 实时代码补全和对话式编辑 |
-| GitHub Copilot | IDE 插件 | 行级代码补全 |
+| Cursor                  | IDE            | 实时代码补全和对话式编辑                   |
+| GitHub Copilot          | IDE 插件       | 行级代码补全                               |
 
 **为什么推荐 Claude Code？**
 
@@ -93,12 +98,12 @@ API 服务 (src/service/api/<module>.ts)
 
 ### 命名规范
 
-| 层级 | 规范 | 示例 |
-| ---- | ---- | ---- |
-| 后端 Python | `snake_case` | `user_name`, `get_user_list` |
-| 前端 TypeScript | `camelCase` | `userName`, `getUserList` |
-| 数据库列 | `snake_case` | `user_name` |
-| API 字段传输 | `camelCase` | `userName`（Pydantic 自动转换） |
+| 层级            | 规范         | 示例                            |
+| --------------- | ------------ | ------------------------------- |
+| 后端 Python     | `snake_case` | `user_name`, `get_user_list`    |
+| 前端 TypeScript | `camelCase`  | `userName`, `getUserList`       |
+| 数据库列        | `snake_case` | `user_name`                     |
+| API 字段传输    | `camelCase`  | `userName`（Pydantic 自动转换） |
 
 ### 响应格式
 
@@ -160,12 +165,12 @@ AI 会：
 
 每个子项目的 `CLAUDE.md` 文件是 AI 工具的"项目说明书"。HoHu Admin 已预置完善的配置：
 
-| 子项目 | CLAUDE.md 位置 | 包含内容 |
-| ------ | -------------- | -------- |
-| hohu-admin | `hohu-admin/CLAUDE.md` | 后端分层规范、依赖注入、异常处理、测试命令 |
+| 子项目         | CLAUDE.md 位置             | 包含内容                                   |
+| -------------- | -------------------------- | ------------------------------------------ |
+| hohu-admin     | `hohu-admin/CLAUDE.md`     | 后端分层规范、依赖注入、异常处理、测试命令 |
 | hohu-admin-web | `hohu-admin-web/CLAUDE.md` | 前端组件规范、路由生成、状态管理、构建命令 |
-| hohu-admin-app | `hohu-admin-app/CLAUDE.md` | 移动端组件规范、多端适配、构建命令 |
-| hohu-cli | `hohu-cli/CLAUDE.md` | CLI 开发规范、i18n、测试命令 |
+| hohu-admin-app | `hohu-admin-app/CLAUDE.md` | 移动端组件规范、多端适配、构建命令         |
+| hohu-cli       | `hohu-cli/CLAUDE.md`       | CLI 开发规范、i18n、测试命令               |
 
 ::: tip 自定义 CLAUDE.md
 你可以编辑各子项目的 `CLAUDE.md`，添加团队特有的约定（如业务术语、代码风格偏好）。AI 工具会在每次会话开始时自动读取。

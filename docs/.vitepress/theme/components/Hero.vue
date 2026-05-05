@@ -1,12 +1,12 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <section class="hero">
     <div class="hero-inner">
       <p class="hero-label">AI-FIRST ENTERPRISE ADMIN</p>
       <h1 class="hero-title">
-        AI 驱动的企业级<br>
+        AI 驱动的企业级
+        <br />
         <span class="gradient-text">后台管理平台</span>
       </h1>
       <p class="hero-desc">对话式操作 · 自然语言管理业务 · 一个平台覆盖 ERP · CRM · OA · 电商 · IoT</p>
@@ -141,12 +141,18 @@
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
   display: inline-block;
 }
 
-.btn:hover { transform: translateY(-2px); }
-.btn:active { transform: translateY(0); }
+.btn:hover {
+  transform: translateY(-2px);
+}
+.btn:active {
+  transform: translateY(0);
+}
 
 .btn-primary {
   background: linear-gradient(90deg, #10b981, #3b82f6);
@@ -189,11 +195,24 @@
   color: #fff;
 }
 
-.browser-dots { display: flex; gap: 6px; }
-.dot { width: 10px; height: 10px; border-radius: 50%; }
-.dot-red { background: #ef4444; }
-.dot-yellow { background: #f59e0b; }
-.dot-green { background: #10b981; }
+.browser-dots {
+  display: flex;
+  gap: 6px;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.dot-red {
+  background: #ef4444;
+}
+.dot-yellow {
+  background: #f59e0b;
+}
+.dot-green {
+  background: #10b981;
+}
 
 .browser-url {
   flex: 1;
@@ -264,14 +283,30 @@
   margin-top: 2px;
 }
 
-.stat-green { background: rgba(16, 185, 129, 0.1); }
-.stat-green .stat-value { color: #10b981; }
-.stat-blue { background: rgba(59, 130, 246, 0.1); }
-.stat-blue .stat-value { color: #3b82f6; }
-.stat-purple { background: rgba(168, 85, 247, 0.1); }
-.stat-purple .stat-value { color: #8b5cf6; }
-.stat-yellow { background: rgba(245, 158, 11, 0.1); }
-.stat-yellow .stat-value { color: #f59e0b; }
+.stat-green {
+  background: rgba(16, 185, 129, 0.1);
+}
+.stat-green .stat-value {
+  color: #10b981;
+}
+.stat-blue {
+  background: rgba(59, 130, 246, 0.1);
+}
+.stat-blue .stat-value {
+  color: #3b82f6;
+}
+.stat-purple {
+  background: rgba(168, 85, 247, 0.1);
+}
+.stat-purple .stat-value {
+  color: #8b5cf6;
+}
+.stat-yellow {
+  background: rgba(245, 158, 11, 0.1);
+}
+.stat-yellow .stat-value {
+  color: #f59e0b;
+}
 
 .preview-bottom {
   display: flex;
@@ -305,8 +340,14 @@
   margin-bottom: 8px;
 }
 
-.ai-icon { font-size: 16px; }
-.ai-label { font-size: 12px; color: #10b981; font-weight: 600; }
+.ai-icon {
+  font-size: 16px;
+}
+.ai-label {
+  font-size: 12px;
+  color: #10b981;
+  font-weight: 600;
+}
 
 .ai-bubble {
   background: rgba(16, 185, 129, 0.1);
@@ -326,13 +367,30 @@
 }
 
 @media (max-width: 768px) {
-  .hero { padding: 60px 16px 40px; }
-  .hero-title { font-size: 28px; }
-  .hero-desc { font-size: 14px; }
-  .hero-actions { flex-direction: column; align-items: center; }
-  .preview-sidebar { display: none; }
-  .stat-cards { grid-template-columns: repeat(2, 1fr); }
-  .preview-bottom { flex-direction: column; }
-  .ai-chat { width: 100%; }
+  .hero {
+    padding: 60px 16px 40px;
+  }
+  .hero-title {
+    font-size: 28px;
+  }
+  .hero-desc {
+    font-size: 14px;
+  }
+  .hero-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  .preview-sidebar {
+    display: none;
+  }
+  .stat-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .preview-bottom {
+    flex-direction: column;
+  }
+  .ai-chat {
+    width: 100%;
+  }
 }
 </style>

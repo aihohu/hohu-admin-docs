@@ -1,3 +1,8 @@
+---
+title: hohu build
+description: 使用 hohu build 从本地源码构建后端和前端 Docker 镜像，构建完成后通过 hohu deploy 部署
+---
+
 # hohu build
 
 从本地源码构建 Docker 镜像。构建完成后，运行 `hohu deploy` 即可使用本地镜像部署。
@@ -15,12 +20,12 @@ hohu build --reset          # 重置为官方 GHCR 镜像
 
 ## 参数
 
-| 参数 | 说明 | 默认值 |
-|------|------|--------|
-| `--only` | 仅构建指定组件（`backend` 或 `frontend`） | 全部 |
-| `--tag` | Docker 镜像标签 | `source` |
-| `--no-cache` | 不使用 Docker 构建缓存 | `false` |
-| `--reset` | 清除本地镜像配置，切回官方 GHCR 镜像 | `false` |
+| 参数         | 说明                                      | 默认值   |
+| ------------ | ----------------------------------------- | -------- |
+| `--only`     | 仅构建指定组件（`backend` 或 `frontend`） | 全部     |
+| `--tag`      | Docker 镜像标签                           | `source` |
+| `--no-cache` | 不使用 Docker 构建缓存                    | `false`  |
+| `--reset`    | 清除本地镜像配置，切回官方 GHCR 镜像      | `false`  |
 
 ## 工作流程
 

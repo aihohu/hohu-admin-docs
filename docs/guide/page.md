@@ -1,3 +1,8 @@
+---
+title: 分页
+description: HoHu Admin 统一的后端分页查询与前端表格分页方案，使用 paginate() 和 useNaivePaginatedTable 快速接入
+---
+
 # 分页
 
 HoHu Admin 提供了统一的后端分页查询和前端表格分页方案，新增模块时只需遵循固定模式即可快速接入。
@@ -19,12 +24,12 @@ HoHu Admin 提供了统一的后端分页查询和前端表格分页方案，新
 }
 ```
 
-| 字段 | 类型 | 说明 |
-| ---- | ---- | ---- |
-| `records` | `list` | 当前页数据 |
-| `total` | `int` | 总记录数 |
-| `current` | `int` | 当前页码（从 1 开始） |
-| `size` | `int` | 每页条数 |
+| 字段      | 类型   | 说明                  |
+| --------- | ------ | --------------------- |
+| `records` | `list` | 当前页数据            |
+| `total`   | `int`  | 总记录数              |
+| `current` | `int`  | 当前页码（从 1 开始） |
+| `size`    | `int`  | 每页条数              |
 
 ## 后端分页
 
@@ -85,13 +90,13 @@ filters = build_filters(User, field_mapping, **query.model_dump())
 
 支持的操作类型：
 
-| 操作 | 说明 | 示例 |
-| ---- | ---- | ---- |
-| `"contains"` | 模糊匹配（LIKE） | `user_name` 字段搜索 |
-| `"=="` | 精确匹配 | `status` 字段筛选 |
-| `"in_"` | IN 查询 | 批量 ID 查询 |
-| `">="` / `"<="` | 范围比较 | 日期区间筛选 |
-| `Callable` | 自定义逻辑 | 多表关联过滤 |
+| 操作            | 说明             | 示例                 |
+| --------------- | ---------------- | -------------------- |
+| `"contains"`    | 模糊匹配（LIKE） | `user_name` 字段搜索 |
+| `"=="`          | 精确匹配         | `status` 字段筛选    |
+| `"in_"`         | IN 查询          | 批量 ID 查询         |
+| `">="` / `"<="` | 范围比较         | 日期区间筛选         |
+| `Callable`      | 自定义逻辑       | 多表关联过滤         |
 
 `None` 和空字符串的参数会被自动跳过，无需手动判空。
 
@@ -167,7 +172,7 @@ interface PaginatingQueryRecord<T> {
 type CommonSearchParams = {
   current: number;
   size: number;
-}
+};
 ```
 
 ### useNaivePaginatedTable Hook
@@ -175,29 +180,29 @@ type CommonSearchParams = {
 前端通过 `useNaivePaginatedTable` hook 统一处理服务端分页，所有分页视图遵循相同模式：
 
 ```typescript
-import { useNaivePaginatedTable, defaultTransform } from '@/hooks/common/table'
+import { useNaivePaginatedTable, defaultTransform } from '@/hooks/common/table';
 
 // 1. 定义搜索参数
 const searchParams = reactive({
   current: 1,
   size: 10,
   userName: null,
-  status: null,
-})
+  status: null
+});
 
 // 2. 初始化表格 hook
 const { columns, data, loading, pagination, mobilePagination, getDataByPage } = useNaivePaginatedTable({
   api: () => fetchGetUserList(searchParams),
   transform: defaultTransform,
   onPaginationParamsChange: params => {
-    searchParams.current = params.page
-    searchParams.size = params.pageSize
+    searchParams.current = params.page;
+    searchParams.size = params.pageSize;
   },
   columns: () => [
     { title: '用户名', key: 'userName' },
-    { title: '状态', key: 'status' },
+    { title: '状态', key: 'status' }
   ]
-})
+});
 ```
 
 ### 模板渲染

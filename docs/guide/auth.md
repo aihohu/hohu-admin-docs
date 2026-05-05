@@ -1,3 +1,8 @@
+---
+title: 权限控制
+description: HoHu Admin 采用 RBAC 模型实现从菜单路由到按钮级别的细粒度权限管理，包括角色、菜单、API 接口的权限控制
+---
+
 # 权限控制
 
 HoHu Admin 采用经典的 **RBAC（基于角色的访问控制）** 模型，实现从菜单路由到按钮级别的细粒度权限管理。
@@ -57,6 +62,7 @@ async def get_profile(current_user: User = Depends(get_current_user)):
 ```
 
 `get_current_user` 会自动：
+
 1. 从 `Authorization` 请求头提取 JWT Token
 2. 解码验证 Token（HS256）
 3. 查询用户并预加载角色和菜单（`selectinload`）
@@ -81,10 +87,10 @@ system:menu:add     # 新增菜单
 
 前端支持两种路由模式（通过 `.env` 中 `VITE_AUTH_ROUTE_MODE` 配置）：
 
-| 模式 | 说明 |
-| ---- | ---- |
-| `dynamic`（默认） | 路由由后端 API 返回，根据用户角色动态生成 |
-| `static` | 路由由本地文件结构生成，按 `meta.roles` 过滤 |
+| 模式              | 说明                                         |
+| ----------------- | -------------------------------------------- |
+| `dynamic`（默认） | 路由由后端 API 返回，根据用户角色动态生成    |
+| `static`          | 路由由本地文件结构生成，按 `meta.roles` 过滤 |
 
 **动态模式流程**：
 
@@ -99,16 +105,14 @@ system:menu:add     # 新增菜单
 
 ```vue
 <script setup lang="ts">
-import { useAuth } from '@/hooks/business/auth'
+import { useAuth } from '@/hooks/business/auth';
 
-const { hasAuth } = useAuth()
+const { hasAuth } = useAuth();
 </script>
 
 <template>
   <!-- 只有拥有 sys:user:add 权限的用户才能看到新增按钮 -->
-  <NButton v-if="hasAuth('sys:user:add')" @click="handleAdd">
-    新增用户
-  </NButton>
+  <NButton v-if="hasAuth('sys:user:add')" @click="handleAdd">新增用户</NButton>
 
   <!-- 只有拥有 sys:user:delete 权限才能看到删除确认 -->
   <NPopconfirm v-if="hasAuth('sys:user:delete')" @positive-click="handleDelete(row.userId)">
@@ -124,7 +128,7 @@ const { hasAuth } = useAuth()
 
 ```ts
 // 拥有编辑或查看权限之一即可
-hasAuth(['sys:user:edit', 'sys:user:list'])
+hasAuth(['sys:user:edit', 'sys:user:list']);
 ```
 
 ### 路由守卫
@@ -156,12 +160,12 @@ hasAuth(['sys:user:edit', 'sys:user:list'])
 
 ## 关键配置
 
-| 配置项 | 位置 | 说明 |
-| ------ | ---- | ---- |
-| `SECRET_KEY` | 后端 `.env` | JWT 签名密钥 |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | 后端 `.env` | Token 有效期（默认 7 天） |
-| `VITE_AUTH_ROUTE_MODE` | 前端 `.env` | 路由模式：`dynamic` 或 `static` |
-| `VITE_STATIC_SUPER_ROLE` | 前端 `.env` | 静态模式下的超级管理员角色编码 |
+| 配置项                        | 位置        | 说明                            |
+| ----------------------------- | ----------- | ------------------------------- |
+| `SECRET_KEY`                  | 后端 `.env` | JWT 签名密钥                    |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | 后端 `.env` | Token 有效期（默认 7 天）       |
+| `VITE_AUTH_ROUTE_MODE`        | 前端 `.env` | 路由模式：`dynamic` 或 `static` |
+| `VITE_STATIC_SUPER_ROLE`      | 前端 `.env` | 静态模式下的超级管理员角色编码  |
 
 ## 相关文件
 

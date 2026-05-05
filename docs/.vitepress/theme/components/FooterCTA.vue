@@ -1,5 +1,4 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <section class="footer-section">
@@ -21,7 +20,11 @@
             <div class="logo-icon"></div>
             <span class="logo-text">HoHu Admin</span>
           </div>
-          <p class="footer-about">AI 驱动的开源企业级后台管理平台<br>让开发像对话一样简单</p>
+          <p class="footer-about">
+            AI 驱动的开源企业级后台管理平台
+            <br />
+            让开发像对话一样简单
+          </p>
           <div class="social-links">
             <a class="social-icon" href="https://github.com/aihohu/hohu-admin" target="_blank" title="GitHub">GH</a>
             <a class="social-icon" href="#" title="微信">微</a>
@@ -105,12 +108,18 @@
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
   display: inline-block;
 }
 
-.btn:hover { transform: translateY(-2px); }
-.btn:active { transform: translateY(0); }
+.btn:hover {
+  transform: translateY(-2px);
+}
+.btn:active {
+  transform: translateY(0);
+}
 
 .btn-primary {
   background: linear-gradient(90deg, #10b981, #3b82f6);
@@ -182,7 +191,9 @@
   font-weight: 700;
   color: var(--landing-text-3);
   text-decoration: none;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .social-icon:hover {
@@ -205,7 +216,9 @@
   margin: 0;
 }
 
-.col-links li { margin-bottom: 8px; }
+.col-links li {
+  margin-bottom: 8px;
+}
 
 .col-links a {
   font-size: 13px;
@@ -214,7 +227,9 @@
   transition: color 0.2s;
 }
 
-.col-links a:hover { color: #10b981; }
+.col-links a:hover {
+  color: #10b981;
+}
 
 /* Bottom */
 .footer-bottom {
@@ -227,18 +242,27 @@
   color: var(--landing-text-3);
 }
 
-.lang-switch { display: flex; gap: 8px; }
-.lang-active { color: var(--landing-text-2); }
+.lang-switch {
+  display: flex;
+  gap: 8px;
+}
+.lang-active {
+  color: var(--landing-text-2);
+}
 
 .lang-switch a {
   color: var(--landing-text-3);
   text-decoration: none;
 }
 
-.lang-switch a:hover { color: var(--landing-text-2); }
+.lang-switch a:hover {
+  color: var(--landing-text-2);
+}
 
 @media (max-width: 768px) {
-  .cta-title { font-size: 20px; }
+  .cta-title {
+    font-size: 20px;
+  }
   .footer-columns {
     grid-template-columns: 1fr;
     gap: 24px;

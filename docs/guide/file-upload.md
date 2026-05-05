@@ -1,3 +1,8 @@
+---
+title: 文件上传
+description: HoHu Admin FileUpload 可复用组件，支持单文件、多文件、图片卡片等多种上传模式，通过 v-model 绑定 fileId 关联业务数据
+---
+
 # 文件上传
 
 HoHu Admin 提供了 `FileUpload` 可复用组件，支持单文件、多文件、图片卡片等多种上传模式，通过 `v-model` 绑定 `fileId` 即可与业务数据关联。
@@ -13,7 +18,7 @@ import FileUpload from '@/components/custom/file-upload.vue';
 const form = reactive({
   docFileId: '',
   avatarFileId: '',
-  imageFileIds: [] as string[],
+  imageFileIds: [] as string[]
 });
 </script>
 
@@ -22,12 +27,7 @@ const form = reactive({
   <FileUpload v-model:value="form.docFileId" />
 
   <!-- 单图上传（头像） -->
-  <FileUpload
-    v-model:value="form.avatarFileId"
-    accept="image/*"
-    list-type="image-card"
-    :max="1"
-  />
+  <FileUpload v-model:value="form.avatarFileId" accept="image/*" list-type="image-card" :max="1" />
 
   <!-- 多图上传（商品图片） -->
   <FileUpload
@@ -46,23 +46,23 @@ const form = reactive({
 
 ### Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-| ---- | ---- | ------ | ---- |
-| `value` | `string \| string[]` | — | `v-model` 绑定 fileId，单文件传 string，多文件传 string[] |
-| `businessType` | `string` | — | 业务类型，如 `product`、`avatar` |
-| `businessId` | `string` | — | 业务记录 ID |
-| `accept` | `string` | — | 限制文件类型，如 `image/*`、`.pdf,.doc` |
-| `multiple` | `boolean` | `false` | 是否允许多文件 |
-| `max` | `number` | — | 最大文件数量 |
-| `listType` | `'text' \| 'image' \| 'image-card'` | `'text'` | 列表展示类型 |
-| `disabled` | `boolean` | `false` | 是否禁用 |
+| 属性           | 类型                                | 默认值   | 说明                                                      |
+| -------------- | ----------------------------------- | -------- | --------------------------------------------------------- |
+| `value`        | `string \| string[]`                | —        | `v-model` 绑定 fileId，单文件传 string，多文件传 string[] |
+| `businessType` | `string`                            | —        | 业务类型，如 `product`、`avatar`                          |
+| `businessId`   | `string`                            | —        | 业务记录 ID                                               |
+| `accept`       | `string`                            | —        | 限制文件类型，如 `image/*`、`.pdf,.doc`                   |
+| `multiple`     | `boolean`                           | `false`  | 是否允许多文件                                            |
+| `max`          | `number`                            | —        | 最大文件数量                                              |
+| `listType`     | `'text' \| 'image' \| 'image-card'` | `'text'` | 列表展示类型                                              |
+| `disabled`     | `boolean`                           | `false`  | 是否禁用                                                  |
 
 ### Events
 
-| 事件 | 参数 | 说明 |
-| ---- | ---- | ---- |
-| `update:value` | `string \| string[]` | fileId 变化时触发 |
-| `change` | `{ fileId, fileUrl, fileName }` | 上传成功回调，可获取完整文件信息 |
+| 事件           | 参数                            | 说明                             |
+| -------------- | ------------------------------- | -------------------------------- |
+| `update:value` | `string \| string[]`            | fileId 变化时触发                |
+| `change`       | `{ fileId, fileUrl, fileName }` | 上传成功回调，可获取完整文件信息 |
 
 ## 业务接入示例
 
@@ -115,12 +115,12 @@ files = await file_service.get_list(db, FileQuery(
 
 后端通过 `.env` 配置上传参数：
 
-| 变量 | 默认值 | 说明 |
-| ---- | ------ | ---- |
-| `SERVER_URL` | `http://127.0.0.1:8000` | 服务地址，用于拼接文件访问 URL |
-| `UPLOAD_DIR` | `uploads` | 上传目录 |
-| `UPLOAD_MAX_SIZE` | `10485760`（10MB） | 最大文件大小 |
-| `UPLOAD_ALLOWED_EXTENSIONS` | `.jpg,.jpeg,.png,...` | 允许的文件扩展名 |
+| 变量                        | 默认值                  | 说明                           |
+| --------------------------- | ----------------------- | ------------------------------ |
+| `SERVER_URL`                | `http://127.0.0.1:8000` | 服务地址，用于拼接文件访问 URL |
+| `UPLOAD_DIR`                | `uploads`               | 上传目录                       |
+| `UPLOAD_MAX_SIZE`           | `10485760`（10MB）      | 最大文件大小                   |
+| `UPLOAD_ALLOWED_EXTENSIONS` | `.jpg,.jpeg,.png,...`   | 允许的文件扩展名               |
 
 ## 相关文件
 
