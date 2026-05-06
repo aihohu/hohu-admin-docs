@@ -74,7 +74,9 @@ export default defineConfig({
               text: 'Backend',
               items: [
                 { text: 'Introduction', link: '/guide/backend/introduction' },
-                { text: 'Directory Structure', link: '/guide/backend/dir' }
+                { text: 'Directory Structure', link: '/guide/backend/dir' },
+                { text: 'Error Codes', link: '/guide/backend/error-code' },
+                { text: 'Error Code Reference', link: '/guide/backend/error-code-list' }
               ]
             },
             {
@@ -133,7 +135,9 @@ export default defineConfig({
               text: '后端文档',
               items: [
                 { text: '介绍', link: '/zh/guide/backend/introduction' },
-                { text: '目录结构', link: '/zh/guide/backend/dir' }
+                { text: '目录结构', link: '/zh/guide/backend/dir' },
+                { text: '错误码', link: '/zh/guide/backend/error-code' },
+                { text: '错误码速查表', link: '/zh/guide/backend/error-code-list' }
               ]
             },
             {
