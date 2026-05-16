@@ -118,6 +118,7 @@ hohu build --reset          # Reset to official images
 ```bash
 hohu deploy          # One-click deploy (pull → migrate → start)
 hohu deploy init     # Initialize deployment directory and .env
+hohu deploy init --force  # Force update templates after CLI upgrade
 hohu deploy pull     # Pull latest images and restart
 hohu deploy ps       # View service status
 hohu deploy logs     # View logs
@@ -134,6 +135,14 @@ Deployment flags:
 hohu deploy --init          # Also initialize the database (create admin user and menus)
 hohu deploy --no-migrate    # Skip database migrations
 ```
+
+### Upgrading Templates After CLI Update
+
+When you update hohu-cli, deployment templates may have changed. Run `hohu deploy init` to sync:
+
+- It detects version differences and lists files that need updating
+- Prompts for confirmation before overwriting (`.env` is never overwritten)
+- Use `--force` to skip the confirmation prompt
 
 ## Configuration Reference
 

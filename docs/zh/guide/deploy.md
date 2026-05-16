@@ -118,6 +118,7 @@ hohu build --reset          # 重置为官方镜像
 ```bash
 hohu deploy          # 一键部署（拉取 → 迁移 → 启动）
 hohu deploy init     # 初始化部署目录和 .env
+hohu deploy init --force  # CLI 升级后强制更新模板
 hohu deploy pull     # 拉取最新镜像并重启
 hohu deploy ps       # 查看服务状态
 hohu deploy logs     # 查看日志
@@ -134,6 +135,14 @@ hohu migrate --init  # 迁移 + 初始化数据（创建管理员用户和菜单
 hohu deploy --init          # 同时初始化数据库（创建管理员用户和菜单）
 hohu deploy --no-migrate    # 跳过数据库迁移
 ```
+
+### CLI 升级后更新模板
+
+更新 hohu-cli 后，部署模板可能发生变化。执行 `hohu deploy init` 即可同步：
+
+- 自动检测版本差异并列出需要更新的文件
+- 覆盖前会提示确认（`.env` 不会被覆盖）
+- 加 `--force` 可跳过确认直接覆盖
 
 ## 配置说明
 

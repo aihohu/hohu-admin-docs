@@ -52,6 +52,23 @@ hohu deploy init
 
 自动生成的 `.env` 包含随机生成的 `SECRET_KEY`、`POSTGRES_PASSWORD`、`REDIS_PASSWORD`。
 
+### 模板版本升级
+
+当 CLI 更新且部署模板发生变化时，再次运行 `hohu deploy init` 会：
+
+1. 检测版本差异并列出需要更新的文件
+2. 提示确认后再覆盖（`.env` 不会被覆盖）
+3. 确认后更新模板文件
+
+```bash
+hohu deploy init           # 交互式：覆盖前会提示确认
+hohu deploy init --force   # 强制覆盖所有模板文件，跳过确认
+```
+
+| 参数      | 说明                             |
+| --------- | -------------------------------- |
+| `--force` | 强制覆盖所有模板文件（跳过确认） |
+
 ::: tip
 使用 `hohu build` 时会自动初始化，无需单独执行此命令。
 :::

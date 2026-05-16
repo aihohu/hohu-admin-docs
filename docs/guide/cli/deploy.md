@@ -52,6 +52,23 @@ hohu deploy init
 
 The auto-generated `.env` includes randomly generated `SECRET_KEY`, `POSTGRES_PASSWORD`, and `REDIS_PASSWORD`.
 
+### Template Version Upgrade
+
+When the CLI is updated and deployment templates change, running `hohu deploy init` again will:
+
+1. Detect the version difference and list files that need updating
+2. Prompt for confirmation before overwriting (`.env` is never overwritten)
+3. Update the template files after confirmation
+
+```bash
+hohu deploy init           # Interactive: prompts before overwriting
+hohu deploy init --force   # Force overwrite all template files without prompting
+```
+
+| Parameter  | Description                                        |
+| ---------- | -------------------------------------------------- |
+| `--force`  | Force overwrite all template files (skip confirmation) |
+
 ::: tip
 When using `hohu build`, initialization is performed automatically. You do not need to run this command separately.
 :::
