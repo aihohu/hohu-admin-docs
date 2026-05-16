@@ -10,24 +10,22 @@ The project follows a modular organization where each module has clear responsib
 ```text
 hohu-admin/
 ├── app/
-│   ├── core/              # Core framework configuration (Security, JWT, Redis, Config)
+│   ├── core/              # Core framework (Security, JWT, Redis, Cache, Config)
 │   ├── db/                # Database connection and base model
 │   │
-│   ├── modules/           # 🧩 Modular directory
+│   ├── modules/           # Modular directory
 │   │   ├── auth/          # Authentication module (login, token refresh)
-│   │   ├── system/        # System management module (User, Role, Menu, Dict)
-│   │   │   ├── api/       # System API endpoints
-│   │   │   ├── crud/      # System business logic
-│   │   │   ├── models/    # System models
-│   │   │   └── schemas/   # System schemas
+│   │   ├── system/        # System management (User, Role, Menu, Dict, Config, File)
+│   │   │   ├── api/       # API endpoints
+│   │   │   ├── models/    # Data models
+│   │   │   ├── schemas/   # Pydantic schemas
+│   │   │   └── service/   # Business logic
 │   │   │
-│   │   └── business/      # 🚀 Placeholder module for custom business logic
-│   │       ├── api/       # User-defined API endpoints
-│   │       └── models/    # User-defined models
-│   │       └── schemas/   # User-defined schemas
+│   │   ├── ai/            # AI module (chat, model management)
+│   │   └── job/           # Scheduled jobs module
 │   │
 │   └── main.py            # Aggregates all module routes
-├── scripts/               # Data initialization scripts
+├── scripts/               # Data initialization and menu sync scripts
 ├── alembic/               # Database migration scripts
 └── .env                   # Environment variable configuration
 ```
