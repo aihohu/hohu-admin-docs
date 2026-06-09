@@ -90,13 +90,25 @@ filters = build_filters(User, field_mapping, **query.model_dump())
 
 Supported operation types:
 
-| Operation       | Description        | Example                  |
-| --------------- | ------------------ | ------------------------ |
-| `"contains"`    | Fuzzy match (LIKE) | `user_name` field search |
-| `"=="`          | Exact match        | `status` field filter    |
-| `"in_"`         | IN query           | Batch ID query           |
-| `">="` / `"<="` | Range comparison   | Date range filter        |
-| `Callable`      | Custom logic       | Multi-table join filter  |
+| Operation       | Description                  | Example                               |
+| --------------- | ---------------------------- | ------------------------------------- |
+| `"contains"`    | Fuzzy match `LIKE '%val%'`   | `user_name` field search              |
+| `"ilike"`       | Case-insensitive fuzzy match | `ILIKE '%val%'`                       |
+| `"like"`        | LIKE with custom pattern     | value contains `%` wildcards          |
+| `"startswith"`  | Prefix match `LIKE 'val%'`   | Starts with specified prefix          |
+| `"endswith"`    | Suffix match `LIKE '%val'`   | Ends with specified suffix            |
+| `"=="`          | Exact match                  | `status` field filter                 |
+| `"!="`          | Not equal                    | Exclude a specific value              |
+| `">"`           | Greater than                 | Numeric comparison                    |
+| `"<"`           | Less than                    | Numeric comparison                    |
+| `">="`          | Greater than or equal        | Date range start                      |
+| `"<="`          | Less than or equal           | Date range end                        |
+| `"in_"`         | IN query                     | Batch ID query                        |
+| `"not_in"`      | NOT IN query                 | Exclude multiple values               |
+| `"between"`     | BETWEEN range query          | value is a `[a, b]` tuple/list        |
+| `"is_null"`     | IS NULL check                | When value is `True`, checks null     |
+| `"is_not_null"` | IS NOT NULL check            | When value is `True`, checks not null |
+| `Callable`      | Custom logic                 | Multi-table join filter               |
 
 Parameters with `None` or empty string values are automatically skipped — no manual null checks needed.
 
