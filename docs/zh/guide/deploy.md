@@ -24,26 +24,32 @@ Internet (:80/:443)
 └────────┬────────┘
          │ /api/
          ▼
-┌─────────────────┐
-│  hohu-admin-api │  FastAPI + uvicorn
-└───┬─────────┬───┘
-    │         │
-    ▼         ▼
-┌───────┐ ┌───────┐
-│  PG   │ │ Redis │
-└───────┘ └───────┘
+┌─────────────────────┐         ┌──────────────────────┐
+│  hohu-admin-api     │  Redis  │  hohu-admin-scheduler │
+│  FastAPI + uvicorn  │ ──────► │  APScheduler 独立进程  │
+└───┬─────────────┬───┘ pub/sub └──────────┬─────────────┘
+    │             │                       │
+    ▼             ▼                       ▼
+┌───────┐   ┌───────┐             ┌───────┐
+│  PG   │   │ Redis │ ◄────────── │       │
+└───────┘   └───────┘             └───────┘
 ```
 
 **包含服务：**
 
-| 服务           | 镜像                 | 说明                                  |
-| -------------- | -------------------- | ------------------------------------- |
-| postgres       | `postgres:16-alpine` | PostgreSQL 数据库（可替换为外部实例） |
-| redis          | `redis:7-alpine`     | Redis 缓存（可替换为外部实例）        |
-| hohu-admin-api | 后端镜像             | FastAPI 应用                          |
-| hohu-admin-web | 前端镜像             | Vue 3 静态文件 + API 反代             |
-| nginx          | `nginx:alpine`       | SSL 反向代理（可选）                  |
-| certbot        | `certbot/certbot`    | Let's Encrypt 自动证书（可选）        |
+| 服务                 | 镜像                 | 说明                                                |
+| -------------------- | -------------------- | --------------------------------------------------- |
+| postgres             | `postgres:16-alpine` | PostgreSQL 数据库（可替换为外部实例）               |
+| redis                | `redis:7-alpine`     | Redis 缓存 + 调度器 pub/sub（可替换为外部实例）     |
+| hohu-admin-api       | 后端镜像             | FastAPI 应用（`APP_ROLE=api`，不跑调度器）          |
+| hohu-admin-scheduler | 后端镜像             | APScheduler 独立进程（`APP_ROLE=scheduler`）        |
+| hohu-admin-web       | 前端镜像             | Vue 3 静态文件 + API 反代                           |
+| nginx                | `nginx:alpine`       | SSL 反向代理（可选）                                |
+| certbot              | `certbot/certbot`    | Let's Encrypt 自动证书（可选）                      |
+
+::: tip 为什么要把调度器拆出来？
+`hohu-admin-api` 默认起 4 个 uvicorn worker。如果把 APScheduler 也放进 web 进程，4 个 worker 会各跑一份调度器，导致同一任务被触发 4 次。生产部署将调度器拆为独立容器彻底消除该问题。详见 [定时任务 - 进程架构](./scheduled-job.md#进程架构)。
+:::
 
 ## 前置条件
 

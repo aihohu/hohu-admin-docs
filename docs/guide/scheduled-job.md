@@ -7,6 +7,43 @@ description: HoHu Admin scheduled job module based on APScheduler, supporting Cr
 
 HoHu Admin includes a built-in scheduled job module based on APScheduler for task registration, scheduling, execution, and logging. It supports two scheduling modes — Cron expressions (5/6 fields) and fixed intervals — and provides a visual task management interface.
 
+## Process Architecture
+
+Scheduled task execution runs in a **separate process** from FastAPI, preventing the same job from firing N times when uvicorn runs multiple workers:
+
+```
+┌─────────────────────┐         ┌──────────────────────┐
+│  hohu-admin-api     │         │  hohu-admin-scheduler │
+│  (FastAPI/uvicorn)  │         │  (APScheduler)        │
+│                     │  Redis  │                       │
+│  - HTTP endpoints   │ ──────► │  - Fires jobs on cron │
+│  - Job CRUD         │ pub/sub │  - Listens for config │
+│  - Publishes events │         │    changes            │
+└─────────────────────┘         └──────────────────────┘
+```
+
+The process role is configured via the `APP_ROLE` environment variable. The **default is derived from `ENV`**:
+
+| Value         | Meaning                                                | Use Case                              |
+| ------------- | ------------------------------------------------------ | ------------------------------------- |
+| `api`         | FastAPI only, scheduler disabled                       | Production web process                |
+| `scheduler`   | APScheduler only, runs in a dedicated container        | Production scheduler process          |
+| `all`         | Single process does both API and scheduling            | Local dev                             |
+
+| `ENV`         | Default `APP_ROLE` | Why                                              |
+| ------------- | ------------------ | ------------------------------------------------ |
+| `dev`         | `all`              | Dev convenience — `fastapi dev` runs scheduler alongside API |
+| `test`        | `api`              | Tests don't run scheduler, avoid side effects    |
+| `prod`        | `api`              | Prod web process doesn't run scheduler; dedicated container does |
+
+::: warning
+In **production**, never set `APP_ROLE=all` on the web process with multiple uvicorn workers — each worker would start its own scheduler, causing every job to fire N times.
+:::
+
+::: tip
+For local dev, just run `fastapi dev app/main.py` with the default `ENV=dev` — the scheduler starts alongside the API automatically. No extra configuration needed.
+:::
+
 ## Core Flow
 
 ```
@@ -106,15 +143,25 @@ Select "Fixed Interval" as the schedule type, then set the interval value and un
 ### Enable / Disable
 
 - Click the **Enable** / **Disable** button in the actions column to toggle status
-- When enabled, the task is immediately registered to the scheduler and runs on schedule
-- When disabled, it is removed from the scheduler and will no longer trigger
+- When enabled, the scheduler is notified in real time and the job is registered to run on schedule
+- When disabled, the scheduler removes the job and it will no longer trigger
+
+::: tip
+Enable/disable, create, update, and delete operations are propagated to the scheduler process in real time via Redis pub/sub — no service restart needed.
+:::
 
 ### Run Immediately
 
-Click **Run Immediately** to manually trigger a one-time execution regardless of the task's status. Useful for debugging or ad-hoc runs.
+Click **Run Immediately** to manually trigger a one-time execution, useful for debugging or ad-hoc runs.
+
+Flow: API verifies the job exists → notifies the scheduler via Redis pub/sub → scheduler executes the job once.
 
 ::: tip
-Running immediately is not restricted by enable/disable status — disabled tasks can also be manually triggered.
+"Run Immediately" **bypasses the enable/disable status** — disabled jobs can also be triggered manually. This is by design: manual trigger is a debug/emergency channel, separate from "should this run on schedule".
+:::
+
+::: tip
+"Run Immediately" notifies the scheduler via Redis pub/sub, so the **scheduler process must be online**. If the scheduler is mid-restart, the trigger request returns success but the job will not run. Ensure the scheduler container is healthy in production.
 :::
 
 ### Delete
@@ -194,7 +241,8 @@ Select multiple log entries, then click the "Batch Delete" button at the top.
 - `app/modules/job/job_runner.py` — Task execution engine
 - `app/modules/job/task_registry.py` — Task registry
 - `app/modules/job/tasks/log_tasks.py` — Built-in task examples
-- `app/core/scheduler.py` — APScheduler wrapper
+- `app/core/scheduler.py` — APScheduler wrapper (includes Redis pub/sub coordination)
+- `app/scheduler_worker.py` — Standalone scheduler process entry point (used in production)
 
 ### Frontend
 

@@ -24,26 +24,32 @@ Internet (:80/:443)
 └────────┬────────┘
          │ /api/
          ▼
-┌─────────────────┐
-│  hohu-admin-api │  FastAPI + uvicorn
-└───┬─────────┬───┘
-    │         │
-    ▼         ▼
-┌───────┐ ┌───────┐
-│  PG   │ │ Redis │
-└───────┘ └───────┘
+┌─────────────────────┐         ┌──────────────────────┐
+│  hohu-admin-api     │  Redis  │  hohu-admin-scheduler │
+│  FastAPI + uvicorn  │ ──────► │  Standalone APSched   │
+└───┬─────────────┬───┘ pub/sub └──────────┬─────────────┘
+    │             │                       │
+    ▼             ▼                       ▼
+┌───────┐   ┌───────┐             ┌───────┐
+│  PG   │   │ Redis │ ◄────────── │       │
+└───────┘   └───────┘             └───────┘
 ```
 
 **Included services:**
 
-| Service        | Image                | Description                                                  |
-| -------------- | -------------------- | ------------------------------------------------------------ |
-| postgres       | `postgres:16-alpine` | PostgreSQL database (can be replaced with external instance) |
-| redis          | `redis:7-alpine`     | Redis cache (can be replaced with external instance)         |
-| hohu-admin-api | Backend image        | FastAPI application                                          |
-| hohu-admin-web | Frontend image       | Vue 3 static files + API reverse proxy                       |
-| nginx          | `nginx:alpine`       | SSL reverse proxy (optional)                                 |
-| certbot        | `certbot/certbot`    | Let's Encrypt auto-certificates (optional)                   |
+| Service             | Image                | Description                                                       |
+| ------------------- | -------------------- | ----------------------------------------------------------------- |
+| postgres            | `postgres:16-alpine` | PostgreSQL database (can be replaced with external instance)      |
+| redis               | `redis:7-alpine`     | Redis cache + scheduler pub/sub (can be replaced with external)   |
+| hohu-admin-api       | Backend image        | FastAPI app (`APP_ROLE=api`, does not run scheduler)              |
+| hohu-admin-scheduler | Backend image        | Standalone APScheduler process (`APP_ROLE=scheduler`)             |
+| hohu-admin-web       | Frontend image       | Vue 3 static files + API reverse proxy                            |
+| nginx                | `nginx:alpine`       | SSL reverse proxy (optional)                                      |
+| certbot              | `certbot/certbot`    | Let's Encrypt auto-certificates (optional)                        |
+
+::: tip Why split the scheduler out?
+`hohu-admin-api` runs 4 uvicorn workers by default. Embedding APScheduler in the web process would cause 4 workers to each run their own scheduler instance, triggering every job 4 times. Production deployment isolates the scheduler in its own container to eliminate this. See [Scheduled Jobs - Process Architecture](./scheduled-job.md#process-architecture).
+:::
 
 ## Prerequisites
 
