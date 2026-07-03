@@ -81,6 +81,15 @@ export default defineConfig({
               ]
             },
             {
+              text: 'Desktop',
+              items: [
+                { text: 'Introduction', link: '/guide/desktop/introduction' },
+                { text: 'Quick Start', link: '/guide/desktop/quick-start' },
+                { text: 'Architecture', link: '/guide/desktop/architecture' },
+                { text: 'Features', link: '/guide/desktop/features' }
+              ]
+            },
+            {
               text: 'CLI Reference',
               items: [
                 { text: 'Overview', link: '/guide/cli/index' },
@@ -140,6 +149,15 @@ export default defineConfig({
                 { text: '错误码', link: '/zh/guide/backend/error-code' },
                 { text: '错误码速查表', link: '/zh/guide/backend/error-code-list' },
                 { text: '缓存', link: '/zh/guide/backend/cache' }
+              ]
+            },
+            {
+              text: '桌面端',
+              items: [
+                { text: '介绍', link: '/zh/guide/desktop/introduction' },
+                { text: '快速上手', link: '/zh/guide/desktop/quick-start' },
+                { text: '架构详解', link: '/zh/guide/desktop/architecture' },
+                { text: '已实现特性', link: '/zh/guide/desktop/features' }
               ]
             },
             {
