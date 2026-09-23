@@ -65,7 +65,7 @@ const { t, prefix, locale } = useI18n();
       </footer>
 
       <div class="footer-bottom">
-        <span>© 2025 HoHu · MIT License</span>
+        <span>© 2025-2026 HoHux · Apache-2.0</span>
         <div class="lang-switch">
           <span v-if="locale === 'en'" class="lang-active">{{ t.langEn }}</span>
           <a v-if="locale !== 'en'" href="/">{{ t.langEn }}</a>

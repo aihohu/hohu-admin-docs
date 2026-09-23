@@ -37,7 +37,7 @@ const translations = {
     f5Title: 'Full-Stack Coverage',
     f5Desc: 'Web · H5 · WeChat Mini Program<br>Native App',
     f6Title: 'Fully Open Source',
-    f6Desc: 'MIT License<br>Self-hosted · Commercial use',
+    f6Desc: 'Apache-2.0<br>Self-hosted · Commercial use',
     // QuickStart
     qsTitle: 'Start in 3 Minutes',
     qsDesc: 'From zero to a complete admin system, just a few commands',
@@ -102,7 +102,7 @@ const translations = {
     f5Title: '全端覆盖',
     f5Desc: 'Web · H5 · 微信小程序<br>原生 App',
     f6Title: '完全开源',
-    f6Desc: 'MIT 协议<br>自主可控 · 可商用',
+    f6Desc: 'Apache-2.0 协议<br>自主可控 · 可商用',
     qsTitle: '3 分钟启动项目',
     qsDesc: '从零到完整后台管理系统，只需几条命令',
     qsLearnMore: '了解更多 →',
