@@ -21,7 +21,11 @@ pnpm fmt                  # Format all files (oxfmt, not Prettier)
 ## VitePress Conventions
 
 - Config file: `docs/.vitepress/config.mts`
-- Adding a new page: create `.md` file → add frontmatter `title` and `description` → add entry to `sidebar` in `config.mts`. **Every page must have a `description`** for SEO
+- Adding a new page: create both language `.md` files → add frontmatter `title` and `description` → register the shared route in `navigation.mjs`. **Every page must have a `description`** for SEO
 - Homepage components are globally registered in `docs/.vitepress/theme/index.ts`, no external UI library (raw HTML + scoped CSS)
-- Component colors use `--landing-*` CSS custom properties defined in `style.css`, auto-adapting to light/dark theme
-- Documentation targets developers, written in Chinese
+- Homepage colors use scoped `--home-*` tokens and VitePress theme variables; verify light and dark appearance
+- Documentation serves users, deployers and developers in paired Chinese and English pages. Follow [DOCUMENTATION.md](./DOCUMENTATION.md).
+- Navigation and published page inventory are shared in `docs/.vitepress/navigation.mjs`. Keep existing URLs stable.
+- Run `pnpm test`, `pnpm lint`, `pnpm fmt:check`, `pnpm build`, `pnpm docs:check-dist`, and `pnpm docs:check-seo` after changes.
+- Review both languages before recording a pair with `pnpm docs:review <guide-path>`. Never refresh every hash to hide stale translations.
+- Keep personal drafts outside the site source in ignored `.local/docs/`. Necessary public decisions remain in the code repository.

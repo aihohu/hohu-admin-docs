@@ -2,17 +2,22 @@
   "name": "hohu-admin-docs",
   "version": "1.0.0",
   "private": true,
-  "description": "HoHu Admin 官方网站与文档",
+  "description": "HoHu 企业应用平台官网与文档",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "build": "vitepress build docs",
+    "build": "pnpm docs:check && vitepress build docs",
     "dev": "vitepress dev docs",
+    "docs:check": "node scripts/check-docs.mjs",
+    "docs:check-dist": "node scripts/check-docs-dist.mjs",
+    "docs:check-seo": "node scripts/check-seo.mjs",
+    "docs:review": "node scripts/check-docs.mjs --accept",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "lint": "oxlint && eslint .",
     "lint:fix": "oxlint --fix && eslint --fix .",
-    "preview": "vitepress preview docs"
+    "preview": "vitepress preview docs",
+    "test": "node --test tests/*.test.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

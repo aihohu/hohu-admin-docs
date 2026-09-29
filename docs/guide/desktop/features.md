@@ -1,13 +1,13 @@
 ---
 title: Desktop Features
-description: The full inventory of built-in capabilities — from Phase 1 infrastructure to Phase 2 desktop differentiators, each with a spec link
+description: Explore HoHu desktop authentication, routing, storage, windows, updates and notifications, including platform limits.
 ---
 
 # Features
 
 > For the complete roadmap and design rationale, see the in-repo [`docs/framework-design.md`](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/framework-design.md). This page is a user-facing overview.
 
-## Phase 1 — Foundation (parity with web)
+## Application foundation
 
 ### Request Layer (HTTP through main process)
 
@@ -39,9 +39,9 @@ description: The full inventory of built-in capabilities — from Phase 1 infras
 
 ---
 
-## Phase 2 — Desktop Differentiation
+## Desktop integration
 
-### Phase 2.1: Logging + Local Storage
+### Logging + Local Storage
 
 - **electron-log**: unified logging across main / preload / renderer, writes to `~/Library/Logs/{appName}/` (macOS)
 - **electron-store**: non-sensitive config (window state, shortcuts, tray behavior, notification toggle, etc.) persisted to `userData/config.json`
@@ -49,7 +49,7 @@ description: The full inventory of built-in capabilities — from Phase 1 infras
 
 > See [spec-phase2.1](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.1-logging-store.md)
 
-### Phase 2.2: Window / Tray / Global Shortcuts
+### Window / Tray / Global Shortcuts
 
 - **WindowManager**: singleton managing the main window; window state (position, size, maximized, fullscreen) persists across restarts
 - **TrayManager**: tray icon + right-click menu (Show/Hide / Reload / DevTools / Check for Updates / Quit); close button minimizes to tray instead of quitting
@@ -58,7 +58,7 @@ description: The full inventory of built-in capabilities — from Phase 1 infras
 
 > See [spec-phase2.2](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.2-window-tray-shortcut.md)
 
-### Phase 2.3: Auto-Update
+### Auto-Update
 
 - Wraps **electron-updater v6** as an `UpdaterManager` singleton
 - Dual provider: GitHub Releases (default) / Generic (any static URL, requires `latest.yml`)
@@ -70,7 +70,7 @@ description: The full inventory of built-in capabilities — from Phase 1 infras
 
 > See [spec-phase2.3](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.3-auto-update.md)
 
-### Phase 2.4: Notification Dispatcher
+### Notification Dispatcher
 
 - **NotificationManager singleton**: every `new Notification()` call must go through this — one place for muting, logging, and behavior changes
 - **Renderer pushes via IPC**: `window.api.notification.show({ source, category, title, body, actionId? })` lets the renderer fire system notifications (which the web cannot do)
@@ -85,25 +85,25 @@ description: The full inventory of built-in capabilities — from Phase 1 infras
 
 ## Platform Limitations
 
-| Platform | Auto-Update | System Notifications |
-|---|---|---|
-| Windows | ✅ NSIS, works out of the box | ✅ |
-| macOS | ⚠️ Requires code signing (Developer ID Application cert). Without it, can detect and download but install is rejected. | ✅ |
-| Linux | ✅ AppImage (deb / snap don't support auto-update) | ⚠️ Requires libnotify; no-op in containers / headless environments |
+| Platform | Auto-Update                                                                                                            | System Notifications                                               |
+| -------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Windows  | ✅ NSIS, works out of the box                                                                                          | ✅                                                                 |
+| macOS    | ⚠️ Requires code signing (Developer ID Application cert). Without it, can detect and download but install is rejected. | ✅                                                                 |
+| Linux    | ✅ AppImage (deb / snap don't support auto-update)                                                                     | ⚠️ Requires libnotify; no-op in containers / headless environments |
 
 Notarization is Apple's independent requirement for **first-time distribution** (e.g., a downloaded DMG the first time it runs), unrelated to the auto-update flow. Neither signing nor notarization is configured by default — developers set these up when shipping their own apps.
 
 ---
 
-## Not Done (YAGNI)
+## Scope and limitations
 
 The following are deliberately omitted until there's real demand:
 
 - Notification history / notification center (the OS already has one)
 - Per-category mute, dedup, rate-limiting, custom action buttons (Reply / Snooze)
-- Renderer-side settings page UI (IPC fully exposed; UI deferred to Phase 3)
+- Renderer-side settings page UI
 - Beta channels / pre-release filtering
-- AI chat module, AI desktop scenarios (overlay / selection / screenshot) — Phase 3 roadmap
+- AI chat module, AI desktop scenarios (overlay / selection / screenshot)
 - Duplicating all web admin pages — wasteful
 - Data dashboards, CRUD tables — the web does it better
 

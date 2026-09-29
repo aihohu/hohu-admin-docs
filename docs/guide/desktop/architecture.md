@@ -59,7 +59,7 @@ fetchXxx()  ──→  window.api.http.request(cfg)  ──→  net.request()
 The renderer uses a flat result shape:
 
 ```ts
-const { data, error } = await fetchUserInfo()
+const { data, error } = await fetchUserInfo();
 if (error) {
   // handle error
 } else {
@@ -71,7 +71,7 @@ No try/catch needed — errors are return values, not exceptions. Token expiry t
 
 See [`src/main/services/http.ts`](https://github.com/aihohu/hohu-admin-desktop/blob/main/src/main/services/http.ts) and the renderer's [`service/request/factory.ts`](https://github.com/aihohu/hohu-admin-desktop/blob/main/src/renderer/src/service/request/factory.ts).
 
-## 🔐 Token Storage & Keychain
+## 🔐 Token Storage & Keychain {#token-storage-keychain}
 
 **Tokens never enter localStorage.**
 
@@ -81,8 +81,8 @@ See [`src/main/services/http.ts`](https://github.com/aihohu/hohu-admin-desktop/b
 
 ```ts
 // Renderer usage
-await window.api.secureStore.set('token', authToken)
-const token = await window.api.secureStore.get('token')
+await window.api.secureStore.set('token', authToken);
+const token = await window.api.secureStore.get('token');
 ```
 
 Logout calls `clear()` and the file is emptied. Token refresh is centralized in `service/request/index.ts`: expired-token codes trigger single-flight refresh, concurrent requests share one refresh Promise, retry once.
@@ -104,24 +104,24 @@ See [Quick Start — Your First IPC Channel](./quick-start#_5-your-first-ipc-cha
 
 ## 🛡️ Security Model
 
-| Layer | Configuration |
-|---|---|
-| **contextIsolation** | `true` (default) — isolates preload from renderer |
-| **nodeIntegration** | `false` (default) — renderer has no Node API |
-| **sandbox** | `false` (current) — preload can use Node API; planned to switch to `true` in Phase 3+ |
-| **CSP** | configured in `src/renderer/index.html` — adding new origins (CDN / WebSocket) requires updating `connect-src` / `img-src` |
-| **External links** | go through `shell.openExternal`; protocol whitelist optional |
-| **DevTools** | F12 toggle in dev; auto-disabled in prod |
+| Layer                | Configuration                                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **contextIsolation** | `true` (default) — isolates preload from renderer                                                                          |
+| **nodeIntegration**  | `false` (default) — renderer has no Node API                                                                               |
+| **sandbox**          | `false` (current) — preload can use Node API                                                                               |
+| **CSP**              | configured in `src/renderer/index.html` — adding new origins (CDN / WebSocket) requires updating `connect-src` / `img-src` |
+| **External links**   | go through `shell.openExternal`; protocol whitelist optional                                                               |
+| **DevTools**         | F12 toggle in dev; auto-disabled in prod                                                                                   |
 
 ## 📁 Path Aliases
 
-| Alias | Resolves to | Used by |
-|---|---|---|
-| `@renderer/*` | `src/renderer/src/*` | renderer |
-| `@shared/*` | `src/shared/*` | all three processes |
-| `@main/*` | `src/main/*` | main |
-| `@resources/*` | `resources/*` | main, renderer |
-| `@iconify-json` | `node_modules/@iconify/json/json` | renderer |
+| Alias           | Resolves to                       | Used by             |
+| --------------- | --------------------------------- | ------------------- |
+| `@renderer/*`   | `src/renderer/src/*`              | renderer            |
+| `@shared/*`     | `src/shared/*`                    | all three processes |
+| `@main/*`       | `src/main/*`                      | main                |
+| `@resources/*`  | `resources/*`                     | main, renderer      |
+| `@iconify-json` | `node_modules/@iconify/json/json` | renderer            |
 
 Configured in `tsconfig.{node,web}.json` and `electron.vite.config.ts`.
 

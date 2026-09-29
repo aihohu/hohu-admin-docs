@@ -1,169 +1,31 @@
 ---
-title: hohu deploy
-description: 使用 hohu deploy 通过 Docker Compose 将全栈服务部署到 Linux 服务器，包含环境初始化和服务编排
+title: hohu deploy 与迁移
+description: HoHu hohu deploy 与迁移的使用步骤、适用范围与限制
 ---
 
-# hohu deploy
+# hohu deploy 与迁移
 
-通过 Docker Compose 将全栈服务部署到 Linux 服务器。
+使用部署命令前，安装与应用配套的 CLI；命令选项可通过 `hohu deploy --help` 查看，组件发行记录见[更新说明](../reference/versions)。
 
-## hohu deploy
-
-一键部署，自动完成完整流程：拉取镜像 → 启动数据库 → 等待就绪 → 迁移 → 启动全部服务。
-
-```bash
-hohu deploy
-```
-
-### 参数
-
-| 参数           | 说明                                             |
-| -------------- | ------------------------------------------------ |
-| `--init`       | 迁移后额外运行初始化脚本（创建管理员用户和菜单） |
-| `--no-migrate` | 跳过数据库迁移                                   |
-
-```bash
-hohu deploy --init          # 部署并初始化数据
-hohu deploy --no-migrate    # 部署但跳过迁移
-```
-
-### 部署流程
-
-```
-hohu deploy
-    │
-    ├─ 1. 检查 Docker 环境
-    ├─ 2. 同步部署模板
-    ├─ 3. 生成 .env 配置（首次）
-    ├─ 4. 拉取镜像（本地构建时仅拉取基础设施镜像）
-    ├─ 5. 启动 PostgreSQL + Redis（如果启用）
-    ├─ 6. 等待数据库就绪
-    ├─ 7. 运行数据库迁移
-    └─ 8. 启动应用服务
-```
-
-## hohu deploy init
-
-初始化部署配置，创建 `.hohu/deploy/` 目录并生成 `.env`。
-
-```bash
-hohu deploy init
-```
-
-自动生成的 `.env` 包含随机生成的 `SECRET_KEY`、`POSTGRES_PASSWORD`、`REDIS_PASSWORD`。
-
-### 模板版本升级
-
-当 CLI 更新且部署模板发生变化时，再次运行 `hohu deploy init` 会：
-
-1. 检测版本差异并列出需要更新的文件
-2. 提示确认后再覆盖（`.env` 不会被覆盖）
-3. 确认后更新模板文件
-
-```bash
-hohu deploy init           # 交互式：覆盖前会提示确认
-hohu deploy init --force   # 强制覆盖所有模板文件，跳过确认
-```
-
-| 参数      | 说明                             |
-| --------- | -------------------------------- |
-| `--force` | 强制覆盖所有模板文件（跳过确认） |
-
-::: tip
-使用 `hohu build` 时会自动初始化，无需单独执行此命令。
-:::
-
-## hohu deploy pull
-
-拉取最新镜像并重启服务。
-
-```bash
-hohu deploy pull
-```
-
-适用于官方镜像更新后拉取新版本。
-
-## hohu deploy ps
-
-查看所有服务的运行状态。
+| 命令                                | 行为                                                                          |
+| ----------------------------------- | ----------------------------------------------------------------------------- |
+| `hohu deploy init`                  | 生成/补齐 `.hohu/deploy` 配置；`--force` 会覆盖需更新的模板，先保存自定义内容 |
+| `hohu deploy`                       | 拉取适用镜像、准备基础服务、迁移并同步种子，然后启动                          |
+| `hohu deploy --no-migrate`          | 跳过迁移阶段及该阶段的种子同步，仅用于确认无需更新的受控场景                  |
+| `hohu migrate`                      | 单独运行部署迁移及种子同步，不接受额外初始化开关                              |
+| `hohu deploy pull`                  | 更新镜像后迁移、同步种子并启动，不是纯下载                                    |
+| `hohu deploy upgrade`               | 拉取源码、构建、停止再部署；可用 --no-cache，存在停机窗口                     |
+| `hohu deploy restart [SERVICES...]` | 重启服务，不代替版本迁移                                                      |
+| `hohu deploy down`                  | 停止 Compose 服务，不是删除业务数据的重置命令                                 |
 
 ```bash
 hohu deploy ps
+hohu deploy logs -f hohu-admin-api
+hohu deploy restart hohu-admin-api
 ```
 
-## hohu deploy logs
+默认部署自动同步基础数据，**不再使用 `hohu deploy --init` 或 `hohu migrate --init`**。重复执行保留密码、自定义内容及已有授权，任一迁移/种子失败阻断正常启动。
 
-查看服务日志。
+使用外部数据库/Redis 时，先核对匹配版本对各个命令的基础服务编排支持，不假定所有维护子命令都会识别同一外部服务配置。
 
-```bash
-hohu deploy logs                    # 全部日志
-hohu deploy logs -f                 # 实时跟踪
-hohu deploy logs hohu-admin-api     # 仅后端
-hohu deploy logs -f postgres        # 跟踪数据库
-```
-
-| 参数              | 说明                 |
-| ----------------- | -------------------- |
-| `-f` / `--follow` | 实时跟踪日志输出     |
-| `SERVICE...`      | 指定服务名称（可选） |
-
-## hohu deploy restart
-
-重启服务。
-
-```bash
-hohu deploy restart                 # 重启全部
-hohu deploy restart hohu-admin-api  # 仅重启后端
-```
-
-## hohu deploy down
-
-停止所有服务并移除容器。
-
-```bash
-hohu deploy down
-```
-
-数据卷保留，不会删除数据库数据。如需清除所有数据：
-
-```bash
-cd .hohu/deploy
-docker compose down -v
-```
-
-## hohu migrate
-
-独立运行数据库迁移。
-
-```bash
-hohu migrate           # 仅迁移
-hohu migrate --init    # 迁移 + 初始化（创建管理员用户和菜单）
-```
-
-| 参数     | 说明                 |
-| -------- | -------------------- |
-| `--init` | 迁移后运行初始化脚本 |
-
-::: tip
-`hohu deploy` 默认会自动运行迁移，通常无需单独使用此命令。仅在需要手动控制迁移时使用。
-:::
-
-## 环境变量速查
-
-部署配置通过 `.hohu/deploy/.env` 管理。关键配置项：
-
-| 变量              | 说明                                        |
-| ----------------- | ------------------------------------------- |
-| `IMAGE_TAG`       | 镜像标签（`latest` 或 `source`）            |
-| `API_IMAGE`       | 后端镜像地址（源码构建时自动设为本地名称）  |
-| `WEB_IMAGE`       | 前端镜像地址（源码构建时自动设为本地名称）  |
-| `ENABLE_POSTGRES` | 是否使用内置 PostgreSQL（`true` / `false`） |
-| `DATABASE_URL`    | 外部 PostgreSQL 连接串                      |
-| `ENABLE_REDIS`    | 是否使用内置 Redis（`true` / `false`）      |
-| `REDIS_HOST`      | 外部 Redis 地址                             |
-| `SECRET_KEY`      | JWT 签名密钥                                |
-| `ENABLE_NGINX`    | 是否启用内置 Nginx                          |
-| `WEB_PORT`        | 前端端口暴露（如 `0.0.0.0:9527`）           |
-| `API_PORT`        | 后端端口暴露                                |
-
-完整配置参考见 [部署指南 →](/guide/deploy)
+环境配置调整、备份、维护窗口及回滚责任见[升级指南](../operations/upgrade)。源码构建说明见 [hohu build](./build)。

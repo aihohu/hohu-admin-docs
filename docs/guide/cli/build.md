@@ -1,5 +1,5 @@
 ---
-title: hohu build
+title: hohu build command
 description: Use hohu build to build backend and frontend Docker images from local source code, then deploy with hohu deploy
 ---
 

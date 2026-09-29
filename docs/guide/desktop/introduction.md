@@ -26,13 +26,13 @@ The desktop client **focuses on what the web cannot do or does poorly**:
 
 ## 🛠️ Tech Stack
 
-| Layer | Tech |
-|---|---|
-| Shell | Electron 39 / electron-vite 5 |
-| Renderer | Vue 3.5 / TypeScript 5.9 / NaiveUI / Pinia 3 / Vite 7 |
-| Packaging | electron-builder (NSIS / DMG / AppImage) |
-| Main-process libs | electron-store / electron-log / electron-updater |
-| Type contracts | `src/shared/types.ts` — shared across main / preload / renderer |
+| Layer             | Tech                                                            |
+| ----------------- | --------------------------------------------------------------- |
+| Shell             | Electron 39 / electron-vite 5                                   |
+| Renderer          | Vue 3.5 / TypeScript 5.9 / NaiveUI / Pinia 3 / Vite 7           |
+| Packaging         | electron-builder (NSIS / DMG / AppImage)                        |
+| Main-process libs | electron-store / electron-log / electron-updater                |
+| Type contracts    | `src/shared/types.ts` — shared across main / preload / renderer |
 
 ## 📦 Three-Process Layout
 
@@ -56,5 +56,5 @@ Key constraints:
 
 - [Quick Start](./quick-start) — running in 5 minutes
 - [Architecture](./architecture) — three processes, request layer, IPC, security
-- [Features](./features) — Phase 1 + Phase 2 inventory
+- [Features](./features) — Desktop capability inventory
 - [Source Repository](https://github.com/aihohu/hohu-admin-desktop)

@@ -1,0 +1,182 @@
+{
+  "index": {
+    "en": "282fc021c99cecbb764e6159d9e5a42688501dc619246abced89cd67fcbefbf3",
+    "zh": "16647aaec9088f653cc6eb414f95630d74562460a0a3c788b64884318cae76af"
+  },
+  "user/index": {
+    "en": "be33659ae52211c0d57750ed9d4ef1c31315bc3f83ecb90d409a17318432de44",
+    "zh": "2d7f9775226d38de7ebfe0168bf2a6edfb9befebf95a6a5726c6724ad5e1b011"
+  },
+  "introduction": {
+    "en": "3f9f4f3cf2f250c8fd74825fca326fd3f72825c7c5cbadbe78aef2baf1cf23f4",
+    "zh": "731067b81ce91129f47beda883bffb651d283c5b330a05fb84697cf20474f617"
+  },
+  "user/account": {
+    "en": "8b5fa43b1f9c2ea2b333264f2190e868805105369f5af8ff811f6332db56cc08",
+    "zh": "487bb7119f6e738565bc0644b47c63d8b711d9024248e827910998949c647c3e"
+  },
+  "user/access": {
+    "en": "bf5d5a94e500caf4a954160e008bc69b7bbe7283ae37faa93ef5d1f398f1305b",
+    "zh": "ffae192475e665e6c3b372cfd35c1b710c4661104f9571575d5cf8431605281a"
+  },
+  "user/settings": {
+    "en": "91a407d86d4f4813cbca45588b718e1852b1382f6f54b802acb21e7ab47d1198",
+    "zh": "08da5f8f2f41174f7e07d97b1ca19f1f10512bdc0744d9b67a75268621092de6"
+  },
+  "user/parameters": {
+    "en": "4c1edd119f3f001f66e27fc143ea65f029dd6f3a695b79a999e33d0953e57789",
+    "zh": "858cfdd54d0d245d561d10c8e71cd83bc420db227fd87637b727b6ad3df7a1d6"
+  },
+  "user/files": {
+    "en": "f1c961e698fdd2f872b5a23c6a8713ec9742e7f4db90a6bc9253f65ecfc2c648",
+    "zh": "893acd23bc730d521bd1ac695ba1de6afad98debd2a7d5d110ad31df01ee8ffe"
+  },
+  "user/ai": {
+    "en": "10979f659b8c1e61b9f7c15a142232dde6e538325d6a093beff751f0b4bcf0fc",
+    "zh": "73d2572847fe2a58f551a3b4151bd17329be1a5fc9643322befe6f1248f213c0"
+  },
+  "user/faq": {
+    "en": "dc2ec05fa7748ba86ace8640d4c4bf11a410a8c8629621ba0e869c8f8227ed7c",
+    "zh": "1fdd76c0c0a73c5dffb8bc9d2f0714008be7ac6b1e826373fd9d2c75adc73f71"
+  },
+  "show": {
+    "en": "633decca4fd3b4151adf2ad5ecb01fdbf5e1c95674e7ea895e6255a5191decf7",
+    "zh": "5cd333a6b72e2eb710aaecf2d786c35b2598cca0c9cab3ff0e39bc7dc245214a"
+  },
+  "operations/index": {
+    "en": "70578968389ff7037fe493e3da70e515928d1df8e96fd129df744735f35be68e",
+    "zh": "26f712caf37208f9d9b8339aa7ecee349c213902f8f6f0cb8aa908d160efff3c"
+  },
+  "deploy": {
+    "en": "60a0a3ae211a17cb90ca8db9741fb55e493372b255fa075b0ffdcaf65b6bcde7",
+    "zh": "de37a76f1da631a5ca1a226c2e4975e0128a79e277730c2b3e752bb2607f8954"
+  },
+  "operations/upgrade": {
+    "en": "9274adf07e1e2b40f22972c196435721fb3451efa27a943f3d9e8086b12e34b6",
+    "zh": "17bd7635bdb108f26de6a141b8c14d6e6dff41fb3851aa2c6b0192e11588e58e"
+  },
+  "operations/tenants": {
+    "en": "bd9ceff8961bcd2dcde7e20d6c8605727eb48fd7ae82df77a11ee47721385436",
+    "zh": "4b920b9f233c994fd5480fdd632305581a38998a8decf986fa75c856ef0dbdcb"
+  },
+  "operations/ai": {
+    "en": "ba4dc93a26fd965ff8c2e96c1c46677f3ccb26a6f64af18d0d00d80ed96100f4",
+    "zh": "1e3f3416859d738ca2964814573e383a4a5d9800ad0b53627e3a940749fbc9c3"
+  },
+  "development/index": {
+    "en": "c75b19c78e307dc4d068c49955ae4ec1c60fd157efd2d562dda7c182fd50486f",
+    "zh": "fa92fefb5fef330c801723c4bc7ba67accbb5f5b3c1458281b08d3e1d50c1fce"
+  },
+  "quick-start": {
+    "en": "4505d866c3ea1628142179112b73a81e7122c394593770605a3610b25488be13",
+    "zh": "d5305cc77f956bc523f6b626c5d2a3686f7bf208324d5fc0bf4050ca39c4759e"
+  },
+  "backend/introduction": {
+    "en": "d112b6c7a3d7c8c5d91998b5a831bb25f9a7ba555c936916ffb3a4b22abe178c",
+    "zh": "2b40db73fe88ce7c82f8b1504ce808fdae083b5dbab7e741681884418d54e713"
+  },
+  "backend/dir": {
+    "en": "400d23976671b4577265799d2e4692eeabfb67e22dbff9f1c97a9da7da71e456",
+    "zh": "d964a916536c85c940c73130c2190786006210b16ff80b48ad8028126fdcae83"
+  },
+  "development/module": {
+    "en": "3333e93cac406ab69c77ebed53b0ddbb93b5b46ff3bb07a87e77d83d530d12ce",
+    "zh": "2a74ee298c71cb38c7282db834ada9a9fe28349184ed69928eff92a3ba3b607b"
+  },
+  "auth": {
+    "en": "dfc459c1f646398ea1d0e114d7d97972368c81eb33e2dedb9de9f7aa36ad6829",
+    "zh": "f12342d6a4274418cd2468acc4bde8d2d8433f41be672774fedb3aa93765eaf1"
+  },
+  "data-permission": {
+    "en": "5ed3177f5990fa904920ace4fef048d88692155a22d624ef1174a8987ce5458d",
+    "zh": "5803f86a156dd3cea31d423fbd9cf5b789d42b0c2dda9a56e286a86f61f7448d"
+  },
+  "page": {
+    "en": "91c05de57f7b28d642acb726dd2e5fbfbad60cddd857b9fc4cbdd218eb5874f1",
+    "zh": "ac76c671925111694b4225cf17130133192f93b430758c316f036b4cb46bf596"
+  },
+  "file-upload": {
+    "en": "2ddc5544a70fe462a5820c33d8d87788c8a5124a5e65cdf69b6c6f021496e34b",
+    "zh": "f9a7311a036baffc875ce331b4b49549c1d7d35826ab684ed8f879549a7d9bbb"
+  },
+  "backend/cache": {
+    "en": "9ce6cc17b0b3c7fe5b28edf2c5f3aa80d69306200cded54131d092ffcefb84b6",
+    "zh": "3d4b1507e08d3247fb9124e4b0965d33f7263bb3134b5164a8afeeb367174257"
+  },
+  "scheduled-job": {
+    "en": "81cdcce20fa2f506be9b88faa47f046db62b93b34e26527a6f4ec43adf14229e",
+    "zh": "ccf17bb342fe79afdfbf4dd30af47094e3329041f54f72027a5ad68d426218cc"
+  },
+  "development/i18n": {
+    "en": "1fc2e99ad0201385fafc1a473f93b3c1e1d97740b6f859ffbcd329b9578ec4ab",
+    "zh": "e73d558efb7a758657bc54974db81374950cfe73b4e40bacbd8094f3c240d258"
+  },
+  "ai-coding": {
+    "en": "da8b2d0fe444cd818f540d272db793dc7853d98f98110298f22f1c746d208abb",
+    "zh": "224897b01e46e4d48522339e9a64b43ba0c193dad9bfd0846ab68abb3ed19eb9"
+  },
+  "desktop/introduction": {
+    "en": "6abed4ca233f59b5272825de939fca6f8172d34d4c3946af54129fc8ed506b26",
+    "zh": "f9409caab991a81ff8ca4e9161abb5c215bbe76e611f6fbe36218968d966ea9f"
+  },
+  "desktop/quick-start": {
+    "en": "270599f5c06a27ac1f462e5f20d87994d2d7322b3b357074ae72108b8ab7b826",
+    "zh": "91a84543f8a252d40ee7993982c92f47d25de88d23e5bc8936c81b97ab97068a"
+  },
+  "desktop/architecture": {
+    "en": "c43d68a0cf3370e6e6cb33e066421754aa50abf9a331acc84a7f9455c71b2fcc",
+    "zh": "8fc83cb8dec102ec5fe08ab1662eecd3b434cac7f97eec12d0cd6413ff4f3a5f"
+  },
+  "desktop/features": {
+    "en": "580acf16530ad4b21cb6665831aacc84be4c2c2aad5e4c54400f3373c002a166",
+    "zh": "578e83116874b741f9b5c6ad399a01d63c675044e00514e9ad314ef4734dd90b"
+  },
+  "reference/index": {
+    "en": "28c289cc24f0f085161fd6b6f8000ee4ca1c692073f72f157ca4b64ff4bcf5db",
+    "zh": "5a7ea0fc604cd333eff4c27ce8f680d2e3c29955f9af741f6be21d97f19971cb"
+  },
+  "reference/versions": {
+    "en": "a1f177e89ea866f350a2f90d26a8426685fa96bd9252f947e79b29d169f8a91a",
+    "zh": "2a066f5ba1fd1456f15c2ab7ecf37aeef5e21d48307106790a4a148828aa664f"
+  },
+  "reference/configuration": {
+    "en": "1653987656bc45b467b35bde9c9f4960c4f3e18d7765b52bba527a912ae31ebb",
+    "zh": "65e9e74b63d6c4871d0232a257e574014bc1331d622c01560d46029d4b08d720"
+  },
+  "reference/settings": {
+    "en": "c14781394184bb670ab01cb5d549a8bda7989dc1fee90f4b4f6f9c0d768059f3",
+    "zh": "fb8e9121d949a26abd8edcefd1ae938419d6e46b3e1a99d2e8646dbd7a6a9181"
+  },
+  "reference/api": {
+    "en": "9c50796c2c56d9fb913c01fa8d2c20b1d931f710ac0f85b143d2f29f8d5a8cda",
+    "zh": "35d5a824cd46564d44d7dcbc2ce29e8741c02c855c73bd8835e3fa66a14e1fe5"
+  },
+  "cli/index": {
+    "en": "f183511c5a3387a38e904ee11083efdd2a6538bf60e4b02c5b34f2dee6c39f3b",
+    "zh": "c4d6f0b69b888a5320a7666076566b158ce1b0c35482681b625d10408fb022cc"
+  },
+  "cli/build": {
+    "en": "de946742c24892d2dffe99b9c522955f4de5a9f0e59c7ed02f6962a0e9db5e78",
+    "zh": "217da60aec29c5bc093f10b07f3dc9fd35e124273318c87375f5de26b2b16137"
+  },
+  "cli/deploy": {
+    "en": "22dab43d9af00dbcdfa168219b48e1506aae640feb88a92d74f1c76fb557fa7a",
+    "zh": "60e753506cfd652bab80f79b011d0f7d1f98f557ae428ae0de231a0820c8be42"
+  },
+  "backend/error-code": {
+    "en": "cd08f8ed29d0853425ac289cd796f700f2e42568ba8923c643195338bee06573",
+    "zh": "211b6a29d19743efb87ca75d7d03eff0361efd9ef67425c7ce26896d75206dd6"
+  },
+  "backend/error-code-list": {
+    "en": "2eb504db7d730d5959cf5a28e78517669a6fa11c226f4ed69f9b579d449c0703",
+    "zh": "d7412b66f1bb3db34d9b07b34714d153d64fdba73fc4ae9859dbeb02142fb189"
+  },
+  "src": {
+    "en": "a874965ba5c812805ad2aba0b59ab7a5bf51d0c965de8911b6a2557f6be7aad9",
+    "zh": "8898e8c78b0445d9ca2ba6046ce2a6cce197199dfc525e7e7958c5db7296f30c"
+  },
+  "development/ai-tools": {
+    "en": "3f8208047a81fac60a8ec21e5cc55143636642a97393111c542307383cc8d147",
+    "zh": "f529b59ac9972ecd05542be29b1547da34a838e1b30e9c9932dd4948a3df193a"
+  }
+}

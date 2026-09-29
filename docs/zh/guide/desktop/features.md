@@ -1,13 +1,13 @@
 ---
 title: 桌面端已实现特性
-description: hohu-admin-desktop 内置能力的完整清单 —— 从 Phase 1 基础设施到 Phase 2 桌面差异化，每个特性附 spec 链接
+description: 了解 HoHu 桌面端的请求与认证、路由、存储、窗口、自动更新和通知能力及平台限制。
 ---
 
 # 已实现特性
 
 > 完整 roadmap 与设计理由见仓库内的 [`docs/framework-design.md`](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/framework-design.md)。本页是面向使用者的概览。
 
-## Phase 1 —— 与 web 对齐的基础设施
+## 基础能力
 
 ### 请求层（HTTP 走主进程）
 
@@ -39,9 +39,9 @@ description: hohu-admin-desktop 内置能力的完整清单 —— 从 Phase 1 �
 
 ---
 
-## Phase 2 —— 桌面差异化
+## 桌面集成
 
-### Phase 2.1：日志 + 本地存储
+### 日志 + 本地存储
 
 - **electron-log**：main / preload / renderer 三进程统一日志，写文件到 `~/Library/Logs/{appName}/`（macOS）
 - **electron-store**：非敏感配置（窗口状态、快捷键、托盘行为、通知开关等）持久化到 `userData/config.json`
@@ -49,7 +49,7 @@ description: hohu-admin-desktop 内置能力的完整清单 —— 从 Phase 1 �
 
 > 详见 [spec-phase2.1](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.1-logging-store.md)
 
-### Phase 2.2：窗口 / 托盘 / 全局快捷键
+### 窗口 / 托盘 / 全局快捷键
 
 - **WindowManager**：单例管理主窗口，窗口状态（位置、大小、最大化、全屏）跨重启持久化
 - **TrayManager**：托盘图标 + 右键菜单（Show/Hide / Reload / DevTools / Check for Updates / Quit），关闭按钮缩到托盘而不是退出
@@ -58,7 +58,7 @@ description: hohu-admin-desktop 内置能力的完整清单 —— 从 Phase 1 �
 
 > 详见 [spec-phase2.2](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.2-window-tray-shortcut.md)
 
-### Phase 2.3：自动更新
+### 自动更新
 
 - **electron-updater v6** 封装为 `UpdaterManager` 单例
 - 双 provider：GitHub Releases（默认）/ Generic（任意静态 URL，需提供 `latest.yml`）
@@ -70,7 +70,7 @@ description: hohu-admin-desktop 内置能力的完整清单 —— 从 Phase 1 �
 
 > 详见 [spec-phase2.3](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.3-auto-update.md)
 
-### Phase 2.4：系统通知分发器
+### 系统通知分发器
 
 - **NotificationManager 单例**：所有 `new Notification()` 调用必须经此入口 —— 一处 mute、一处日志、一处改行为
 - **渲染层 IPC 推送**：`window.api.notification.show({ source, category, title, body, actionId? })`，让渲染层能弹系统通知（web 做不到）
@@ -85,25 +85,25 @@ description: hohu-admin-desktop 内置能力的完整清单 —— 从 Phase 1 �
 
 ## 平台限制
 
-| 平台 | 自动更新 | 系统通知 |
-|---|---|---|
-| Windows | ✅ NSIS 开箱即用 | ✅ |
-| macOS | ⚠️ 需代码签名（Developer ID Application 证书），未签名则能检测能下载但安装被拒 | ✅ |
-| Linux | ✅ AppImage（deb / snap 不支持自动更新）| ⚠️ 需 libnotify，容器 / 无桌面环境会 no-op |
+| 平台    | 自动更新                                                                       | 系统通知                                   |
+| ------- | ------------------------------------------------------------------------------ | ------------------------------------------ |
+| Windows | ✅ NSIS 开箱即用                                                               | ✅                                         |
+| macOS   | ⚠️ 需代码签名（Developer ID Application 证书），未签名则能检测能下载但安装被拒 | ✅                                         |
+| Linux   | ✅ AppImage（deb / snap 不支持自动更新）                                       | ⚠️ 需 libnotify，容器 / 无桌面环境会 no-op |
 
 公证（notarization）是 Apple 对**首次分发**的独立要求，与自动更新流程无关。两者都不在框架默认配置中 —— 开发者发布自家应用时需自行配置。
 
 ---
 
-## 未做（YAGNI）
+## 适用边界
 
 以下功能**故意没做**，等真有需求再加：
 
 - 通知历史 / 通知中心（系统通知中心已有）
 - 通知分类静音、dedup、限频、自定义 action buttons（Reply / Snooze）
-- 渲染层「设置页」UI（IPC 全暴露，UI 留 Phase 3）
+- 渲染层「设置页」UI
 - Beta 通道 / 预发布过滤
-- AI 对话模块、AI 桌面场景（悬浮窗 / 划词 / 截图）—— Phase 3 roadmap
+- AI 对话模块、AI 桌面场景（悬浮窗 / 划词 / 截图）
 - 完整复制 web 后台所有页面 —— 浪费
 - 数据可视化大屏、CRUD 表格 —— web 端更好
 

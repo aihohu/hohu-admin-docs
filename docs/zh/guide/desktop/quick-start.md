@@ -26,6 +26,7 @@ pnpm dev
 ```
 
 启动后：
+
 - Electron 主窗口打开（默认 1280×800）
 - 渲染层在 `http://localhost:5173`（内部 Vite dev server）
 - 主进程改动**需要重启 dev**（HMR 只覆盖渲染层）
@@ -52,12 +53,12 @@ dev 模式下，渲染层的请求会通过主进程的 `net` 模块转发到这
 
 ```ts
 export interface GreetApi {
-  greet: (name: string) => Promise<string>
+  greet: (name: string) => Promise<string>;
 }
 
 export interface AppApi {
   // ... 已有字段
-  greet: GreetApi
+  greet: GreetApi;
 }
 ```
 
@@ -66,19 +67,19 @@ export interface AppApi {
 新建 `src/main/ipc/greet.ts`：
 
 ```ts
-import { ipcMain } from 'electron'
+import { ipcMain } from 'electron';
 
 export function registerGreetIpc(): void {
   ipcMain.handle('greet', async (_e, name: string) => {
-    return `Hello, ${name}!`
-  })
+    return `Hello, ${name}!`;
+  });
 }
 ```
 
 在 `src/main/ipc/index.ts` 的 `registerAllIpc()` 里调一次：
 
 ```ts
-registerGreetIpc()
+registerGreetIpc();
 ```
 
 ### 5.3 Preload 暴露
@@ -88,12 +89,12 @@ registerGreetIpc()
 ```ts
 const greet = {
   greet: (name: string): Promise<string> => ipcRenderer.invoke('greet', name)
-} as const
+} as const;
 
 const api = {
   // ... 已有字段
   greet
-}
+};
 ```
 
 ### 5.4 渲染层调用
@@ -101,8 +102,8 @@ const api = {
 任意 `.vue` / `.ts`：
 
 ```ts
-const msg = await window.api.greet.greet('World')
-console.log(msg) // "Hello, World!"
+const msg = await window.api.greet.greet('World');
+console.log(msg); // "Hello, World!"
 ```
 
 完整类型推断链路：`window.api.greet.greet` 的参数和返回值都被 TypeScript 严格检查，调用方传错类型立刻报红。
@@ -122,5 +123,5 @@ pnpm build:linux  # 出 .AppImage / .deb / .snap
 ## 7. 下一步
 
 - [架构详解](./architecture) —— 理解三进程、请求层、Token 存储
-- [已实现特性](./features) —— 看 Phase 1 + Phase 2 都内置了什么
+- [已实现特性](./features) —— 了解桌面端内置能力
 - [CLAUDE.md](https://github.com/aihohu/hohu-admin-desktop/blob/main/CLAUDE.md) —— 仓库内的开发指南和踩坑记录

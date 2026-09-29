@@ -26,12 +26,12 @@ description: hohu-admin-desktop 是 hohu 生态的 Electron + Vue 3 桌面应用
 
 ## 🛠️ 技术栈
 
-| 层 | 技术 |
-|---|---|
-| 框架 | Electron 39 / electron-vite 5 |
-| 渲染层 | Vue 3.5 / TypeScript 5.9 / NaiveUI / Pinia 3 / Vite 7 |
-| 构建 | electron-builder（NSIS / DMG / AppImage）|
-| 主进程库 | electron-store / electron-log / electron-updater |
+| 层       | 技术                                                    |
+| -------- | ------------------------------------------------------- |
+| 框架     | Electron 39 / electron-vite 5                           |
+| 渲染层   | Vue 3.5 / TypeScript 5.9 / NaiveUI / Pinia 3 / Vite 7   |
+| 构建     | electron-builder（NSIS / DMG / AppImage）               |
+| 主进程库 | electron-store / electron-log / electron-updater        |
 | 类型契约 | `src/shared/types.ts` —— main / preload / renderer 共享 |
 
 ## 📦 三进程架构
@@ -47,6 +47,7 @@ src/
 ```
 
 关键约束：
+
 - **所有 HTTP 走主进程**（renderer 不发 axios，调 `window.api.http.request()` → IPC → main `net.request`）
 - **所有 Token 走 OS 钥匙串**（不进 localStorage）
 - **typed IPC**（`shared/types.ts` 是单一来源，preload 通过 `contextBridge` 暴露白名单）
@@ -55,5 +56,5 @@ src/
 
 - [快速上手](./quick-start) —— 5 分钟跑起来
 - [架构详解](./architecture) —— 三进程、请求层、IPC、安全
-- [已实现特性](./features) —— Phase 1 + Phase 2 完整清单
+- [已实现特性](./features) —— 桌面端能力清单
 - [源码仓库](https://github.com/aihohu/hohu-admin-desktop)

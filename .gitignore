@@ -32,3 +32,10 @@ docs/.vitepress/cache/*
 *-screenshot.png
 
 docs/superpowers/
+
+# Personal working material is outside the VitePress source directory.
+.local/
+.tmp/
+__pycache__/
+*.pyc
+.ruff_cache/

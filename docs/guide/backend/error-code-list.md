@@ -1,24 +1,23 @@
 ---
-title: Error Code Reference
-description: Complete list of all HoHu Admin error codes for quick lookup
+title: Common error codes
+description: 'HoHu common error codes: steps, scope and limitations'
 ---
 
-# Error Code Reference
+# Common error codes
 
-A complete list of all built-in error codes. For details on the response format and how to add new error codes, see [Error Codes](./error-code).
+This is a troubleshooting selection, not an exhaustive error registry. The running API defines exact HTTP statuses and fields. See [Error handling](./error-code) for response structure.
 
-## All Error Codes
+| errorCode                   | Investigation                                                       |
+| --------------------------- | ------------------------------------------------------------------- |
+| `INVALID_CREDENTIALS`       | Account, password and tenant resolution                             |
+| `TOKEN_EXPIRED`             | Token validity and current identity; follow the authentication flow |
+| `ACCOUNT_DISABLED`          | Ask an administrator to check account status                        |
+| `MISSING_PERMISSION`        | Current role permissions and enabled status                         |
+| `AI_CHAT_PERMISSION_DENIED` | Explicit AI entry authorization                                     |
+| `AI_MODULE_DISABLED`        | AI deployment switch, 503                                           |
+| `SETTINGS_CONFLICT`         | Concurrent settings revision, 409; reload and reconcile             |
+| `SETTING_VALUE_INVALID`     | Field type, range and options                                       |
+| `RATE_LIMIT_EXCEEDED`       | Request quota, 429; respect Retry-After                             |
+| `RATE_LIMIT_UNAVAILABLE`    | Redis throttling dependency, 503                                    |
 
-| errorCode | HTTP | Module | Message | Scenario |
-|-----------|------|--------|---------|----------|
-| `UNAUTHORIZED` | 401 | Auth | Session expired | OAuth2 or native HTTPException 401 |
-| `INVALID_CREDENTIALS` | 401 | Auth | Invalid username or password | Login credentials verification failed |
-| `TOKEN_EXPIRED` | 401 | Auth | Token invalid or expired | JWT decode failure or user not found |
-| `ACCOUNT_DISABLED` | 403 | Auth | Account has been disabled | User status is disabled |
-| `AI_PROVIDER_NOT_FOUND` | 404 | AI | AI provider not found | Provider ID does not exist |
-| `AI_CONVERSATION_NOT_FOUND` | 404 | AI | AI conversation not found | Conversation ID does not exist |
-| `AI_MODEL_NOT_CONFIGURED` | 400 | AI | AI model not configured | No model configured for provider |
-| `AI_PROVIDER_DUPLICATE` | 400 | AI | Provider code already exists | Duplicate provider code |
-| `AI_TEST_NO_MODEL` | 400 | AI | No model configured | No model for connectivity test |
-| `AI_TEST_NO_API_KEY` | 400 | Missing API Key | No API key for connectivity test |
-| `AI_TEST_FAILED` | 400 | AI | Connectivity test failed | Provider connection test failed |
+Report the code, steps, time and version without secrets or full user data. HTTP 200 alone does not establish a streamed tool operation's final business outcome.

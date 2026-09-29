@@ -1,11 +1,8 @@
 ---
 layout: page
-title: HoHu Admin
-description: AI-Powered Enterprise Admin Platform built with FastAPI and Vue3, featuring RBAC permissions, Snowflake ID, and async stack
+title: HoHu — Build AI-native business applications
+titleTemplate: false
+description: Build business applications with HoHu, an open-source platform with AI assistants, permissions, tenant isolation and CLI tooling. Develop and deploy on your infrastructure.
 ---
 
-<Hero />
-<FeatureGrid />
-<QuickStart />
-<TechStack />
-<FooterCTA />
+<HoHuHome />

@@ -59,7 +59,7 @@ fetchXxx()  ──→  window.api.http.request(cfg)  ──→  net.request()
 渲染层用 flat result shape：
 
 ```ts
-const { data, error } = await fetchUserInfo()
+const { data, error } = await fetchUserInfo();
 if (error) {
   // 错误处理
 } else {
@@ -71,7 +71,7 @@ if (error) {
 
 详见 [`src/main/services/http.ts`](https://github.com/aihohu/hohu-admin-desktop/blob/main/src/main/services/http.ts) 和渲染层 [`service/request/factory.ts`](https://github.com/aihohu/hohu-admin-desktop/blob/main/src/renderer/src/service/request/factory.ts)。
 
-## 🔐 Token 存储与钥匙串
+## 🔐 Token 存储与钥匙串 {#token-存储与钥匙串}
 
 **Token 永远不进 localStorage**。
 
@@ -81,8 +81,8 @@ if (error) {
 
 ```ts
 // 渲染层用法
-await window.api.secureStore.set('token', authToken)
-const token = await window.api.secureStore.get('token')
+await window.api.secureStore.set('token', authToken);
+const token = await window.api.secureStore.get('token');
 ```
 
 登出时调 `clear()`，文件清空。Token refresh 由 `service/request/index.ts` 中央化处理：expired-token code 触发单飞 refresh，并发请求共享同一个 refresh Promise，retry 一次。
@@ -104,24 +104,24 @@ const token = await window.api.secureStore.get('token')
 
 ## 🛡️ 安全模型
 
-| 防护层 | 配置 |
-|---|---|
-| **contextIsolation** | `true`（默认）—— preload 与 renderer 隔离 |
-| **nodeIntegration** | `false`（默认）—— 渲染层无 Node API |
-| **sandbox** | `false`（当前）—— preload 可用 Node API；计划 Phase 3+ 切 `true` |
-| **CSP** | 在 `src/renderer/index.html` 配置 —— 加新域名（CDN / WebSocket）需更新 `connect-src` / `img-src` |
-| **外链** | 走 `shell.openExternal`，可加协议白名单 |
-| **DevTools** | dev 模式 F12 切换；prod 自动禁用 |
+| 防护层               | 配置                                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------ |
+| **contextIsolation** | `true`（默认）—— preload 与 renderer 隔离                                                        |
+| **nodeIntegration**  | `false`（默认）—— 渲染层无 Node API                                                              |
+| **sandbox**          | `false`（当前）—— preload 可用 Node API                                                          |
+| **CSP**              | 在 `src/renderer/index.html` 配置 —— 加新域名（CDN / WebSocket）需更新 `connect-src` / `img-src` |
+| **外链**             | 走 `shell.openExternal`，可加协议白名单                                                          |
+| **DevTools**         | dev 模式 F12 切换；prod 自动禁用                                                                 |
 
 ## 📁 路径别名
 
-| 别名 | 解析到 | 用途 |
-|---|---|---|
-| `@renderer/*` | `src/renderer/src/*` | 渲染层 |
-| `@shared/*` | `src/shared/*` | main / preload / renderer 三方共享 |
-| `@main/*` | `src/main/*` | 主进程 |
-| `@resources/*` | `resources/*` | 静态资源（图标等） |
-| `@iconify-json` | `node_modules/@iconify/json/json` | 图标 |
+| 别名            | 解析到                            | 用途                               |
+| --------------- | --------------------------------- | ---------------------------------- |
+| `@renderer/*`   | `src/renderer/src/*`              | 渲染层                             |
+| `@shared/*`     | `src/shared/*`                    | main / preload / renderer 三方共享 |
+| `@main/*`       | `src/main/*`                      | 主进程                             |
+| `@resources/*`  | `resources/*`                     | 静态资源（图标等）                 |
+| `@iconify-json` | `node_modules/@iconify/json/json` | 图标                               |
 
 配置在 `tsconfig.{node,web}.json` 和 `electron.vite.config.ts`。
 

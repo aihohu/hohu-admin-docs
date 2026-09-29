@@ -1,169 +1,31 @@
 ---
-title: hohu deploy
-description: Deploy the full-stack service to a Linux server using Docker Compose via hohu deploy, including environment initialization and service orchestration
+title: hohu deploy and migrations
+description: 'HoHu hohu deploy and migrations: steps, scope and limitations'
 ---
 
-# hohu deploy
+# hohu deploy and migrations
 
-Deploy the full-stack service to a Linux server via Docker Compose.
+Install a CLI release compatible with your application. Run `hohu deploy --help` for available options and see [release notes](../reference/versions) for component releases.
 
-## hohu deploy
-
-One-click deployment that automatically completes the full workflow: pull images -> start database -> wait for ready -> migrate -> start all services.
-
-```bash
-hohu deploy
-```
-
-### Parameters
-
-| Parameter      | Description                                                              |
-| -------------- | ------------------------------------------------------------------------ |
-| `--init`       | Run initialization script after migration (creates admin user and menus) |
-| `--no-migrate` | Skip database migration                                                  |
-
-```bash
-hohu deploy --init          # Deploy and initialize data
-hohu deploy --no-migrate    # Deploy but skip migration
-```
-
-### Deployment Flow
-
-```
-hohu deploy
-    │
-    ├─ 1. Check Docker environment
-    ├─ 2. Sync deployment templates
-    ├─ 3. Generate .env configuration (first run)
-    ├─ 4. Pull images (only infrastructure images when building locally)
-    ├─ 5. Start PostgreSQL + Redis (if enabled)
-    ├─ 6. Wait for database to be ready
-    ├─ 7. Run database migrations
-    └─ 8. Start application services
-```
-
-## hohu deploy init
-
-Initialize the deployment configuration by creating the `.hohu/deploy/` directory and generating `.env`.
-
-```bash
-hohu deploy init
-```
-
-The auto-generated `.env` includes randomly generated `SECRET_KEY`, `POSTGRES_PASSWORD`, and `REDIS_PASSWORD`.
-
-### Template Version Upgrade
-
-When the CLI is updated and deployment templates change, running `hohu deploy init` again will:
-
-1. Detect the version difference and list files that need updating
-2. Prompt for confirmation before overwriting (`.env` is never overwritten)
-3. Update the template files after confirmation
-
-```bash
-hohu deploy init           # Interactive: prompts before overwriting
-hohu deploy init --force   # Force overwrite all template files without prompting
-```
-
-| Parameter  | Description                                        |
-| ---------- | -------------------------------------------------- |
-| `--force`  | Force overwrite all template files (skip confirmation) |
-
-::: tip
-When using `hohu build`, initialization is performed automatically. You do not need to run this command separately.
-:::
-
-## hohu deploy pull
-
-Pull the latest images and restart services.
-
-```bash
-hohu deploy pull
-```
-
-Use this when official images have been updated and you want to pull the new version.
-
-## hohu deploy ps
-
-View the running status of all services.
+| Command                             | Behavior                                                                                                |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `hohu deploy init`                  | Generate/complete `.hohu/deploy`; --force replaces outdated templates, so preserve custom content first |
+| `hohu deploy`                       | Pull applicable images, prepare infrastructure, migrate, synchronize seeds and start                    |
+| `hohu deploy --no-migrate`          | Skip migrations and seed synchronization in that stage; only for controlled cases that need no update   |
+| `hohu migrate`                      | Run deployment migration and seeds separately, without an additional initialization switch              |
+| `hohu deploy pull`                  | Update images, migrate, synchronize and start; not download-only                                        |
+| `hohu deploy upgrade`               | Pull source, build, stop and redeploy; accepts --no-cache and involves downtime                         |
+| `hohu deploy restart [SERVICES...]` | Restart services; does not replace migration                                                            |
+| `hohu deploy down`                  | Stop Compose services; not a business-data reset command                                                |
 
 ```bash
 hohu deploy ps
+hohu deploy logs -f hohu-admin-api
+hohu deploy restart hohu-admin-api
 ```
 
-## hohu deploy logs
+Normal deployment synchronizes seed data automatically. **Do not use `hohu deploy --init` or `hohu migrate --init`.** Repeated runs preserve passwords, custom content and existing grants. Migration/seed failure prevents normal startup.
 
-View service logs.
+For external database/Redis deployments, verify infrastructure orchestration for each command in your revision; do not assume every maintenance subcommand recognizes identical external-service settings.
 
-```bash
-hohu deploy logs                    # All logs
-hohu deploy logs -f                 # Live tail
-hohu deploy logs hohu-admin-api     # Backend only
-hohu deploy logs -f postgres        # Tail database logs
-```
-
-| Parameter         | Description                      |
-| ----------------- | -------------------------------- |
-| `-f` / `--follow` | Follow log output in real time   |
-| `SERVICE...`      | Specify service names (optional) |
-
-## hohu deploy restart
-
-Restart services.
-
-```bash
-hohu deploy restart                 # Restart all
-hohu deploy restart hohu-admin-api  # Restart backend only
-```
-
-## hohu deploy down
-
-Stop all services and remove containers.
-
-```bash
-hohu deploy down
-```
-
-Data volumes are preserved and database data is not deleted. To remove all data:
-
-```bash
-cd .hohu/deploy
-docker compose down -v
-```
-
-## hohu migrate
-
-Run database migrations independently.
-
-```bash
-hohu migrate           # Migrate only
-hohu migrate --init    # Migrate + initialize (create admin user and menus)
-```
-
-| Parameter | Description                               |
-| --------- | ----------------------------------------- |
-| `--init`  | Run initialization script after migration |
-
-::: tip
-`hohu deploy` automatically runs migrations by default, so you typically do not need this command separately. Use it only when you need manual control over migrations.
-:::
-
-## Environment Variable Reference
-
-Deployment configuration is managed through `.hohu/deploy/.env`. Key configuration items:
-
-| Variable          | Description                                                                        |
-| ----------------- | ---------------------------------------------------------------------------------- |
-| `IMAGE_TAG`       | Image tag (`latest` or `source`)                                                   |
-| `API_IMAGE`       | Backend image address (automatically set to local name when building from source)  |
-| `WEB_IMAGE`       | Frontend image address (automatically set to local name when building from source) |
-| `ENABLE_POSTGRES` | Whether to use the built-in PostgreSQL (`true` / `false`)                          |
-| `DATABASE_URL`    | External PostgreSQL connection string                                              |
-| `ENABLE_REDIS`    | Whether to use the built-in Redis (`true` / `false`)                               |
-| `REDIS_HOST`      | External Redis address                                                             |
-| `SECRET_KEY`      | JWT signing secret key                                                             |
-| `ENABLE_NGINX`    | Whether to enable the built-in Nginx                                               |
-| `WEB_PORT`        | Frontend port exposure (e.g., `0.0.0.0:9527`)                                      |
-| `API_PORT`        | Backend port exposure                                                              |
-
-For the complete configuration reference, see [Deployment Guide ->](/guide/deploy)
+See [Upgrade guidance](../operations/upgrade) for configuration, backups, maintenance windows and recovery, and [hohu build](./build) for source images.

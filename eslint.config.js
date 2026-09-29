@@ -4,7 +4,7 @@ import eslintPluginVue from 'eslint-plugin-vue';
 import { globalIgnores } from 'eslint/config';
 
 export default tseslint.config(
-  globalIgnores(['docs/.vitepress/cache', 'docs/.vitepress/dist']),
+  globalIgnores(['docs/.vitepress/cache', 'docs/.vitepress/dist', '.local/**', '.tmp/**']),
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...eslintPluginVue.configs['flat/recommended'],
@@ -22,6 +22,7 @@ export default tseslint.config(
   {
     files: ['**/*.vue'],
     languageOptions: {
+      parserOptions: { parser: tseslint.parser },
       globals: {
         document: 'readonly',
         window: 'readonly'

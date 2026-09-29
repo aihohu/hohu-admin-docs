@@ -1,6 +1,6 @@
 ---
 title: Directory Structure
-description: HoHu Admin backend project directory structure overview, featuring a modular layered design with separated responsibilities for API, Service, and Model layers
+description: HoHu backend project directory structure overview, featuring a modular layered design with separated responsibilities for API, Service, and Model layers
 ---
 
 # Directory Structure

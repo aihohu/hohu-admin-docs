@@ -53,12 +53,12 @@ Edit `src/shared/types.ts` and extend `AppApi` with a new interface:
 
 ```ts
 export interface GreetApi {
-  greet: (name: string) => Promise<string>
+  greet: (name: string) => Promise<string>;
 }
 
 export interface AppApi {
   // ... existing fields
-  greet: GreetApi
+  greet: GreetApi;
 }
 ```
 
@@ -67,19 +67,19 @@ export interface AppApi {
 Create `src/main/ipc/greet.ts`:
 
 ```ts
-import { ipcMain } from 'electron'
+import { ipcMain } from 'electron';
 
 export function registerGreetIpc(): void {
   ipcMain.handle('greet', async (_e, name: string) => {
-    return `Hello, ${name}!`
-  })
+    return `Hello, ${name}!`;
+  });
 }
 ```
 
 Call it once in `src/main/ipc/index.ts`'s `registerAllIpc()`:
 
 ```ts
-registerGreetIpc()
+registerGreetIpc();
 ```
 
 ### 5.3 Expose via preload
@@ -89,12 +89,12 @@ Edit `src/preload/index.ts`, add a bridge object and include it in `api`:
 ```ts
 const greet = {
   greet: (name: string): Promise<string> => ipcRenderer.invoke('greet', name)
-} as const
+} as const;
 
 const api = {
   // ... existing fields
   greet
-}
+};
 ```
 
 ### 5.4 Call from renderer
@@ -102,8 +102,8 @@ const api = {
 Anywhere in `.vue` / `.ts`:
 
 ```ts
-const msg = await window.api.greet.greet('World')
-console.log(msg) // "Hello, World!"
+const msg = await window.api.greet.greet('World');
+console.log(msg); // "Hello, World!"
 ```
 
 Full type inference chain: parameters and return value of `window.api.greet.greet` are strictly checked by TypeScript — wrong types at the call site go red immediately.
@@ -123,5 +123,5 @@ Artifacts land in `release/`.
 ## 7. Next Steps
 
 - [Architecture](./architecture) — understand the three processes, request layer, token storage
-- [Features](./features) — what Phase 1 + Phase 2 ship out of the box
+- [Features](./features) — built-in desktop capabilities
 - [CLAUDE.md](https://github.com/aihohu/hohu-admin-desktop/blob/main/CLAUDE.md) — in-repo dev guide and pitfalls

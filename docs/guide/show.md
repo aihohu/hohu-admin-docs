@@ -1,66 +1,24 @@
 ---
-title: Online Demo
-description: HoHu Admin online demo environment with full feature experience including user management, role permissions, menu configuration, department management, and system monitoring
+title: Online demo
+description: Explore HoHu AI assistants, user permissions and system settings in the live demo, then create your own instance with the CLI.
 ---
 
-# Online Demo
+# Online demo
 
-We provide an online demo environment so you can experience the full feature set of HoHu Admin without any installation.
+[Open the HoHu demo](https://show.hohu.org). Available features depend on the instance configuration and account permissions. Use the sign-in information displayed by the demo entry point.
 
-## Access URL
+## Suggested tour
 
-**Demo URL**: [https://show.hohu.org](https://show.hohu.org)
+1. Explore users, roles and departments to understand how accounts and permissions are organized.
+2. Open system settings for brand, account, language, file and security options. Read the [settings guide](./user/settings) before making changes.
+3. Open the AI assistant to see available assistants. Models and tools are configured by the instance administrator; see the [AI guide](./user/ai).
 
-## Login Credentials
+Use sample content in the public demo. To keep your own configuration and data, [create a local environment](./quick-start) or [deploy your own instance](./deploy).
 
-| Field    | Value    |
-| -------- | -------- |
-| Username | `admin`  |
-| Password | `123456` |
+## Product interface
 
-::: warning Note
-Demo environment data is periodically reset. Do not enter real sensitive information.
-:::
+These screenshots show the actual HoHu interface. Menus and assistants depend on the instance configuration.
 
-## Feature Preview
+![HoHu AI assistant](/images/product/ai-assistant-en.png)
 
-After logging in, you can explore the following features:
-
-### User Management
-
-- User CRUD operations
-- Enable/disable user status
-- Assign roles
-
-### Role Management
-
-- Role CRUD operations
-- Configure role menu permissions
-- Configure role data permissions
-
-### Menu Management
-
-- Tree-structured menu configuration
-- Support for three types: directory, menu, and button
-- Dynamic route generation
-
-### Department Management
-
-- Tree-structured department configuration
-- Data permissions by department
-
-### System Monitoring
-
-- View online users
-- Operation log audit
-- Login log queries
-
-## Screenshots
-
-![HoHu Admin](/images/home.jpeg)
-
-## Related Links
-
-- [Quick Start](/guide/quick-start) — Set up a local development environment
-- [Deployment Guide](/guide/deploy) — Deploy to a production server
-- [Source Repositories](/guide/src) — Get the full source code
+![Brand and appearance in HoHu system settings](/images/product/settings-brand-en.png)

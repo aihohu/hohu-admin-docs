@@ -1,138 +1,53 @@
 ---
-title: CLI Overview
-description: Overview of the hohu command-line tool providing full lifecycle management including project creation, dependency installation, dev server, source builds, and one-click deployment
+title: HoHu CLI overview and installation
+description: Install and upgrade hohu-cli, then create projects, initialize environments, run development services and build deployments.
 ---
 
-# CLI Overview
+# CLI overview
 
-`hohu` is the official command-line tool for hohu-admin, providing full lifecycle management capabilities including project creation, dependency installation, development servers, source builds, and one-click deployment.
+hohu-cli is the shared entry for project creation, initialization, development and deployment. See [Versions](../reference/versions) for installation sources and matching revisions.
 
-## Installation
+## Install and upgrade
+
+Prepare Python 3.10 or later and uv, then run:
 
 ```bash
-# uv (recommended)
 uv tool install hohu
-
-# pip
-pip install hohu
+hohu --version
 ```
 
-## Update
+Upgrade an existing installation:
 
 ```bash
-# uv
 uv tool upgrade hohu
-
-# pip
-pip install --upgrade hohu
 ```
 
-## Command Reference
+The CLI Python requirement differs from the backend. Backend projects also require the Python, Node.js, database and Redis versions described in [development setup](../quick-start).
 
-| Command               | Description                                     |
-| --------------------- | ----------------------------------------------- |
-| `hohu create [NAME]`  | Create a project and clone repository templates |
-| `hohu init`           | Install dependencies for all sub-projects       |
-| `hohu dev`            | Start development servers                       |
-| `hohu build`          | Build Docker images from local source code      |
-| `hohu deploy`         | One-click Docker deployment                     |
-| `hohu deploy init`    | Initialize deployment directory and .env        |
-| `hohu deploy pull`    | Pull latest images and restart                  |
-| `hohu deploy ps`      | View service status                             |
-| `hohu deploy logs`    | View service logs                               |
-| `hohu deploy restart` | Restart services                                |
-| `hohu deploy down`    | Stop all services                               |
-| `hohu migrate`        | Run database migrations                         |
-| `hohu lang`           | Switch display language                         |
-| `hohu info`           | View current configuration                      |
-| `hohu --version`      | Display version number                          |
-
-## hohu create
-
-Create a new project and interactively select components (backend / frontend / app).
+## Project workflow
 
 ```bash
+hohu --version
+hohu --help
 hohu create my-project
-hohu create              # Default name: hohu-admin
-hohu create my-app --repo https://github.com/your-org/your-template.git
-```
-
-| Parameter       | Description                            |
-| --------------- | -------------------------------------- |
-| `NAME`          | Project name, defaults to `hohu-admin` |
-| `--repo` / `-r` | Custom template repository URL         |
-
-After creation, run:
-
-```bash
 cd my-project
 hohu init
+hohu dev
 ```
 
-## hohu init
+| Command                            | Current responsibility                                                              |
+| ---------------------------------- | ----------------------------------------------------------------------------------- |
+| `hohu create`                      | Create a project and select components                                              |
+| `hohu init`                        | Install dependencies and prepare backend environment, migrations and initialization |
+| `hohu dev`                         | Start development services                                                          |
+| `hohu build`                       | Build Docker images from source                                                     |
+| `hohu deploy init`                 | Prepare deployment directory and configuration                                      |
+| `hohu deploy`                      | Infrastructure, migrations, seed synchronization and startup                        |
+| `hohu migrate`                     | Run deployment migrations and seed synchronization                                  |
+| `hohu deploy ps/logs/restart/down` | Status, logs, restart and stop                                                      |
+| `hohu deploy pull/upgrade`         | Image or source-build upgrades; see deployment reference                            |
+| `hohu lang` / `hohu info`          | CLI language and configuration information                                          |
 
-Automatically detects the project configuration (`.hohu/project.json`) and installs all dependencies.
+Use `hohu <command> --help` to inspect subcommand arguments and examples. Initialization does not wipe the database; users do not separately run internal init_db or sync_menus scripts.
 
-```bash
-hohu init
-```
-
-- Backend: runs `uv sync` (automatically installs `uv` if missing)
-- Frontend / App: runs `pnpm install`
-- Provides manual installation instructions if automatic installation fails
-
-## hohu dev
-
-Starts all development services in a single terminal with color-coded log output.
-
-```bash
-hohu dev          # Start all components
-hohu dev -o be    # Backend only
-hohu dev -o fe    # Frontend only
-hohu dev -s app   # Skip the App
-hohu dev -t mp    # App in WeChat Mini Program mode
-```
-
-### Parameters
-
-| Parameter      | Short | Description                                       | Default |
-| -------------- | ----- | ------------------------------------------------- | ------- |
-| `--app-target` | `-t`  | App run target: `h5` / `mp` / `app`               | `h5`    |
-| `--only`       | `-o`  | Only start specified components (can be repeated) | All     |
-| `--skip`       | `-s`  | Skip specified components (can be repeated)       | None    |
-
-Component aliases (case-insensitive):
-
-| Alias             | Component |
-| ----------------- | --------- |
-| `be` / `backend`  | Backend   |
-| `fe` / `frontend` | Frontend  |
-| `app`             | App       |
-
-### Log Colors
-
-| Prefix       | Color  | Service |
-| ------------ | ------ | ------- |
-| `[Backend]`  | Green  | FastAPI |
-| `[Frontend]` | Cyan   | Vue 3   |
-| `[App]`      | Yellow | Uni-app |
-
-Press `Ctrl+C` to gracefully exit. All child processes will be safely terminated.
-
-## hohu lang
-
-Switch the CLI display language. Supports Chinese, English, and system default.
-
-```bash
-hohu lang
-```
-
-Interactive selection: Simplified Chinese / English / System default.
-
-## hohu info
-
-View current CLI configuration details, including version, language, and config file paths.
-
-```bash
-hohu info
-```
+See [hohu build](./build), [hohu deploy](./deploy) and the [Deployment guide](../deploy).

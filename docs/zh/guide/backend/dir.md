@@ -1,6 +1,6 @@
 ---
 title: 目录结构
-description: HoHu Admin 后端项目目录结构说明，采用模块化分层设计，API、Service、Model 职责分离
+description: HoHu 后端项目目录结构说明，采用模块化分层设计，API、Service、Model 职责分离
 ---
 
 # 目录结构

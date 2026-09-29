@@ -1,48 +1,38 @@
 ---
-title: Introduction
-description: HoHu Admin is an enterprise-grade admin management system optimized for AI-assisted development, combining the FastAPI async framework with Vue3 for modular decoupling and explicit semantic design
+title: Meet HoHu
+description: 'Discover HoHu’s open-source business application platform, AI capabilities, project components and paths for users, developers and deployers.'
 ---
 
-# Introduction
+# Meet HoHu
 
-### A Modern, High-Efficiency Full-Stack Development Framework Based on FastAPI & AI
+HoHu is an open-source platform for AI-native business applications. It brings business interfaces, AI, permissions and data together so teams can build and run their own applications.
 
-HoHu Admin is an enterprise-grade admin management system optimized for **AI-assisted development**. It combines the lightweight **FastAPI** async framework from the Python ecosystem with the ultimate **Vue3** UI experience, enabling developers to rapidly build high-performance, maintainable business systems with AI assistance (such as Gemini, Cursor, ChatGPT).
+## What you can do
 
-## Core Vision: AI First
+- **Build business applications:** reuse users, organizations, permissions, files, jobs and settings while implementing your own models, APIs and pages.
+- **Use AI inside applications:** query data or request controlled business actions through conversations, within the account’s permissions and data scope.
+- **Run on your infrastructure:** create, develop, build and deploy with the CLI while retaining control of source and data.
 
-In traditional development patterns, scaffolding is often bloated and tightly coupled. HoHu Admin adopts **modular decoupling** and **explicit semantic** design principles, allowing AI to precisely understand code structure and generate more accurate feature code.
+HoHu supplies the application foundation. CRM, inventory and operations systems can be built on it; these are not bundled complete business suites. Feature-specific guides describe the available behavior.
 
-## Why Choose HoHu Admin?
+## Projects
 
-### Deep AI Adaptation (AI-Ready)
+| Repository           | Responsibility                                                                          |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| `hohu-admin`         | Backend and platform core: business APIs, authentication, authorization and AI services |
+| `hohu-admin-web`     | Web application interface                                                               |
+| `hohu-cli`           | Project creation, initialization, development, builds and deployment                    |
+| `hohu-admin-app`     | Mobile client                                                                           |
+| `hohu-admin-desktop` | Desktop client                                                                          |
+| `hohu-admin-docs`    | HoHu website and documentation                                                          |
 
-- **Standardized Schemas**: Strict Pydantic V2 definitions allow AI to quickly infer API protocols, enabling zero-modification frontend integration.
-- **Explicit Type Annotations**: Full-chain Python Type Hints coverage improves Cursor or Copilot completion accuracy by over 80%.
-- **Prompt-Friendly Architecture**: The project structure follows industry-standard RESTful conventions. You can feed the project directory structure directly to AI, and it will immediately understand business boundaries.
+Admin remains part of the repository names; **HoHu** is the platform and website brand. See [Source and licensing](./src).
 
-### Extreme Performance and Security
+## Choose a starting point
 
-- **Async Engine**: Full-chain `asyncio`-driven, supporting high-concurrency processing for demanding business scenarios.
-- **RBAC Permission Loop**: Fine-grained permission management down to the button level, with dynamic route generation that perfectly adapts to the frontend permission model.
-- **Snowflake ID Integration**: Built-in high-performance distributed ID generator, eliminating the security risks of auto-increment IDs.
-
-### Modular Layered Design
-
-- **Zero-Coupling Directories**: System modules (users, roles, menus, logs) are highly self-contained. New business modules can be migrated with a single click, avoiding tangled codebases.
-- **Automated Migrations**: Integrated Alembic database migration tool — version control your database changes like Git.
-
-## AI-Assisted Workflow
-
-In HoHu Admin, you can quickly deliver features through the following workflow:
-
-1. **Define Models**: Describe business entities to AI, which auto-generates `SQLAlchemy` models.
-2. **Generate CRUD**: Using HoHu Admin's preset BaseService template, AI can produce complete CRUD logic in seconds.
-3. **Protocol Synchronization**: AI automatically generates frontend request types from Pydantic definitions, bridging the last mile between frontend and backend.
-
-## Tech Stack
-
-- **Backend**: FastAPI (Python 3.10+)
-- **Database**: PostgreSQL / MySQL (via SQLAlchemy 2.0)
-- **Cache**: Redis (Async)
-- **Auth**: JWT / OAuth2
+| Your goal                        | Start here                                                               |
+| -------------------------------- | ------------------------------------------------------------------------ |
+| Use an existing installation     | [User guide](./user/index)                                               |
+| Run locally and develop features | [Quick start](./quick-start) → [Your first module](./development/module) |
+| Deploy on your server            | [Deployment and operations](./operations/index)                          |
+| Look up a command or option      | [Reference](./reference/index)                                           |

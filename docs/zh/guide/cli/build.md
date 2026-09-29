@@ -1,5 +1,5 @@
 ---
-title: hohu build
+title: hohu build 构建命令
 description: 使用 hohu build 从本地源码构建后端和前端 Docker 镜像，构建完成后通过 hohu deploy 部署
 ---
 

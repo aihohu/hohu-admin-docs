@@ -1,0 +1,41 @@
+"""Append these entries to the application's MENU_DEFINITIONS before syncing."""
+
+NOTE_MENUS = [
+    {
+        "route_name": "notes",
+        "parent_route": "0",
+        "menu_name": "业务便签",
+        "menu_type": "C",
+        "icon": "carbon:document",
+        "icon_type": "1",
+        "component": "layout.base$view.notes",
+        "layout": "base",
+        "page": "notes",
+        "route_path": "/notes",
+        "i18n_key": "route.notes",
+        "order": 20,
+        "status": "1",
+        "hide_in_menu": False,
+        "keep_alive": False,
+        "constant": False,
+        "multi_tab": False,
+    },
+    {
+        "key": "business_note_list",
+        "parent_route": "notes",
+        "menu_name": "查看便签",
+        "menu_type": "F",
+        "permission": "business:note:list",
+        "route_path": "",
+        "status": "1",
+    },
+    {
+        "key": "business_note_add",
+        "parent_route": "notes",
+        "menu_name": "创建便签",
+        "menu_type": "F",
+        "permission": "business:note:add",
+        "route_path": "",
+        "status": "1",
+    },
+]

@@ -1,132 +1,24 @@
 ---
-title: File Upload
-description: HoHu Admin FileUpload reusable component supporting single file, multiple files, and image card upload modes, binding fileId via v-model to associate with business data
+title: Upload integration
+description: 'HoHu upload integration: steps, scope and limitations'
 ---
 
-# File Upload
+# Upload integration
 
-HoHu Admin provides a `FileUpload` reusable component that supports single file, multiple file, and image card upload modes. Bind `fileId` via `v-model` to associate files with business data.
+This page is for developers integrating uploads. User steps are in [Files and uploads](./user/files).
 
-## Quick Start
+## Client
 
-Import the component and start using it:
+Web's reusable component is `src/components/custom/file-upload.vue`. Bind file IDs using its actual props and submit dependent forms after upload success. Obtain size and extension capabilities from the current tenant's backend runtime response instead of maintaining separate fixed limits.
 
-```vue
-<script setup lang="ts">
-import FileUpload from '@/components/custom/file-upload.vue';
+Browser accept filters and client validation improve UX, not security. The server rechecks tenant, owner and business association when saving; client-supplied IDs do not grant access.
 
-const form = reactive({
-  docFileId: '',
-  avatarFileId: '',
-  imageFileIds: [] as string[]
-});
-</script>
+## Backend
 
-<template>
-  <!-- Single file -->
-  <FileUpload v-model:value="form.docFileId" />
+Reuse file services and scenario policies with explicit trusted tenant, user and purpose. Reads also enforce ownership; do not copy old `get_list` examples without tenant parameters.
 
-  <!-- Single image upload (avatar) -->
-  <FileUpload v-model:value="form.avatarFileId" accept="image/*" list-type="image-card" :max="1" />
+Effective size is the minimum of deployment, tenant and scenario limits. Extensions are the intersection of tenant and scenario allowlists. MIME, image decoding, XLSX expansion budgets, row counts and path checks remain independent. Do not mount private attachments as public static files.
 
-  <!-- Multiple image upload (product images) -->
-  <FileUpload
-    v-model:value="form.imageFileIds"
-    accept="image/*"
-    list-type="image-card"
-    :max="5"
-    multiple
-    business-type="product"
-    :business-id="productId"
-  />
-</template>
-```
+`UPLOAD_MAX_SIZE` and `UPLOAD_ALLOWED_EXTENSIONS` were removed. Business preferences are system settings; `UPLOAD_HARD_MAX_BYTES` is the deployment ceiling, and the CLI derives proxy request limits. See [Settings and upload policies](./reference/settings).
 
-## Component API
-
-### Props
-
-| Property       | Type                                | Default  | Description                                                            |
-| -------------- | ----------------------------------- | -------- | ---------------------------------------------------------------------- |
-| `value`        | `string \| string[]`                | —        | `v-model` bound fileId — string for single file, string[] for multiple |
-| `businessType` | `string`                            | —        | Business type, e.g. `product`, `avatar`                                |
-| `businessId`   | `string`                            | —        | Business record ID                                                     |
-| `accept`       | `string`                            | —        | Restrict file types, e.g. `image/*`, `.pdf,.doc`                       |
-| `multiple`     | `boolean`                           | `false`  | Whether to allow multiple files                                        |
-| `max`          | `number`                            | —        | Maximum number of files                                                |
-| `listType`     | `'text' \| 'image' \| 'image-card'` | `'text'` | List display type                                                      |
-| `disabled`     | `boolean`                           | `false`  | Whether the component is disabled                                      |
-
-### Events
-
-| Event          | Payload                         | Description                                          |
-| -------------- | ------------------------------- | ---------------------------------------------------- |
-| `update:value` | `string \| string[]`            | Fired when fileId changes                            |
-| `change`       | `{ fileId, fileUrl, fileName }` | Upload success callback, provides complete file info |
-
-## Business Integration Example
-
-Using product management image upload as an example:
-
-```vue
-<template>
-  <NForm>
-    <NFormItem label="Product Images">
-      <FileUpload
-        v-model:value="form.imageFileIds"
-        accept="image/*"
-        list-type="image-card"
-        :max="5"
-        multiple
-        business-type="product"
-        :business-id="productId"
-      />
-    </NFormItem>
-  </NForm>
-</template>
-```
-
-The `imageFileIds` bound via `v-model` updates automatically as files are uploaded. When submitting the form, simply pass it to the backend.
-
-The backend queries associated files using `business_type` + `business_id`:
-
-```python
-files = await file_service.get_list(db, FileQuery(
-    business_type="product",
-    business_id=product.product_id,
-    size=100,
-))
-```
-
-## Custom Trigger Area
-
-Use the default slot to customize the upload area style, such as drag-and-drop upload:
-
-```vue
-<FileUpload multiple>
-  <NUploadDragger>
-    <icon-ic:round-cloud-upload class="text-48px text-gray-400" />
-    <NText>Click or drag files to this area to upload</NText>
-  </NUploadDragger>
-</FileUpload>
-```
-
-## Configuration
-
-The backend configures upload parameters via `.env`:
-
-| Variable                    | Default                 | Description                                |
-| --------------------------- | ----------------------- | ------------------------------------------ |
-| `SERVER_URL`                | `http://127.0.0.1:8000` | Server URL, used to build file access URLs |
-| `UPLOAD_DIR`                | `uploads`               | Upload directory                           |
-| `UPLOAD_MAX_SIZE`           | `10485760` (10MB)       | Maximum file size                          |
-| `UPLOAD_ALLOWED_EXTENSIONS` | `.jpg,.jpeg,.png,...`   | Allowed file extensions                    |
-
-## Related Files
-
-- `src/components/custom/file-upload.vue` — Reusable upload component
-- `src/views/system/file/` — File management page
-- `src/service/api/system.ts` — `fetchUploadFile` and other API functions
-- `src/typings/api/system-manage.d.ts` — `FileRecord` type definition
-- `app/modules/system/service/file_service.py` — Backend file service
-- `app/modules/system/api/file.py` — Backend API routes
+General public uploads currently validate JPEG/PNG content. Expanding client accept values does not implement arbitrary document uploads. AI private text parsing is separate from general public uploads.

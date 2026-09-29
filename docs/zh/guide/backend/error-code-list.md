@@ -1,24 +1,23 @@
 ---
-title: 错误码速查表
-description: HoHu Admin 全部错误码完整列表，方便快速查找
+title: 常见错误码
+description: HoHu 常见错误码的使用步骤、适用范围与限制
 ---
 
-# 错误码速查表
+# 常见错误码
 
-全部内置错误码一览。关于响应格式和如何新增错误码，请参阅 [错误码](./error-code)。
+这是一份排查摘录，不是全部错误码清单。准确 HTTP 状态与字段以当前运行接口为准，响应结构见[错误处理](./error-code)。
 
-## 全部错误码
+| errorCode                   | 排查方向                               |
+| --------------------------- | -------------------------------------- |
+| `INVALID_CREDENTIALS`       | 账号、密码及租户定位                   |
+| `TOKEN_EXPIRED`             | Token 有效性与当前身份，按认证流程处理 |
+| `ACCOUNT_DISABLED`          | 联系管理员检查账号状态                 |
+| `MISSING_PERMISSION`        | 当前角色的功能权限与启用状态           |
+| `AI_CHAT_PERMISSION_DENIED` | 显式 AI 入口授权                       |
+| `AI_MODULE_DISABLED`        | AI 部署开关，503                       |
+| `SETTINGS_CONFLICT`         | 设置并发版本冲突，409，重新读取再合并  |
+| `SETTING_VALUE_INVALID`     | 字段类型、范围与选项                   |
+| `RATE_LIMIT_EXCEEDED`       | 请求额度，429，遵循 Retry-After        |
+| `RATE_LIMIT_UNAVAILABLE`    | Redis 限流依赖，503                    |
 
-| errorCode | HTTP | 模块 | 消息 | 场景 |
-|-----------|------|------|------|------|
-| `UNAUTHORIZED` | 401 | 认证 | 登录已过期 | OAuth2 或原生 HTTPException 401 |
-| `INVALID_CREDENTIALS` | 401 | 认证 | 用户名或密码错误 | 登录凭证校验失败 |
-| `TOKEN_EXPIRED` | 401 | 认证 | 登录已过期 | JWT 解码失败或用户不存在 |
-| `ACCOUNT_DISABLED` | 403 | 认证 | 账号已被禁用 | 用户状态为禁用 |
-| `AI_PROVIDER_NOT_FOUND` | 404 | AI | AI 提供商不存在 | 提供商 ID 不存在 |
-| `AI_CONVERSATION_NOT_FOUND` | 404 | AI | AI 会话不存在 | 会话 ID 不存在 |
-| `AI_MODEL_NOT_CONFIGURED` | 400 | AI | AI 模型未配置 | 提供商未配置可用模型 |
-| `AI_PROVIDER_DUPLICATE` | 400 | AI | 提供商标识已存在 | 提供商 code 重复 |
-| `AI_TEST_NO_MODEL` | 400 | AI | 未配置可用模型 | 连通性测试时无模型 |
-| `AI_TEST_NO_API_KEY` | 400 | AI | 缺少 API Key | 连通性测试时无 API Key |
-| `AI_TEST_FAILED` | 400 | AI | 连通性测试失败 | 提供商连接测试失败 |
+反馈时提供错误码、操作步骤、时间与版本，避免提供密钥或完整用户数据。不要仅通过 HTTP 200 判断流式工具操作的最终业务状态。
