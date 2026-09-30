@@ -51,3 +51,5 @@ hohu dev
 Use `hohu <command> --help` to inspect subcommand arguments and examples. Initialization does not wipe the database; users do not separately run internal init_db or sync_menus scripts.
 
 See [hohu build](./build), [hohu deploy](./deploy) and the [Deployment guide](../deploy).
+
+To install coding assistant skills, see [Install Skills](./skills).

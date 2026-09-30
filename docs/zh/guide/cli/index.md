@@ -51,3 +51,5 @@ hohu dev
 使用 `hohu <command> --help` 查看子命令参数与示例。`hohu init` 和部署初始化不是清库操作，不需要额外运行 init_db、sync_menus 等内部脚本。
 
 源码构建见 [hohu build](./build)，部署命令见 [hohu deploy](./deploy)，完整操作流程见[部署指南](../deploy)。
+
+安装编程助手 Skills 见 [安装 Skills](./skills)。

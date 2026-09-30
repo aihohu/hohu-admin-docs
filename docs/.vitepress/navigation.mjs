@@ -6,6 +6,7 @@ export const sections = [
     path: 'cli/index',
     pages: [
       ['cli/index', 'Overview and installation', '概览与安装'],
+      ['cli/skills', 'Install Skills', '安装 Skills'],
       ['cli/build', 'hohu build', 'hohu build'],
       ['cli/deploy', 'hohu deploy', 'hohu deploy']
     ]
