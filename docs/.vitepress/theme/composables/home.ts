@@ -74,6 +74,7 @@ export const homeContent = {
       ['使用指南', '了解账号、权限、设置和 AI 助手。', 'user/'],
       ['开发指南', '构建业务模块，并连接 AI 工具。', 'development/'],
       ['CLI', '从项目创建到构建部署的统一入口。', 'cli/'],
+      ['AI', '使用 Skills 开发项目，让应用助手处理业务。', 'ai/'],
       ['部署与运维', '安装、升级、备份和维护应用。', 'operations/'],
       ['参考资料', '查阅命令、配置项与接口约定。', 'reference/']
     ],
@@ -190,6 +191,7 @@ export const homeContent = {
       ['User guide', 'Learn accounts, permissions, settings and the AI assistant.', 'user/'],
       ['Development', 'Run the source and build business features.', 'development/'],
       ['CLI', 'Create, develop, build and deploy your project.', 'cli/'],
+      ['AI', 'Develop with Skills and use assistants in your application.', 'ai/'],
       ['Deployment', 'Install, upgrade, back up and maintain applications.', 'operations/'],
       ['Reference', 'Look up commands, configuration and API conventions.', 'reference/']
     ],

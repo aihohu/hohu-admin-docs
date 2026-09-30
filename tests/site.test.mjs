@@ -3,16 +3,36 @@ import test from 'node:test';
 import { navigation, sections } from '../docs/.vitepress/navigation.mjs';
 import { canonicalUrl, pageHead } from '../docs/.vitepress/seo.mjs';
 
-test('CLI has its own navigation and AI tooling belongs to development', () => {
-  assert.deepEqual(
-    navigation('zh').nav.map(item => item.text),
-    ['CLI', '使用指南', '开发指南', '部署与运维', '参考资料', '问题反馈']
-  );
-  const cli = sections.find(section => section.en === 'CLI');
-  assert.ok(cli.pages.some(([path]) => path === 'cli/build'));
-  assert.ok(
-    sections.find(section => section.en === 'Development').pages.some(([path]) => path === 'development/ai-tools')
-  );
+test('AI follows CLI and owns existing AI routes in both languages', () => {
+  const paths = ['ai/index', 'cli/skills', 'ai-coding', 'user/ai', 'development/ai-tools', 'operations/ai'];
+  for (const lang of ['en', 'zh']) {
+    const config = navigation(lang);
+    assert.deepEqual(
+      config.nav.slice(0, 2).map(item => item.text),
+      ['CLI', 'AI']
+    );
+    const ai = sections.find(section => section.en === 'AI');
+    assert.deepEqual(
+      ai.pages.map(([path]) => path),
+      paths
+    );
+    const prefix = lang === 'zh' ? '/zh' : '';
+    for (const path of paths) {
+      assert.equal(sections.filter(section => section.pages.some(([entry]) => entry === path)).length, 1);
+      assert.equal(config.sidebar[`${prefix}/guide/${path}`][0].text, 'AI');
+      // VitePress matches prefixes by slash depth, preserving insertion order for ties.
+      const matched = Object.keys(config.sidebar)
+        .sort((a, b) => b.split('/').length - a.split('/').length)
+        .find(key => `${prefix}/guide/${path}.html`.startsWith(key));
+      assert.equal(config.sidebar[matched][0].text, 'AI');
+      const url = `${prefix}/guide/${path}.html`;
+      assert.deepEqual(
+        config.nav.filter(item => item.activeMatch && new RegExp(item.activeMatch).test(url)).map(item => item.text),
+        ['AI']
+      );
+    }
+  }
+  assert.ok(sections.find(section => section.en === 'CLI').pages.some(([path]) => path === 'cli/build'));
 });
 
 test('canonical URLs use the production origin and normalize directory indexes', () => {

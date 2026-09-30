@@ -6,9 +6,21 @@ export const sections = [
     path: 'cli/index',
     pages: [
       ['cli/index', 'Overview and installation', '概览与安装'],
-      ['cli/skills', 'Install Skills', '安装 Skills'],
       ['cli/build', 'hohu build', 'hohu build'],
       ['cli/deploy', 'hohu deploy', 'hohu deploy']
+    ]
+  },
+  {
+    en: 'AI',
+    zh: 'AI',
+    path: 'ai/index',
+    pages: [
+      ['ai/index', 'Overview', '概览'],
+      ['cli/skills', 'Install Skills', '安装 Skills'],
+      ['ai-coding', 'AI-assisted development', 'AI 辅助开发'],
+      ['user/ai', 'Application AI assistant', '应用内 AI 助手'],
+      ['development/ai-tools', 'Connect business tools', '业务工具接入'],
+      ['operations/ai', 'Configuration and operations', '配置与运维']
     ]
   },
   {
@@ -23,7 +35,6 @@ export const sections = [
       ['user/settings', 'System settings', '系统设置'],
       ['user/parameters', 'Custom parameters', '自定义参数'],
       ['user/files', 'Files and uploads', '文件与上传'],
-      ['user/ai', 'AI assistant', 'AI 助手'],
       ['user/faq', 'Troubleshooting', '常见问题'],
       ['show', 'Live demo', '在线演示']
     ]
@@ -38,7 +49,6 @@ export const sections = [
       ['backend/introduction', 'Backend architecture', '后端架构'],
       ['backend/dir', 'Repository structure', '目录结构'],
       ['development/module', 'Add a module', '新增业务模块'],
-      ['development/ai-tools', 'Connect a module to AI', '让 AI 使用业务模块'],
       ['auth', 'API and button permissions', '接口与按钮权限'],
       ['data-permission', 'Data scope', '数据范围'],
       ['page', 'Pagination', '分页查询'],
@@ -46,7 +56,6 @@ export const sections = [
       ['backend/cache', 'Caching', '缓存'],
       ['scheduled-job', 'Scheduled jobs', '定时任务'],
       ['development/i18n', 'Internationalization', '国际化'],
-      ['ai-coding', 'AI-assisted development', 'AI 辅助开发'],
       ['desktop/introduction', 'Desktop overview', '桌面端介绍'],
       ['desktop/quick-start', 'Desktop quick start', '桌面端开发'],
       ['desktop/architecture', 'Desktop architecture', '桌面端架构'],
@@ -61,8 +70,7 @@ export const sections = [
       ['operations/index', 'Deployment overview', '部署入口'],
       ['deploy', 'Deploy with CLI', '使用 CLI 部署'],
       ['operations/upgrade', 'Upgrade and recovery', '升级、备份与恢复'],
-      ['operations/tenants', 'Multi-tenancy', '多租户管理'],
-      ['operations/ai', 'AI deployment', 'AI 配置与运维']
+      ['operations/tenants', 'Multi-tenancy', '多租户管理']
     ]
   },
   {
@@ -114,6 +122,7 @@ export function navigation(lang) {
       })),
       { text: lang === 'zh' ? '问题反馈' : 'Report an issue', link: 'https://github.com/aihohu/hohu-admin/issues' }
     ],
-    sidebar
+    // Prefer page-specific prefixes over directory fallbacks at the same depth.
+    sidebar: Object.fromEntries(Object.entries(sidebar).sort(([a], [b]) => b.length - a.length))
   };
 }

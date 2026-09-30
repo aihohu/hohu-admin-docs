@@ -18,4 +18,4 @@ Site tutorials do not override repository security constraints. Example queries 
 
 ## Add AI to your business
 
-After building a module, follow the [AI tool tutorial](./ai-tools) for queries, confirmation and results. For source development with a coding assistant, see [AI-assisted development](../ai-coding).
+Choose a task in the [AI overview](../ai/index). For source development with a coding assistant, [install Skills](../cli/skills), then follow [AI-assisted development](../ai-coding). To manually integrate business queries, confirmation and results, see [Connect business tools](./ai-tools).
