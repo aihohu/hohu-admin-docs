@@ -87,6 +87,6 @@ hohu skills install --agent claude-code --agent cursor
 | `hohu deploy pull/upgrade`         | 镜像更新或源码构建升级，详见部署参考 |
 | `hohu lang` / `hohu info`          | CLI 语言与配置信息                   |
 
-使用 `hohu <command> --help` 查看子命令参数与示例。`hohu init` 和部署初始化不是清库操作，不需要额外运行 init_db、sync_menus 等内部脚本。
+使用 `hohu <command> --help` 查看子命令参数与示例。`hohu init` 和部署初始化不是清库操作，已包含基础种子同步。开发新模块后按[模块教程](../development/module)执行必要的增量同步；常规安装无需重复执行内部脚本。
 
 源码构建见 [hohu build](./build)，部署命令见 [hohu deploy](./deploy)，完整操作流程见[部署指南](../deploy)。

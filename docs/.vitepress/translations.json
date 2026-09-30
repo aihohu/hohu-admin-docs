@@ -76,20 +76,20 @@
     "zh": "2b40db73fe88ce7c82f8b1504ce808fdae083b5dbab7e741681884418d54e713"
   },
   "backend/dir": {
-    "en": "400d23976671b4577265799d2e4692eeabfb67e22dbff9f1c97a9da7da71e456",
-    "zh": "d964a916536c85c940c73130c2190786006210b16ff80b48ad8028126fdcae83"
+    "en": "1e0d220fefc0e877d978c717d439c4910dfdbc706e4cbee84dcd956c9c8d440d",
+    "zh": "7ba9a561c080d2baa78aec966e1cd9651f934cb04362cb6abe4ddb6d4f0306f7"
   },
   "development/module": {
-    "en": "3333e93cac406ab69c77ebed53b0ddbb93b5b46ff3bb07a87e77d83d530d12ce",
-    "zh": "2a74ee298c71cb38c7282db834ada9a9fe28349184ed69928eff92a3ba3b607b"
+    "en": "a0b36bb5f5030186a3a9a702e448ab5c9378b11669cf44e7b8f4bfed408f9caa",
+    "zh": "e4450f6b06e5becd88ddacb1fb6029bf1cda51e43625dc4b3a05cf4a683bb60d"
   },
   "auth": {
     "en": "dfc459c1f646398ea1d0e114d7d97972368c81eb33e2dedb9de9f7aa36ad6829",
     "zh": "f12342d6a4274418cd2468acc4bde8d2d8433f41be672774fedb3aa93765eaf1"
   },
   "data-permission": {
-    "en": "5ed3177f5990fa904920ace4fef048d88692155a22d624ef1174a8987ce5458d",
-    "zh": "5803f86a156dd3cea31d423fbd9cf5b789d42b0c2dda9a56e286a86f61f7448d"
+    "en": "05b01eefbdd3d4475918cfccb049877c4c36fa209b1d84523975c29e24a3bfb6",
+    "zh": "f8cdecaa4c5a4e0cc51d1a1ddcd42bd1449683496750dfe5aa16b147f6326827"
   },
   "page": {
     "en": "91c05de57f7b28d642acb726dd2e5fbfbad60cddd857b9fc4cbdd218eb5874f1",
@@ -152,8 +152,8 @@
     "zh": "35d5a824cd46564d44d7dcbc2ce29e8741c02c855c73bd8835e3fa66a14e1fe5"
   },
   "cli/index": {
-    "en": "998db3024ef9fc4c853d4e0bed463f9d1b8b1e866beb00c2a43bf955721caea8",
-    "zh": "eefe172ff6de7049eda3e6a943e28ae18ec3aaf29e0f930ba593b1ccf5e1cc82"
+    "en": "b91db9a7ac9ae490c14861cd238acde4a19739fa33ae5998f1e4a5674e226abe",
+    "zh": "9d1d3b8d5d29057376b1b0be4eab0e26d27aa0a667cd3e4919325d6d1d7d2597"
   },
   "cli/build": {
     "en": "de946742c24892d2dffe99b9c522955f4de5a9f0e59c7ed02f6962a0e9db5e78",
@@ -176,8 +176,8 @@
     "zh": "8898e8c78b0445d9ca2ba6046ce2a6cce197199dfc525e7e7958c5db7296f30c"
   },
   "development/ai-tools": {
-    "en": "3f8208047a81fac60a8ec21e5cc55143636642a97393111c542307383cc8d147",
-    "zh": "f529b59ac9972ecd05542be29b1547da34a838e1b30e9c9932dd4948a3df193a"
+    "en": "36758ccd1b15966bdfd5c16903d227f6a436480061f194cf01395e48e477d27d",
+    "zh": "e4a350e581fe926541f0161ebc7a5a7106ccbf9e5572a601a3a4efdadf5376f7"
   },
   "cli/skills": {
     "en": "9bca6defb85980b0c10a58bacc1735f01ec4250a0ad2c653231c2e892e6cb665",

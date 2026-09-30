@@ -9,8 +9,8 @@ from app.core.exceptions import AuthorizationException
 from app.modules.ai.core.context import AiToolContext, DataScopeContext
 from app.modules.ai.agents.tools.registry import ToolRegistry
 from app.modules.ai.schemas.confirm import ConfirmationPresentation
-from notes.ai_tools import note_create, note_list, _dry_run_note_create
-from notes.projection import can_view_note
+from notes.ai_tools.note import note_create, note_list, _dry_run_note_create
+from notes.service.projection import can_view_note
 
 
 class NotesAiExampleTest(unittest.IsolatedAsyncioTestCase):

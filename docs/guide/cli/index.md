@@ -87,6 +87,6 @@ For a new project, install in the parent workspace and confirm agent discovery. 
 | `hohu deploy pull/upgrade`         | Image or source-build upgrades; see deployment reference                            |
 | `hohu lang` / `hohu info`          | CLI language and configuration information                                          |
 
-Use `hohu <command> --help` to inspect subcommand arguments and examples. Initialization does not wipe the database; users do not separately run internal init_db or sync_menus scripts.
+Use `hohu <command> --help` to inspect subcommand arguments and examples. Initialization does not wipe the database and includes baseline seeds. Developing a new module can require the incremental synchronization described in the [module tutorial](../development/module); routine installation does not require repeating internal scripts.
 
 See [hohu build](./build), [hohu deploy](./deploy) and the [Deployment guide](../deploy).

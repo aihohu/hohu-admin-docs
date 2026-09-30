@@ -18,9 +18,9 @@ An HTTP endpoint does not automatically become an AI tool. The execution path is
 
 ## 1. Implement the tools
 
-Place this file at `app/modules/notes/ai_tools.py` in the backend.
+Create an empty `app/modules/notes/ai_tools/__init__.py` and place this file at `app/modules/notes/ai_tools/note.py`. Keep the tool functions and `_dry_run_note_create` in the same file so the registry can resolve the preview function.
 
-<<< ../../../examples/notes/ai_tools.py
+<<< ../../../examples/notes/ai_tools/note.py
 
 The query returns at most 20 records and reports truncation through `hasMore`. IDs remain strings. `ToolResult.data` goes to the model; `UIResult` describes the interface. Column labels are translation keys, while user-authored titles retain their original text.
 
@@ -38,7 +38,7 @@ Add this entry to `AGENT_SEED` in `scripts/seed_ai_agents.py`:
 {
     "code": "notes",
     "name": "Business notes assistant",
-    "description": "Query business notes in the current tenant and create one note after user approval. Handles short work reminders and business notes, not users, roles or departments. Editing and deletion are unsupported.",
+    "description": "查询当前租户的业务便签，并在确认后创建。典型请求：'查看最近便签'、'记录明天例会'。边界：不负责用户、角色或部门管理，不支持编辑和删除。尚未发布，需管理员启用并授权。",
     "display_order": 20,
 },
 ```
@@ -55,9 +55,15 @@ Add a `notes` entry to `DEFAULT_PROMPTS` in `app/modules/ai/seed_prompts.py`:
 ),
 ```
 
-Append `"app.modules.notes.ai_tools"` to `BUILTIN_TOOL_MODULES` in `app/modules/ai/agents/tools/__init__.py`. This loader imports registered tools; creating the file alone does not load it.
+Append `"app.modules.notes.ai_tools.note"` to `BUILTIN_TOOL_MODULES` in `app/modules/ai/agents/tools/__init__.py`. This loader imports registered tools; creating the file alone does not load it.
 
-Synchronize development data before restarting the backend:
+Extend the exact agent/tool inventories in `tests/modules/ai/test_tool_registry.py`, `tests/modules/ai/test_seed_ai_agents_descriptions.py`, `tests/modules/system/test_ai_tool_safety_gate.py` and `tools/checks/check_ai_tools.py`. Preserve existing entries and safety assertions. `EXPECTED_BUILTIN_TOOL_NAMES` must include `note.list` and `note.create`; update checker tests for the target version. Do not remove inventory assertions to bypass the gate.
+
+Run the backend static gate before incremental seed synchronization:
+
+```bash
+uv run python -m tools.checks.check_ai_tools
+```
 
 ```bash
 uv run python -m scripts.sync_menus
@@ -72,15 +78,15 @@ For your own released module, review `PUBLISHED_AGENT_CODES`, initialization gra
 
 Old AI messages recheck tool permissions and referenced objects. `note` is a new subject type: returning `ResultProjection` alone is insufficient because the backend denies unknown subject types.
 
-Place this file at `app/modules/notes/projection.py`:
+Place this file at `app/modules/notes/service/projection.py`:
 
-<<< ../../../examples/notes/projection.py
+<<< ../../../examples/notes/service/projection.py
 
 Import `can_view_note` in `app/modules/ai/service/result_projection_service.py`. Inside the existing `try` in `_authorize_subject`, add a branch alongside the other subject handlers:
 
 ```python
 # Import at the top of the file
-from app.modules.notes.projection import can_view_note
+from app.modules.notes.service.projection import can_view_note
 
 # Add inside the existing try in _authorize_subject
 if subject_type == "note":
@@ -101,6 +107,8 @@ The previous chapter's `src/locales/notes.ts` already supplies page, permission 
 2. **Default-tenant system administrator**: use the ordinary application session to open system Agent management (`/platform/ai/agents`). Find code `notes`, inspect its prompt, enable it and save. Supply the required change reason, reference and impact acknowledgment. Agent management uses the system administrator session, not the separate model-operator account.
 3. **Role administrator**: select the previous chapter's test role. Grant the AI chat page and `ai:chat:use`, retaining the notes page and `business:note:list` / `business:note:add`. In the role's AI assistant authorization action, select the business notes assistant and save while preserving other existing bindings. The operator needs `system:role:ai-agent-auth`.
 4. **Ordinary test user**: sign out and back in. Open chat and verify that the notes assistant and a model are selectable. Do not switch to super-administrator testing to avoid missing grants.
+
+In Web's `src/views/ai/chat/modules/tool-call-i18n.ts`, map `note.list` and `note.create` to `notes.list` and `notes.create`. Preserve existing mappings. Without these entries, tool cards can display generic titles even when confirmation summaries are translated.
 
 The query uses the existing `data_list` card and creation uses `plain_json`, so no new card component is needed. This example omits `chip_target`: the notes page has not implemented `ai_query_id` replay. A link alone does not implement filter restoration.
 
@@ -158,4 +166,4 @@ Sign in with tenant code `notesbeta` and its administrator. Append `notes` to th
 
 It does not call a model or Redis or simulate the complete Gateway. Role authorization, resume, duplicate/expired confirmation and real conversations require application integration tests. Production initialization uses CLI orchestration; tutorial tests never belong in startup scripts.
 
-This page covers in-application tools. See [AI-assisted development](../ai-coding) for coding workflows. Skills and MCP installation instructions will accompany those capabilities when implemented.
+This page covers in-application tools. See [AI-assisted development](../ai-coding) for coding workflows and [Install Skills](../cli/skills) for installation. These application tools are not external MCP services.

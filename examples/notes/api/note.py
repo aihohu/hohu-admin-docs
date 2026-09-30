@@ -7,8 +7,8 @@ from app.core.tenant import TenantContext
 from app.db.session import get_db
 from app.modules.auth.service import get_current_tenant_context
 
-from .schemas import NoteCreate, NoteOut
-from .service import note_service
+from ..schemas import NoteCreate, NoteOut
+from ..service import note_service
 
 router = APIRouter(prefix="/business/notes", tags=["Notes"])
 

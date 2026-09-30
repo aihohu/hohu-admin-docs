@@ -25,6 +25,14 @@ filters.extend(
 
 Default fields are `dept_id` and `create_by`; override them with `dept_field` and `user_field`. Use the specialized function for User's many-to-many departments.
 
+## Choose the business policy
+
+Decide whether records are tenant-shared, strictly owner-only or governed by role-configured scope. The [notes tutorial](./development/module) uses tenant-shared visibility; configuring a role's department scope does not automatically change that policy. Role-scoped modules must apply the resolver's result to their Service queries.
+
+Use the resource's actual authorization fields. Department-owned models can use the generic filter above; reporter- or owner-scoped models can filter the corresponding user ID through the resolver's `accessible_user_scope`. Define whether scope follows the user's current departments or the department stored on the business record, including transfer behavior.
+
+Reload current authority before confirmed AI execution and historical result access. The target backend provides `load_live_user_authority` in `app/modules/auth/service.py`; use the unified resolver afterwards. Old confirmations or cached user objects cannot preserve revoked access. APIs, AI previews, execution and history projections must share the same data policy.
+
 ## Constraints
 
 - All-data and super-administrator access remain within the tenant.

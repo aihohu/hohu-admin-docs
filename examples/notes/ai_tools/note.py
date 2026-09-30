@@ -7,8 +7,8 @@ from app.modules.ai.agents.tools.decorator import ai_tool
 from app.modules.ai.agents.tools.meta import AiToolMeta
 from app.modules.ai.core.context import AiToolContext
 
-from .schemas import NoteCreate, NoteOut
-from .service import note_service
+from ..schemas import NoteCreate, NoteOut
+from ..service import note_service
 
 
 def _payload(title: str) -> NoteCreate:

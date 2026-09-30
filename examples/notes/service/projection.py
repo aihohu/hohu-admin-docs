@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.tenant import TenantContext
 from app.core.tenant_scope import tenant_select
 
-from .models import Note
+from ..models import Note
 
 
 async def can_view_note(

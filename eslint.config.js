@@ -20,6 +20,10 @@ export default tseslint.config(
     }
   },
   {
+    files: ['examples/notes/**/*.vue'],
+    languageOptions: { globals: { Api: 'readonly' } }
+  },
+  {
     files: ['**/*.vue'],
     languageOptions: {
       parserOptions: { parser: tseslint.parser },

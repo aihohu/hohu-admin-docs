@@ -4,6 +4,7 @@ Uses SQLite memory only; does not connect to the configured application database
 """
 
 import os
+import importlib
 from pathlib import Path
 import sys
 import unittest
@@ -46,6 +47,26 @@ class AsyncAdapter:
 
 
 class NotesExampleTest(unittest.IsolatedAsyncioTestCase):
+    async def test_package_exports_and_registered_api_routes(self):
+        api = importlib.import_module("notes.api.note")
+        package = importlib.import_module("notes.api")
+        self.assertIs(package.router, api.router)
+        self.assertIs(importlib.import_module("notes.models.note").Note, Note)
+        self.assertIs(
+            importlib.import_module("notes.schemas.note").NoteCreate, NoteCreate
+        )
+        self.assertIs(
+            importlib.import_module("notes.service.note").note_service, note_service
+        )
+        routes = {
+            (route.path, method)
+            for route in api.router.routes
+            for method in route.methods
+        }
+        self.assertEqual(
+            routes, {("/business/notes", "GET"), ("/business/notes", "POST")}
+        )
+
     async def test_paging_scopes_count_and_records_and_preserves_transaction(self):
         engine = create_engine("sqlite://")
         # Create only the example table; production FK is covered by migrations.

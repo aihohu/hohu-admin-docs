@@ -5,19 +5,18 @@ import type { DataTableColumns } from 'naive-ui';
 import { useAuth } from '@/hooks/business/auth';
 import { $t } from '@/locales';
 import { createNote, fetchNotes } from '@/service/api/notes';
-import type { Note } from '@/service/api/notes';
 
 const { hasAuth } = useAuth();
 const message = useMessage();
 const title = ref('');
-const records = ref<Note[]>([]);
+const records = ref<Api.Notes.Note[]>([]);
 const total = ref(0);
 const current = ref(1);
 const size = ref(10);
 const loading = ref(false);
 const saving = ref(false);
 let requestVersion = 0;
-const columns = computed<DataTableColumns<Note>>(() => [
+const columns = computed<DataTableColumns<Api.Notes.Note>>(() => [
   { title: $t('notes.title'), key: 'title', minWidth: 180 },
   { title: $t('notes.id'), key: 'noteId', width: 200 }
 ]);
@@ -91,7 +90,7 @@ onMounted(() => void loadNotes());
         <NDataTable
           :columns="columns"
           :data="records"
-          :row-key="(row: Note) => row.noteId"
+          :row-key="(row: Api.Notes.Note) => row.noteId"
           :loading="loading"
           :scroll-x="380"
         />

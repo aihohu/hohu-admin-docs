@@ -1,12 +1,7 @@
 import { request } from '@/service/request';
 
-export interface Note {
-  noteId: string;
-  title: string;
-}
-
 export function fetchNotes(current = 1, size = 10) {
-  return request<{ records: Note[]; total: number; current: number; size: number }>({
+  return request<Api.Notes.Page>({
     url: '/business/notes',
     method: 'get',
     params: { current, size }
@@ -14,5 +9,5 @@ export function fetchNotes(current = 1, size = 10) {
 }
 
 export function createNote(title: string) {
-  return request<Note>({ url: '/business/notes', method: 'post', data: { title } });
+  return request<Api.Notes.Note>({ url: '/business/notes', method: 'post', data: { title } });
 }

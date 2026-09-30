@@ -11,11 +11,11 @@ description: 通过业务便签示例接入 SQLAlchemy 模型、租户隔离、F
 
 首次学习请先按[开发环境](../quick-start)用 `hohu create notes-tutorial` 创建只包含 Backend 和 Frontend 的新项目，再执行 `hohu init` 和 `hohu dev`，完成首次登录。使用专用数据库和独立 Redis 实例；不要沿用已有应用的 `.env`、密钥或数据库。与其他项目并行运行时还需调整端口及前端代理，不能只修改浏览器地址。以下命令中的“后端目录”和“Web 目录”分别指这个新项目的 `hohu-admin/` 与 `hohu-admin-web/`。
 
-文档仓库的 `examples/notes/` 是示例来源，不是运行目录。将 Python 文件复制到后端 `app/modules/notes/`；将 `notes.ts`、`index.vue`、`locales.ts` 分别放到后文指定的 Web 路径。`ai_tools.py` 与 `projection.py` 留到下一篇再接入。不要把整份 examples 目录直接放进后端。
+文档仓库的 `examples/notes/` 是示例来源，不是运行目录。将 Python 文件按下方包结构复制到后端 `app/modules/notes/`，包含各层 `__init__.py`；将 `notes.d.ts`、`notes.ts`、`index.vue`、`locales.ts` 分别放到后文指定的 Web 路径。`ai_tools/note.py` 与 `service/projection.py` 留到下一篇再接入。不要把整份 examples 目录直接放进后端。
 
 ## 1. 确定边界
 
-同一租户中，拥有查看权限的用户可以读取该租户的全部便签；只有拥有新增权限的用户可以创建。它不包含个人私有便签、部门范围、编辑、删除或 AI 工具接入。需要这些能力时，应先补充相应权限和回归测试。
+同一租户中，拥有查看权限的用户可以读取该租户的全部便签；只有拥有新增权限的用户可以创建。本章暂不实现个人私有便签、部门范围、编辑和删除；AI 工具在下一章接入。需要这些能力时，应先补充相应权限和回归测试。
 
 | 项目     | 约定                                          |
 | -------- | --------------------------------------------- |
@@ -28,33 +28,69 @@ description: 通过业务便签示例接入 SQLAlchemy 模型、租户隔离、F
 
 ## 2. 创建模型和输入输出
 
-在后端创建 `app/modules/notes/`，添加空的 `__init__.py`，再创建以下文件。完整示例也保存在文档仓库的 `examples/notes/`。
+在后端按[目录结构](../backend/dir)创建 `app/modules/notes/`。根级 `__init__.py` 为空，`api/`、`models/`、`schemas/`、`service/` 分别包含下文的 `note.py` 与包导出。示例来源为 `examples/notes/`，Web 文件按各自目标路径复制。
 
-**models.py**
+**models/note.py**
 
-<<< ../../../../examples/notes/models.py
+<<< ../../../../examples/notes/models/note.py
 
 联合索引服务于租户内按 ID 分页。外键约束租户必须存在；如果以后关联客户、订单等业务对象，还要增加同租户关联约束。
 
-**schemas.py**
+**schemas/note.py**
 
-<<< ../../../../examples/notes/schemas.py
+<<< ../../../../examples/notes/schemas/note.py
 
 创建请求拒绝未声明字段，避免客户端传入 `tenantId`。输出使用 `noteId`，值为字符串，以保留 Snowflake ID 精度。便签标题属于用户数据，不随界面语言翻译。
 
 ## 3. 实现服务与接口
 
-**service.py**
+**service/note.py**
 
-<<< ../../../../examples/notes/service.py
+<<< ../../../../examples/notes/service/note.py
 
 列表和总数使用相同租户范围。Service 只 flush，不 commit；排序显式使用 ID。本例展开分页 SQL 便于理解作用域，通用模块也可以复用[分页工具](../page)。
 
-**api.py**
+**api/note.py**
 
-<<< ../../../../examples/notes/api.py
+<<< ../../../../examples/notes/api/note.py
 
 API 层认证、检查功能权限、取得可信租户上下文，并在创建成功后提交事务。不要用前端隐藏按钮替代接口权限，也不要把业务异常改成未约定的响应结构。
+
+### 包导出
+
+分别保存以下 `__init__.py`，使注册入口与相邻层能够导入对应对象；其余模块初始化文件保持为空。
+
+`api/__init__.py`
+
+```python
+from .note import router
+
+__all__ = ["router"]
+```
+
+`models/__init__.py`
+
+```python
+from .note import Note
+
+__all__ = ["Note"]
+```
+
+`schemas/__init__.py`
+
+```python
+from .note import NoteCreate, NoteOut
+
+__all__ = ["NoteCreate", "NoteOut"]
+```
+
+`service/__init__.py`
+
+```python
+from .note import note_service
+
+__all__ = ["note_service"]
+```
 
 ## 4. 注册路由并生成迁移
 
@@ -72,6 +108,14 @@ app.include_router(notes_router)
 uv run alembic revision --autogenerate -m "add business notes"
 ```
 
+同时在 `app/core/tenant_inventory.py` 的 `TENANT_MODEL_INVENTORY` 中登记资源，保留已有条目：
+
+```python
+"biz_note": _resource("biz_note", "app.modules.notes.models:Note"),
+```
+
+在 `tests/core/test_tenant_inventory.py` 的预期清单加入该表，并保留租户索引、归属不重叠等检查。迁移生成后，将新 revision 加入 `tests/test_release_migration_roundtrip.py` 的实际迁移链与对应回归；历史迁移测试仍指向原来的 revision，不要统一替换为最新版本。
+
 审查迁移只包含预期的 `biz_note` 表、外键和索引；如果出现其他表的删除，不要执行，先检查模型导入是否完整。确认后在开发库运行：
 
 ```bash
@@ -82,13 +126,19 @@ uv run alembic upgrade head
 
 ## 5. 接入完整 Web 页面、翻译和菜单
 
-以下所有 Web 路径相对 `hohu-admin-web/`。先完成翻译接线，再运行类型检查；否则新增 `$t` 键会报类型错误。
+以下所有 Web 路径相对 `hohu-admin-web/`。本例提供中英文页面；实际模块的语言范围遵从需求，单语言模块不需要修改框架国际化。先完成翻译接线，再运行类型检查；否则新增 `$t` 键会报类型错误。
 
 ### 请求和页面
+
+先将业务类型保存为 `src/typings/api/notes.d.ts`：
+
+<<< ../../../../examples/notes/notes.d.ts
 
 将请求文件保存为 `src/service/api/notes.ts`：
 
 <<< ../../../../examples/notes/notes.ts
+
+在 `src/service/api/index.ts` 中追加 `export * from './notes';`，保留已有导出。页面使用 `Api.Notes` 类型，业务类型不放在请求文件里。
 
 创建 `src/views/notes/index.vue`：
 
@@ -105,19 +155,19 @@ uv run alembic upgrade head
 在 `src/locales/langs/zh-cn.ts` 顶部添加 `import { notesZh as notesMessages } from '../notes';`；在 `en-us.ts` 顶部添加 `import { notesEn as notesMessages } from '../notes';`。两个文件都按以下位置合并，保留原有属性，不用本段替换整个语言文件：
 
 ```typescript
-// 原有 const local: App.I18n.Schema = { ... } 内：
+// Inside the existing local object:
 notes: notesMessages.notes,
-// 将原来的 builtin, 改为：
+// Replace the builtin shorthand:
 builtin: {
   ...builtin,
   permission: { ...builtin.permission, ...notesMessages.permission },
   agent: { ...builtin.agent, ...notesMessages.agent }
 },
-// 原有 route: { ... } 内追加：
+// Inside route:
 ...notesMessages.route,
-// 原有 errorCode: { ... } 内追加（根级 errorCode，不是 page 内的同名属性）：
+// Inside root errorCode, not page.errorCode:
 ...notesMessages.errorCode,
-// 原有 ai: { tool: { ... } } 的 tool 内追加：
+// Inside ai.tool:
 ...notesMessages.tool,
 // page.ai.chat:
 ...notesMessages.chat,
@@ -126,11 +176,11 @@ builtin: {
 在 `src/typings/app.d.ts` 的 `App.I18n.Schema` 中做四处扩展：
 
 ```typescript
-// Schema 根级，与 settings、builtin 同级：
+// At the Schema root:
 notes: typeof import('../locales/notes').notesEn.notes;
-// Schema.ai.tool 内，与 field、user 同级：
+// Inside Schema.ai.tool:
 note: typeof import('../locales/notes').notesEn.tool.note;
-// Schema.errorCode 内：
+// Inside Schema.errorCode:
 NOTE_TITLE_INVALID: string;
 NOTE_APPROVAL_REQUIRED: string;
 // Schema.page.ai.chat:
@@ -153,7 +203,7 @@ MENU_DEFINITIONS.extend(NOTE_MENUS)
 
 这行只添加一次。同步器会为按钮生成 `builtin.permission.business_note_list` 和 `builtin.permission.business_note_add`，上面的资源已提供对应翻译。
 
-在后端目录执行 `uv run python -m scripts.sync_menus`。在项目根目录运行 `hohu dev`，等待前端路由自动生成，再在 Web 目录运行 `pnpm typecheck`。后端 `/docs` 中有 Notes 分组、前端存在 `/notes` 路由后继续授权。
+本步骤是新模块开发后的增量菜单同步，区别于首次 `hohu init` 已完成的基础初始化。在后端目录执行 `uv run python -m scripts.sync_menus`。在项目根目录运行 `hohu dev`，等待前端路由自动生成，再在 Web 目录运行 `pnpm typecheck`。后端 `/docs` 中有 Notes 分组、前端存在 `/notes` 路由后继续授权。
 
 ### 创建验收角色
 
@@ -177,17 +227,27 @@ MENU_DEFINITIONS.extend(NOTE_MENUS)
 
 文档仓库提供内存 SQLite 验证 `tests/test_notes_example.py`，覆盖列表和 count 隔离、分页、输入、ID 字符串化与回滚。它不替代 PostgreSQL 迁移、HTTP 认证和浏览器测试。使用后端虚拟环境，设置 `HOHU_BACKEND_PATH` 指向后端仓库后运行此文件；测试不会连接业务数据库。
 
+在文档仓库目录使用已准备好的后端虚拟环境运行（替换示例后端路径）：
+
+```bash
+export HOHU_BACKEND_PATH=/path/to/hohu-admin
+export PYTHONDONTWRITEBYTECODE=1
+"$HOHU_BACKEND_PATH/.venv/bin/python" -m unittest discover -s tests -p 'test_notes*.py' -v
+```
+
+PowerShell 中设置 `$env:HOHU_BACKEND_PATH` 与 `$env:PYTHONDONTWRITEBYTECODE`，然后使用后端 `.venv/Scripts/python.exe` 执行相同 unittest 参数。
+
 完成后将迁移、模块、菜单、前端页面和双语资源一起纳入版本管理。生产发布通过既有 CLI 流程执行，不把示例测试或演示数据加入初始化脚本。
 
 ## 完成时应有的文件
 
-| 位置                      | 新增或修改                                                                         |
-| ------------------------- | ---------------------------------------------------------------------------------- |
-| 后端 `app/modules/notes/` | `__init__.py`、`models.py`、`schemas.py`、`service.py`、`api.py`、`menu_seed.py`   |
-| 后端注册                  | `app/main.py`、`alembic/env.py`、`app/modules/system/menu_seed.py`                 |
-| 数据库                    | `alembic/versions/` 中本次生成并审核的迁移文件                                     |
-| Web                       | `src/service/api/notes.ts`、`src/views/notes/index.vue`、`src/locales/notes.ts`    |
-| Web 接线                  | 两个 `src/locales/langs/*.ts` 语言文件、`src/typings/app.d.ts`、自动生成的路由文件 |
+| 位置                      | 新增或修改                                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| 后端 `app/modules/notes/` | 各包 `__init__.py`、`models/note.py`、`schemas/note.py`、`service/note.py`、`api/note.py`、`menu_seed.py`     |
+| 后端注册                  | `app/main.py`、`alembic/env.py`、`app/core/tenant_inventory.py`、`app/modules/system/menu_seed.py`            |
+| 数据库                    | `alembic/versions/` 中本次生成并审核的迁移文件                                                                |
+| Web                       | `src/typings/api/notes.d.ts`、`src/service/api/notes.ts`、`src/views/notes/index.vue`、`src/locales/notes.ts` |
+| Web 接线                  | 两个 `src/locales/langs/*.ts` 语言文件、`src/typings/app.d.ts`、自动生成的路由文件                            |
 
 若菜单存在但页面加载失败，检查文件目标路径、dev server 路由生成日志以及 `component` 是否为 `layout.base$view.notes`。若页面出现语言键而非文字，检查资源是否合并到正确层级。若保存失败，不要直接在数据库插入记录绕过接口，先检查接口响应和当前角色权限。
 

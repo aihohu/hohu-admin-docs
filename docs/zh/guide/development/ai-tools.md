@@ -18,9 +18,9 @@ description: 为 HoHu 业务便签接入 AI 查询和确认后创建，完整配
 
 ## 1. 实现两个工具
 
-将以下文件放入后端 `app/modules/notes/ai_tools.py`。
+创建空的 `app/modules/notes/ai_tools/__init__.py`，将以下文件放入 `app/modules/notes/ai_tools/note.py`。工具函数和 `_dry_run_note_create` 保持在同一文件，供注册器解析预演函数。
 
-<<< ../../../../examples/notes/ai_tools.py
+<<< ../../../../examples/notes/ai_tools/note.py
 
 查询最多返回 20 条，`hasMore` 提示结果是否截断；ID 保持字符串。`ToolResult.data` 供模型使用，`UIResult` 供界面展示。列标签使用语言键，用户写入的标题保持原文。
 
@@ -38,7 +38,7 @@ description: 为 HoHu 业务便签接入 AI 查询和确认后创建，完整配
 {
     "code": "notes",
     "name": "业务便签助手",
-    "description": "查询当前租户的业务便签，并在用户确认后创建一条便签。适用于记录工作提醒、待办线索和简短业务信息。不负责用户、角色或部门管理，不支持删除、编辑便签。",
+    "description": "查询当前租户的业务便签，并在确认后创建。典型请求：'查看最近便签'、'记录明天例会'。边界：不负责用户、角色或部门管理，不支持编辑和删除。尚未发布，需管理员启用并授权。",
     "display_order": 20,
 },
 ```
@@ -55,9 +55,17 @@ description: 为 HoHu 业务便签接入 AI 查询和确认后创建，完整配
 ),
 ```
 
-在 `app/modules/ai/agents/tools/__init__.py` 的 `BUILTIN_TOOL_MODULES` 元组中追加 `"app.modules.notes.ai_tools"`。此入口负责导入工具模块，单独创建文件不会触发注册。
+在 `app/modules/ai/agents/tools/__init__.py` 的 `BUILTIN_TOOL_MODULES` 元组中追加 `"app.modules.notes.ai_tools.note"`。此入口负责导入工具模块，单独创建文件不会触发注册。
 
-开发验证时先同步数据，再重启后端：
+同步扩展 `tests/modules/ai/test_tool_registry.py`、`tests/modules/ai/test_seed_ai_agents_descriptions.py`、`tests/modules/system/test_ai_tool_safety_gate.py` 和 `tools/checks/check_ai_tools.py` 中的精确助手／工具清单，保留既有条目和安全断言。静态检查器的 `EXPECTED_BUILTIN_TOOL_NAMES` 需包含 `note.list`、`note.create`；按目标版本同步相关检查器测试。不要通过移除清单断言让新工具绕过门禁。
+
+在后端运行：
+
+```bash
+uv run python -m tools.checks.check_ai_tools
+```
+
+检查通过后再进行开发实例的增量同步并重启后端：
 
 ```bash
 uv run python -m scripts.sync_menus
@@ -72,17 +80,17 @@ uv run python -m scripts.seed_ai_agents
 
 AI 历史消息会重新检查工具权限与结果对象。`note` 是新增的对象类型，仅返回 `ResultProjection` 还不够；当前后端对未知对象类型默认拒绝访问。
 
-把以下文件放入 `app/modules/notes/projection.py`：
+把以下文件放入 `app/modules/notes/service/projection.py`：
 
-<<< ../../../../examples/notes/projection.py
+<<< ../../../../examples/notes/service/projection.py
 
 在 `app/modules/ai/service/result_projection_service.py` 中导入 `can_view_note`，并在 `_authorize_subject` 的已有 `try` 中、其他对象类型分支旁添加：
 
 ```python
-# 文件顶部导入
-from app.modules.notes.projection import can_view_note
+# At module scope:
+from app.modules.notes.service.projection import can_view_note
 
-# 在 _authorize_subject 的现有 try 内加入
+# Inside the existing _authorize_subject try block:
 if subject_type == "note":
     return await can_view_note(db, subject_id, tenant=tenant)
 ```
@@ -101,6 +109,8 @@ if subject_type == "note":
 2. **默认租户系统管理员**：使用普通应用登录会话打开系统 Agent 管理（接口为 `/platform/ai/agents`）。找到 code 为 `notes` 的助手，核对提示词，启用并保存；按页面要求填写变更原因、引用编号及影响确认。这个 Agent 入口使用系统管理员会话，不是模型维护的独立平台账号。
 3. **角色管理员**：在角色管理中选中上一章的测试角色，授予 AI 对话页面和 `ai:chat:use`，保留便签页面与 `business:note:list`、`business:note:add`。通过该角色的 AI 助手授权操作勾选业务便签助手并保存，保留该角色原有的其他绑定；操作者需具备 `system:role:ai-agent-auth`。
 4. **普通测试用户**：退出后重新登录，打开 AI 对话，检查能选择业务便签助手和可用模型。助手缺失时不要用超级管理员测试来跳过授权问题。
+
+在 Web 的 `src/views/ai/chat/modules/tool-call-i18n.ts` 中，为 `note.list` 和 `note.create` 分别添加已有本地化工具名称键 `notes.list`、`notes.create`。保留其他映射，否则工具卡片可能仍显示通用名称；确认摘要翻译不能代替工具标题映射。
 
 查询使用已有 `data_list` 结果卡，创建使用 `plain_json`，不需要编写新的卡片组件。本例没有设置 `chip_target`：便签页尚未实现 `ai_query_id` 回放，不能只增加跳转链接就声称支持筛选恢复。
 
@@ -158,4 +168,4 @@ if subject_type == "note":
 
 此测试不调用模型或 Redis，也不模拟完整 Gateway；角色授权、确认恢复、重复确认、过期确认和真实对话仍需在应用集成测试中验收。生产初始化复用 CLI 编排，不把教程测试加入启动脚本。
 
-本篇覆盖应用内 AI 工具。使用外部编码助手开发模块见 [AI 辅助开发](../ai-coding)；Skills 与 MCP 的安装流程将在对应能力完成后提供。
+本篇覆盖应用内 AI 工具。使用外部编码助手开发模块见 [AI 辅助开发](../ai-coding)；工作流安装见[安装 Skills](../cli/skills)。这些应用内工具不等同于对外 MCP 服务。

@@ -5,8 +5,8 @@ from app.core.base_response import PageResult
 from app.core.tenant import TenantContext
 from app.core.tenant_scope import tenant_filter, tenant_select, tenant_values
 
-from .models import Note
-from .schemas import NoteCreate, NoteOut
+from ..models import Note
+from ..schemas import NoteCreate, NoteOut
 
 
 class NoteService:
