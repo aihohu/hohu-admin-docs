@@ -18,4 +18,4 @@ description: HoHu 后端架构的使用步骤、适用范围与限制
 
 认证入口生成可信 `TenantContext`；Service 显式接收，列表、count、详情、写入、关联与缓存都携带同一租户边界。部门数据范围和超级管理员判断不能替代租户隔离。
 
-数据库结构由 Alembic 迁移，种子只同步基础数据。详细维护约束与 ADR 在[后端仓库](https://github.com/aihohu/hohu-admin)的 `docs/ARCHITECTURE-GUIDELINES.md`、`docs/adr/` 中维护。
+数据库结构由 Alembic 迁移，种子只同步基础数据。详细维护约束在[后端仓库](https://github.com/aihohu/hohu-admin)的 `docs/ARCHITECTURE-GUIDELINES.md`、`docs/SECURITY.md` 中维护。

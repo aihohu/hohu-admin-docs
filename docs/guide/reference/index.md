@@ -14,4 +14,4 @@ Reference pages help look up known behavior; they do not replace tutorials or op
 - [CLI](../cli/index): create, initialize, develop, build, deploy and migrate.
 - [Error handling](../backend/error-code) and [Common error codes](../backend/error-code-list): stable identifiers and diagnosis.
 
-Contribution rules, security policies, ADRs and migration-maintenance constraints remain in the code repositories linked from [Source](../src). Update code definitions and tests before corresponding references. Manual summaries are not presented as complete, automatically generated API inventories.
+Contribution rules, security policies, architecture boundaries and migration-maintenance constraints remain in the code repositories linked from [Source](../src). Update code definitions and tests before corresponding references. Manual summaries are not presented as complete, automatically generated API inventories.

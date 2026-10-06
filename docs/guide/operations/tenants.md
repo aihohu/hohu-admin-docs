@@ -20,8 +20,8 @@ API creation and bootstrap each require a stable `Idempotency-Key`. Retry the or
 
 Disabling retains data. Reactivation does not reset passwords or roles, and does not revive old tokens. Turning off global hosted login rejects business-tenant runtime access while allowing default-tenant maintenance.
 
-System administration requires reason, ticket and correlation information with auditing. Provider/model catalog maintenance uses a separate identity and does not replace ordinary tenant-management sessions.
+System administration requires reason, ticket and correlation information with auditing. Provider/model catalog, Agent and tenant model authorization management all use the default tenant system super-administrator login session.
 
 Tenant administrators remain within their tenant. Hosted Marketplace/Lowcode, cross-tenant memberships, online tenant switching, BYOK and PostgreSQL RLS isolation are not available. The main application does not register marketplace routes either; historical plugin-installation designs are not current deployment instructions.
 
-Implementation constraints and rationale remain in backend ADR-0003. See [Source code](../src).
+Maintainer constraints are documented in `docs/ARCHITECTURE-GUIDELINES.md` and `docs/SECURITY.md` in the backend repository. See [Source code](../src).

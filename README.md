@@ -29,7 +29,7 @@ pnpm docs:review user/settings reference/settings
 
 `pnpm docs:check-seo` 检查逐页 canonical、双语 hreflang、分享元数据、站点地图、页面标题及本地链接和锚点。
 
-正文归属、协作和发布要求见 [文档维护规则](DOCUMENTATION.md)。后端贡献、安全、迁移和 ADR 在代码仓库维护，本站通过链接引用，不再复制完整正文。
+正文归属、协作和发布要求见 [文档维护规则](DOCUMENTATION.md)。后端贡献、安全、架构约束和迁移在代码仓库维护，本站通过链接引用，不再复制完整正文。ADR 默认内部维护，公开页面不依赖内部记录。
 
 ## 教程示例验证
 

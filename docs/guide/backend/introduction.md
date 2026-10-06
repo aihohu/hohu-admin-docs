@@ -18,4 +18,4 @@ Authentication uses JWT Bearer. Ordinary responses follow `{code, msg, data}`, w
 
 Authentication creates a trusted `TenantContext`. Services receive it explicitly, and lists, counts, details, writes, relationships and caches retain the same boundary. Department scope and super-administrator checks do not replace tenant isolation.
 
-Alembic owns schema changes; seeds synchronize initial data. Maintainer constraints and ADRs remain in `docs/ARCHITECTURE-GUIDELINES.md` and `docs/adr/` in the [backend repository](https://github.com/aihohu/hohu-admin).
+Alembic owns schema changes; seeds synchronize initial data. Maintainer constraints are documented in `docs/ARCHITECTURE-GUIDELINES.md` and `docs/SECURITY.md` in the [backend repository](https://github.com/aihohu/hohu-admin).

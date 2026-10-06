@@ -10,7 +10,7 @@ description: 配置 HoHu AI 模型连接、访问权限、出站策略和执行�
 ## 模型与授权
 
 1. 配套升级后端、Web 和 CLI，完成迁移与幂等初始化；不逐个手工运行种子脚本。
-2. 由独立平台维护身份配置 Provider 与模型目录；默认租户系统管理员分配租户模型策略、管理系统 Agent。两类身份不可混用。
+2. 默认租户系统超级管理员通过「AI 管理 → 模型管理」配置 Provider 与模型，并通过当前登录会话管理系统 Agent 和租户模型授权。
 3. 为实际 endpoint 配置精确出站 origin、必要 CIDR 与受控代理，再测试连接。失败时排查策略，不关闭校验绕过。
 4. 显式授予 AI 入口、Role-Agent 绑定与工具权限，检查启用状态。shared 或超级管理员角色不是通用 AI 权限旁路。
 5. 验证授权用户对话、文件、人工确认，以及无权限、撤权、其他租户被拒绝的路径。
@@ -19,46 +19,19 @@ description: 配置 HoHu AI 模型连接、访问权限、出站策略和执行�
 
 ## 首次连接模型
 
-以下命令在后端目录执行。CLI 已完成依赖安装与数据库初始化，后台服务应保持运行。
+使用默认租户内拥有启用系统超级管理员角色的账号登录后台。配置 Provider、模型、Agent 和租户模型授权都复用这次登录；账号名不决定权限，业务租户管理员不能修改全局配置。
 
-1. 创建独立的模型维护身份；命令会交互式要求输入两遍密码（至少 12 位，包含字母和数字）：
+1. 在后端 `.env` 设置 `AI_PROVIDER_EGRESS_ALLOWED_ORIGINS`，值为服务商的精确 origin，例如 `https://api.deepseek.com`，不包含 `/v1`。私有地址还需要精确的 `AI_PROVIDER_EGRESS_ALLOWED_CIDRS`。重启后端使配置生效。
+2. 进入「AI 管理 → 模型管理」，点击「新增」，填写服务商编码、名称、API Key 和 Base URL。例如编码 `deepseek`、名称 `DeepSeek`；模型名称及兼容 API 地址以服务商实际配置为准。点击「创建配置」保存；列表只显示密钥是否已配置，编辑时 API Key 留空保留原密钥。
+3. 在配置抽屉中点击「添加模型」，填写实际模型名称和能力（文本对话至少选 `text`）。API 地址、生成参数和排序位于默认折叠的「高级设置」中；API 地址留空使用 Provider 地址，生成参数留空使用模型默认值。新增配置时先点击「加入模型列表」，再点击「创建配置」；编辑已有配置时点击「保存模型」独立保存，外层「取消」不会撤销已经保存的模型变更。模型编辑未完成时需先完成或取消，再保存配置。先保存 Provider 修改，再对已保存的模型执行「测试连通性」。
+4. 在「租户管理 → AI 授权」中给目标租户分配该模型并按需设为默认。默认租户 ID 为 `0`；全局模型启用不会自动为所有租户授权。
+5. 在「AI 管理 → Agent 管理」中启用所需助手，在角色管理中授予 AI 对话菜单、`ai:chat:use` 和助手绑定。普通用户重新登录后，应能选到模型与助手并完成一次真实查询。
 
-   ```bash
-   uv run python -m tools.ops.platform_principal create --principal-name model-operator --display-name "Model operator" --permission platform:ai:read --permission platform:ai:write
-   ```
+升级后若看不到「模型管理」，刷新页面或退出后重新登录，以重新获取用户信息与动态菜单；核查当前角色属于默认系统范围且已启用。
 
-   此命令只用于首个平台身份初始化，不是普通应用账号。已有平台身份时使用既有维护流程，不重复创建。
+直接调用 API 时，使用同一系统超级管理员的普通 Bearer access token：Provider 和模型接口位于 `/platform/ai/providers`，租户授权接口为 `PUT /platform/tenants/{tenantId}/ai/model-policies/{modelId}`，请求体例如 `{"enabled":true,"isDefault":true}`。`/platform` 是兼容接口路径，不表示需要另一套登录。管理请求还需传入 `X-Platform-Reason`、`X-Platform-Ticket`、`X-Correlation-ID` 审计头，网页自动提供这些信息。
 
-2. 打开后端 `/docs`，调用 `POST /platform/auth/login`，请求体为 `{"principalName":"model-operator","password":"你的平台密码"}`。保存返回的 `data.token` 到当前会话的 `HOHU_PLATFORM_ACCESS_TOKEN` 环境变量；不要提交到 Git。平台 token 默认 15 分钟有效。
-3. 在后端 `.env` 设置 `AI_PROVIDER_EGRESS_ALLOWED_ORIGINS`，值为服务商的精确 origin，例如 `https://api.deepseek.com`，不包含 `/v1`。私有地址还需要精确的 `AI_PROVIDER_EGRESS_ALLOWED_CIDRS`。重启后端使配置生效。
-4. 准备本地 UTF-8 `provider.json`（包含真实密钥，不提交仓库）：
-
-   ```json
-   {
-     "providerCode": "deepseek",
-     "name": "DeepSeek",
-     "apiKey": "替换为密钥",
-     "baseUrl": "https://api.deepseek.com",
-     "isEnabled": true
-   }
-   ```
-
-   ```bash
-   uv run python -m tools.ops.platform_ai --base-url http://127.0.0.1:8000 --reason "Initial model setup" --ticket-id SETUP-001 --correlation-id model-setup-001 providers create --payload-file provider.json
-   ```
-
-   记下返回的 `providerId`。准备 `model.json`：`{"name":"服务商实际模型名称","capabilities":["text"],"isEnabled":true}`，再执行：
-
-   ```bash
-   uv run python -m tools.ops.platform_ai --base-url http://127.0.0.1:8000 --reason "Initial model setup" --ticket-id SETUP-001 --correlation-id model-setup-002 models create --provider-id PROVIDER_ID --payload-file model.json
-   ```
-
-   替换 `PROVIDER_ID`，记下返回的 `modelId`。模型名称及兼容 API 地址以服务商实际配置为准。
-
-5. 使用默认租户的普通系统管理员登录后台，在租户管理中给目标租户分配该模型并设为默认。接口为 `PUT /platform/tenants/{tenantId}/ai/model-policies/{modelId}`，请求体 `{"enabled":true,"isDefault":true}`。它需要普通系统管理员 token，不能使用上一步的平台 token。默认租户 ID 为 `0`。
-6. 在 Agent 管理中启用所需助手，在角色管理中授予 AI 对话菜单、`ai:chat:use` 和助手绑定。普通用户重新登录后，应能选到模型与助手并完成一次真实查询。
-
-直接调用管理 API 时，除 Bearer token 外还需传入 `X-Platform-Reason`、`X-Platform-Ticket`、`X-Correlation-ID` 审计头；上述维护命令会自动添加。配置完成后移除本地明文 payload 文件中的密钥，并清理会话 token。
+需要命令行配置时，在当前会话的 `HOHU_SYSTEM_ACCESS_TOKEN` 中设置普通系统超级管理员 access token，再使用 `uv run python -m tools.ops.platform_ai --help` 查看命令。旧 `HOHU_PLATFORM_ACCESS_TOKEN` 和独立平台 token 不适用于这些接口。凭据和包含密钥的临时文件只保存在本地私有目录，不提交 Git。
 
 ## 运行模式
 
@@ -77,4 +50,4 @@ Provider 请求使用允许列表、DNS/IP 校验、超时、响应大小、并�
 
 将 `AI_MODULE_ENABLED=false` 实际传入进程并重启，AI 业务组件停止初始化，`/ai/**` 和 `/platform/ai/**` 返回 503 / `AI_MODULE_DISABLED`。核查非 AI 功能正常，修复原因后再恢复。该开关是部署熔断，不替代日常角色授权。
 
-维护工具位于[后端仓库](https://github.com/aihohu/hohu-admin)的 `tools/ops/platform_principal.py` 和 `tools/ops/platform_ai.py`，可通过 `--help` 查看当前版本支持的命令。运维操作需要 reason、ticket、correlation 及审计，不在普通用户页面传递维护凭据。
+模型配置的命令行工具位于[后端仓库](https://github.com/aihohu/hohu-admin)的 `tools/ops/platform_ai.py`。它使用正常系统管理员会话并自动添加操作原因、工单及关联信息。

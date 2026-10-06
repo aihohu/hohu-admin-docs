@@ -103,7 +103,7 @@ The previous chapter's `src/locales/notes.ts` already supplies page, permission 
 
 ### Configure each identity explicitly
 
-1. **Model operator**: follow [AI operations](../operations/ai) to configure the Provider, available models and outbound access; the default tenant system administrator configures tenant model policy. First verify a response with a built-in assistant.
+1. **System super-administrator**: follow [AI operations](../operations/ai) to configure the Provider, available models and outbound access and configure tenant model policy in the same login session. First verify a response with a built-in assistant.
 2. **Default-tenant system administrator**: use the ordinary application session to open system Agent management (`/platform/ai/agents`). Find code `notes`, inspect its prompt, enable it and save. Supply the required change reason, reference and impact acknowledgment. Agent management uses the system administrator session, not the separate model-operator account.
 3. **Role administrator**: select the previous chapter's test role. Grant the AI chat page and `ai:chat:use`, retaining the notes page and `business:note:list` / `business:note:add`. In the role's AI assistant authorization action, select the business notes assistant and save while preserving other existing bindings. The operator needs `system:role:ai-agent-auth`.
 4. **Ordinary test user**: sign out and back in. Open chat and verify that the notes assistant and a model are selectable. Do not switch to super-administrator testing to avoid missing grants.
