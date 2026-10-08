@@ -23,13 +23,15 @@ description: 配置 HoHu AI 模型连接、访问权限、出站策略和执行�
 
 1. OpenAI、Anthropic 和 DeepSeek 的官方 API origin 已在内置出站允许列表中。使用其他服务商或兼容 API 地址时，在后端 `.env` 设置 `AI_PROVIDER_EGRESS_ALLOWED_ORIGINS`，值为服务商的精确 origin，不包含 `/v1`。私有地址还需要精确的 `AI_PROVIDER_EGRESS_ALLOWED_CIDRS`。修改后重启后端使配置生效。
 2. 进入「AI 管理 → 模型管理」，点击「新增」，填写服务商编码、名称、API Key 和 Base URL。例如编码 `deepseek`、名称 `DeepSeek`；模型名称及兼容 API 地址以服务商实际配置为准。点击「创建配置」保存；列表只显示密钥是否已配置，编辑时 API Key 留空保留原密钥。
-3. 在配置抽屉中点击「添加模型」，填写实际模型名称和能力（文本对话至少选 `text`）。API 地址、生成参数和排序位于默认折叠的「高级设置」中；API 地址留空使用 Provider 地址，生成参数留空使用模型默认值。新增配置时先点击「加入模型列表」，再点击「创建配置」；编辑已有配置时点击「保存模型」独立保存，外层「取消」不会撤销已经保存的模型变更。模型编辑未完成时需先完成或取消，再保存配置。Provider 的出站策略状态也显示在编辑抽屉中；修改 Provider 配置后需先保存，再查看重新计算的状态。编辑已保存模型时，「取消编辑」左侧提供「测试模型」按钮。按钮只测试已保存配置；如果修改了 Provider 或模型，先保存并重新打开模型编辑。测试会向服务商发送一次真实请求，可能产生费用；“出站允许”只说明地址通过安全检查，仍需测试密钥、模型和服务商连接。
+3. 在配置抽屉中点击「添加模型」，填写实际模型名称和能力（文本对话至少选 `text`）。API 地址、生成参数和排序位于默认折叠的「高级设置」中；API 地址留空使用 Provider 地址，生成参数留空使用模型默认值。新增配置时先点击「加入模型列表」，再点击「创建配置」；编辑已有配置时点击「保存模型」独立保存，外层「取消」不会撤销已经保存的模型变更。模型编辑未完成时需先完成或取消，再保存配置。Provider 的出站策略状态也显示在编辑抽屉中；修改 Provider 配置后需先保存，再查看重新计算的状态。新增或编辑模型时，模型表单操作区的取消按钮左侧提供同一个「测试模型」按钮，测试当前 Provider 和模型表单内容，不会保存修改。新增 Provider 需先填写 API Key；编辑 Provider 时 API Key 留空会使用已保存的密钥。测试会向服务商发送一次真实请求，可能产生费用；“出站允许”只说明已保存地址通过安全检查，当前表单仍需通过测试。
 4. 进入「租户管理」，在目标租户的「AI 授权」列点击「授权」，在抽屉列表中为需要的多个模型开启「允许使用」，从已授权且配置可用的模型中单选一个「租户默认」，点击「保存更改」统一保存。新安装项目使用默认租户时，也必须在「默认租户」（ID 为 `0`）行完成此步；默认租户支持 AI 授权，无需再次初始化。未初始化的业务租户须先完成初始化。全局模型启用不会自动为租户授权。
 5. 在「AI 管理 → Agent 管理」中启用所需助手，在角色管理中授予 AI 对话菜单、`ai:chat:use` 和助手绑定。普通用户重新登录后，应能选到模型与助手并完成一次真实查询。
 
 升级后若看不到「模型管理」，刷新页面或退出后重新登录，以重新获取用户信息与动态菜单；核查当前角色属于默认系统范围且已启用。
 
-直接调用 API 时，使用同一系统超级管理员的普通 Bearer access token：Provider 和模型接口位于 `/platform/ai/providers`，租户授权接口为 `PUT /platform/tenants/{tenantId}/ai/model-policies/{modelId}`，请求体例如 `{"enabled":true,"isDefault":true}`。`/platform` 是兼容接口路径，不表示需要另一套登录。管理请求还需传入 `X-Platform-Reason`、`X-Platform-Ticket`、`X-Correlation-ID` 审计头，网页自动提供这些信息。
+直接调用 API 时，使用同一系统超级管理员的普通 Bearer access token：Provider 和模型接口位于 `/platform/ai/providers`。统一表单测试为 `POST /platform/ai/providers/test`，提交可选字符串 `providerId`、`providerCode`、可留空的 `apiKey`、`baseUrl`、`config` 和 `model`（模型创建表单字段）；返回 `data.status=ok`，不写入配置，也不返回上游内容或密钥。已有的 `POST /platform/ai/providers/{providerId}/test` 继续兼容按已保存 ID 测试。租户授权接口为 `PUT /platform/tenants/{tenantId}/ai/model-policies/{modelId}`，请求体例如 `{"enabled":true,"isDefault":true}`。`/platform` 是兼容接口路径，不表示需要另一套登录。管理请求还需传入 `X-Platform-Reason`、`X-Platform-Ticket`、`X-Correlation-ID` 审计头，网页自动提供这些信息。
+
+测试表单没有可用密钥时返回 `AI_PROVIDER_TEST_KEY_REQUIRED`；出站地址未获允许时返回 `AI_PROVIDER_URL_FORBIDDEN`。测试失败不会保存表单，密钥和上游响应不会出现在成功响应中。
 
 需要命令行配置时，在当前会话的 `HOHU_SYSTEM_ACCESS_TOKEN` 中设置普通系统超级管理员 access token，再使用 `uv run python -m tools.ops.platform_ai --help` 查看命令。旧 `HOHU_PLATFORM_ACCESS_TOKEN` 和独立平台 token 不适用于这些接口。凭据和包含密钥的临时文件只保存在本地私有目录，不提交 Git。
 
