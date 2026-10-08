@@ -21,10 +21,10 @@ Use [CLI deployment](../deploy) for installation. AI is enabled by default, but 
 
 Sign in to the default tenant with an enabled system super-administrator role. Provider, model, Agent and tenant model authorization management all use this login session. Account names grant no authority, and business tenant administrators cannot change global configuration.
 
-1. Set `AI_PROVIDER_EGRESS_ALLOWED_ORIGINS` in the backend `.env` to the provider's exact origin, for example `https://api.deepseek.com`, without `/v1`. Private endpoints also require explicit `AI_PROVIDER_EGRESS_ALLOWED_CIDRS`. Restart the backend.
+1. Official API origins for OpenAI, Anthropic and DeepSeek are included in the built-in egress allowlist. For other providers or compatible API endpoints, set `AI_PROVIDER_EGRESS_ALLOWED_ORIGINS` in the backend `.env` to the provider's exact origin, without `/v1`. Private endpoints also require explicit `AI_PROVIDER_EGRESS_ALLOWED_CIDRS`. Restart the backend after changing these settings.
 2. Open **AI Management → Model Manage**, click **Add**, and enter the provider code, name, API Key and Base URL. For example, use code `deepseek` and name `DeepSeek`; use your provider's actual model names and compatible API endpoint. Click **Create configuration** to save. The list only shows whether a credential is configured. Leave API Key empty when editing to retain the existing key.
 3. Click **Add Model** in the configuration drawer and enter the actual model name and capabilities (include `text` for text chat). The initially collapsed **Advanced settings** section contains the API URL, generation parameters and sort order. An empty API URL uses the Provider address; empty generation parameters use model defaults. For a new configuration, click **Add to model list**, then **Create configuration**. For an existing configuration, **Save model** saves independently; cancelling the outer drawer does not undo saved model changes. Finish or cancel model editing before saving the configuration. Save Provider changes before running **Test Connectivity** on a saved model.
-4. In **Tenant Management → AI access**, assign the model to the target tenant and make it the default if needed. The default tenant ID is `0`; enabling a global model does not automatically authorize every tenant.
+4. Open **Tenants** and click **Authorize** in the target tenant's **AI access** column. Select the model, enable **Allow use**, optionally enable **Default model**, and save. A new installation using the default tenant must also complete this step in the **Default tenant** row (ID `0`). The default tenant supports AI authorization without being initialized again. Business tenants must complete initialization first. Enabling a global model does not automatically authorize tenants.
 5. Enable the required assistant in **AI Management → AI Agent Management**. Grant the role the AI conversation page, `ai:chat:use` and the assistant binding. After signing in again, an ordinary user should be able to select the model and assistant and complete a real query.
 
 If Model Manage is missing after upgrading, refresh or sign out and in to reload user information and dynamic menus. Check that the current role is enabled and belongs to the default system scope.
@@ -47,6 +47,10 @@ Provider calls enforce allowlists, DNS/IP checks, timeouts, response size, concu
 ## Diagnosis and emergency disable
 
 For missing assistants, check entry permission, role bindings and tools. For missing models, check tenant policies and model status. For confirmation timeouts, inspect mode, worker count and Redis.
+
+If Model Manage contains an enabled model but the assistant displays **No chat-safe model is currently available**, first check that the current tenant's **AI access** policy allows the model. Then check its `text` capability, enabled model and Provider status, and egress policy. Upgrades may have authorized models that already existed for the default tenant; newly added models still require explicit authorization.
+
+If an Agent has a preferred model, confirm that the model still exists and the current tenant is authorized to use it. Select the default option to use the common selector with the tenant's authorized models. For **AI availability could not be loaded. Please try again later.**, inspect the HTTP status and response error code from `/ai/chat/models` and `/ai/agents`, together with backend logs.
 
 Pass `AI_MODULE_ENABLED=false` to the process and restart. AI business components stop initializing, and `/ai/**` plus `/platform/ai/**` return 503 / `AI_MODULE_DISABLED`. Verify non-AI features, resolve the cause and then restore service. This is a deployment circuit breaker, not ordinary role authorization.
 
