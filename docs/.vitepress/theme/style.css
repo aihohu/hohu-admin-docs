@@ -9,32 +9,12 @@
   --vp-c-brand-2: #42b995;
   --vp-c-brand-3: #238569;
 }
-.VPPage:has(.hohu-home) .content-container {
-  max-width: none;
-  padding: 0;
-}
-.VPPage:has(.hohu-home) .content {
-  padding: 0;
-}
 .vp-doc img {
   border-radius: 10px;
 }
 
-/* Keep the landing header with the hero; document navigation uses the chosen theme. */
-html:has(.hero-stage) .VPNav,
-html:has(.hero-stage) .VPLocalNav {
-  --vp-nav-bg-color: #090e1b;
-  --vp-c-bg: #090e1b;
-  --vp-c-bg-alt: #111a2d;
-  --vp-c-bg-soft: #172138;
-  --vp-c-text-1: #edf3ff;
-  --vp-c-text-2: #a9b5cd;
-  --vp-c-text-3: #8191af;
-  --vp-c-divider: #ffffff18;
-  --vp-c-brand-1: #8ae4cf;
-}
-html:has(.hero-stage) .VPLocalNav {
-  background: #090e1b;
+html:has(.hohu-home) body {
+  min-width: 0;
 }
 @media (prefers-reduced-motion: no-preference) {
   html {

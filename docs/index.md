@@ -1,8 +1,8 @@
 ---
 layout: page
-title: HoHu — Build AI-native business applications
+title: HoHu — The AI-native enterprise application platform
 titleTemplate: false
-description: Build business applications with HoHu, an open-source platform with AI assistants, permissions, tenant isolation and CLI tooling. Develop and deploy on your infrastructure.
+description: HoHu is an AI-native enterprise application platform. Create and develop business applications with AI Skills or the CLI, deploy on your infrastructure, and work with AI assistants using shared permissions and data.
 ---
 
 <HoHuHome />

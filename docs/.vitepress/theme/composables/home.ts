@@ -1,203 +1,490 @@
-export const homeContent = {
+export type HomeLocale = 'zh' | 'en';
+export type HomeScenarioId = 'orders' | 'approvals' | 'projects';
+export interface GuideEntry {
+  title: string;
+  text: string;
+  path: string;
+  link: string;
+}
+export interface HomeContent {
+  nav: {
+    platform: string;
+    workflow: string;
+    guides: { title: string; path: string }[];
+    feedback: string;
+    menu: string;
+    close: string;
+    skip: string;
+    label: string;
+  };
+  hero: {
+    category: string;
+    title: string;
+    intro: string;
+    demo: string;
+    develop: string;
+    image: string;
+    darkImage: string;
+    alt: string;
+    caption: string;
+    proof: string[];
+    screenTitle: string;
+    imageLink: string;
+  };
+  journey: { title: string; items: GuideEntry[] };
+  workflow: {
+    title: string;
+    intro: string;
+    mode: 'extension-examples';
+    image: string;
+    darkImage: string;
+    alt: string;
+    caption: string;
+    imageLink: string;
+    disclosure: string;
+    scenarios: { id: HomeScenarioId; title: string; text: string; detail: string }[];
+    guide: string;
+    guidePath: string;
+    scenarioLabel: string;
+  };
+  platform: { title: string; intro: string; clients: { title: string; text: string }; items: GuideEntry[] };
+  start: {
+    title: string;
+    intro: string;
+    prerequisites: string;
+    terminal: string;
+    cliTitle: string;
+    cliIntro: string;
+    ai: {
+      title: string;
+      intro: string;
+      prompts: { title: string; text: string }[];
+      note: string;
+      guide: string;
+      guidePath: string;
+      skills: string;
+      skillsPath: string;
+    };
+    copy: string;
+    copied: string;
+    failed: string;
+    links: GuideEntry[];
+  };
+  footer: {
+    title: string;
+    description: string;
+    questions: { title: string; answer: string }[];
+    limitations: string;
+    links: GuideEntry[];
+    license: string;
+  };
+}
+
+export const commands = 'uv tool install hohu\nhohu create my-project\ncd my-project\nhohu init\nhohu dev';
+export function guideLink(locale: HomeLocale, path: string) {
+  return `${locale === 'zh' ? '/zh' : ''}/guide/${path}${path.endsWith('/') ? '' : '.html'}`;
+}
+
+export const homeContent: Record<HomeLocale, HomeContent> = {
   zh: {
-    eyebrow: '开源 · AI 原生 · 自主部署',
-    title: '构建 AI 原生',
-    accent: '业务应用',
-    intro: '将业务界面、AI 能力、权限与数据连接起来。HoHu 为企业应用提供统一基础，让你专注于自己的业务。',
-    start: '快速开始',
-    demo: '查看演示',
-    source: '查看源码',
-    panelTitle: '让 AI 参与业务',
-    panelLabel: '操作流程示意',
-    scenarios: [
-      {
-        title: '查询用户',
-        prompt: '帮我查找销售部门的用户。',
-        steps: ['理解查询条件', '检查功能权限与数据范围', '查询可访问的用户'],
-        result: '以结构化结果呈现，继续查看或追问。'
+    nav: {
+      platform: '平台能力',
+      workflow: 'AI 助手',
+      guides: [
+        { title: '使用指南', path: 'user/' },
+        { title: '开发指南', path: 'development/' },
+        { title: '部署与运维', path: 'operations/' }
+      ],
+      feedback: '问题反馈',
+      menu: '打开导航',
+      close: '关闭导航',
+      skip: '跳到主要内容',
+      label: '官网导航'
+    },
+    hero: {
+      category: '开源 · 自主部署',
+      title: '企业 AI 原生\n应用平台',
+      intro: '开发和部署自己的业务应用，让用户在页面中操作，也能通过 AI 助手查询数据、协助处理业务。',
+      demo: '体验 HoHu',
+      develop: '立即开始',
+      image: '/images/product/ai-assistant-zh.png',
+      darkImage: '/images/product/ai-assistant-zh.png',
+      alt: 'HoHu AI 助手界面：选择业务任务并开始对话',
+      caption: '从一个业务任务开始，让应用和 AI 一起工作。',
+      proof: ['开源代码', '自主部署', 'Web / 移动端 / 桌面端'],
+      screenTitle: 'HoHu 工作空间',
+      imageLink: '查看完整产品画面'
+    },
+    journey: {
+      title: '从开发到使用，围绕同一个应用。',
+      items: [
+        {
+          title: '开发者创建',
+          text: '从数据模型到业务页面，复用平台基础。可使用 HoHu Skills 辅助开发，为 AI 助手接入业务工具。',
+          path: 'development/module',
+          link: '开发第一个业务模块'
+        },
+        {
+          title: '企业部署与管理',
+          text: '在自己的环境运行应用，配置租户、角色和模型，管理团队可使用的能力。',
+          path: 'operations/',
+          link: '了解部署与运维'
+        },
+        {
+          title: '用户与 AI 助手协作',
+          text: '在界面中操作，也可以用自然语言发起任务，查看结果并确认需要执行的变更。',
+          path: 'user/ai',
+          link: '了解 AI 助手'
+        }
+      ]
+    },
+    workflow: {
+      title: '业务问题，\n直接问 AI 助手',
+      intro: '为订单、审批和项目管理应用接入 AI 助手，用自然语言查询业务信息，帮助团队掌握待办和进度。',
+      mode: 'extension-examples',
+      image: '/images/product/ai-conversation-zh.png',
+      darkImage: '/images/product/ai-conversation-zh.png',
+      alt: 'HoHu AI 助手的真实用户管理对话，展示统计结果与只读工具执行记录',
+      caption: 'AI 助手产品界面 / 用户管理示例',
+      imageLink: '打开完整对话截图',
+      disclosure: '场景示例需要开发对应业务应用并接入 AI 工具；产品截图为现有用户管理的只读查询。',
+      scenarios: [
+        {
+          id: 'orders',
+          title: '订单管理',
+          text: '“哪些订单还没处理？”',
+          detail: '在订单应用中接入查询工具，按状态和时间筛选待处理订单，帮助团队安排跟进。'
+        },
+        {
+          id: 'approvals',
+          title: '审批管理',
+          text: '“有哪些待审批事项？”',
+          detail: '在审批应用中接入待办和详情查询工具，整理待审批事项与申请内容，由审批人作出决定。'
+        },
+        {
+          id: 'projects',
+          title: '项目管理',
+          text: '“哪些项目任务已延期？”',
+          detail: '在项目应用中接入任务查询工具，整理延期任务、负责人和截止时间，帮助团队跟进进度。'
+        }
+      ],
+      guide: '让 AI 助手使用业务应用',
+      guidePath: 'development/ai-tools',
+      scenarioLabel: '业务应用场景'
+    },
+    platform: {
+      title: '把基础接好，\n把时间留给业务。',
+      intro: '业务界面与 AI 工具共享服务和授权规则。沿用熟悉的 Python 与 Vue，逐步扩展自己的应用。',
+      clients: {
+        title: '支持多端应用开发',
+        text: '基于同一后端，构建适合浏览器、手机和桌面环境的业务应用。'
       },
-      {
-        title: '调整部门',
-        prompt: '把这个部门移到华东分公司下面。',
-        steps: ['定位并核对目标部门', '展示变更内容，等待确认', '确认后执行并返回结果'],
-        result: '有歧义时先澄清，有影响的操作先确认。'
+      items: [
+        {
+          title: '身份与权限',
+          text: '用户、部门、角色与数据范围，连接团队的组织方式和业务操作。',
+          path: 'auth',
+          link: '查看权限机制'
+        },
+        {
+          title: '租户与数据',
+          text: '在可信租户上下文中访问业务数据，按部署模式配置与管理租户。',
+          path: 'operations/tenants',
+          link: '了解租户管理'
+        },
+        {
+          title: 'AI 与业务工具',
+          text: '配置助手、模型与工具授权；对需要确认的操作，先预览，再由用户批准执行。',
+          path: 'development/ai-tools',
+          link: '为业务接入 AI'
+        },
+        {
+          title: '文件、任务与设置',
+          text: '复用文件管理、定时任务和系统设置，为日常业务提供基础支持。',
+          path: 'backend/introduction',
+          link: '浏览平台基础'
+        }
+      ]
+    },
+    start: {
+      title: '用 AI 或 CLI，\n开始开发',
+      intro: '告诉编程助手你的业务需求，让 HoHu Skills 辅助创建项目和开发模块；也可以使用 CLI 手动创建、运行与部署。',
+      prerequisites: '先准备 Git、uv、Node.js、pnpm、PostgreSQL 和 Redis，并按开发环境指南完成配置。',
+      terminal: '创建并启动项目',
+      cliTitle: '通过 CLI 创建项目',
+      cliIntro: '在终端中创建项目、初始化环境并启动开发服务。',
+      ai: {
+        title: '通过 AI 辅助创建与开发',
+        intro: '安装 HoHu Skills，让编程助手按项目规范完成创建、开发与验证。',
+        prompts: [
+          {
+            title: '创建项目',
+            text: '使用 hohu-project 创建 equipment 项目，只需要 Backend 和 Web。检查依赖与数据库配置，初始化并启动，告诉我访问地址和验证结果。'
+          },
+          {
+            title: '开发业务模块',
+            text: '使用 hohu-business-module 新增设备借用模块，支持借用、归还和查看记录。普通用户只能查看和归还自己的记录，不能重复借用同一设备。'
+          }
+        ],
+        note: '用于 Claude Code、Cursor、Codex 等编程助手。先准备开发环境并安装 Skills。',
+        guide: '查看 AI 开发指南',
+        guidePath: 'ai-coding',
+        skills: '安装 HoHu Skills',
+        skillsPath: 'cli/skills'
       },
-      {
-        title: '管理角色',
-        prompt: '帮我创建一个客服角色。',
-        steps: ['确认角色名称与必要信息', '检查授权并展示操作', '确认后创建角色'],
-        result: '创建角色后，由管理员按业务需要配置权限。'
-      }
-    ],
-    panelNote: '示例用于说明交互流程。实际结果取决于已启用的能力和当前账号权限。',
-    foundationLabel: '平台基础',
-    foundationTitle: '从你的业务开始',
-    foundationDesc: '身份、权限、文件和任务是业务应用的共同需求。把这些基础连接好，再构建属于你的功能。',
-    foundations: [
-      ['身份与权限', '用户、角色、部门和数据范围，为页面操作和 AI 调用提供一致的授权边界。', 'auth'],
-      ['AI 与业务协作', '配置模型与智能体，让对话通过受控工具进入业务流程。', 'user/ai'],
-      ['租户与数据', '在独立租户上下文中组织用户与业务数据，按需要部署单租户或多租户环境。', 'operations/tenants'],
-      ['文件、任务与设置', '复用文件策略、定时任务和系统设置，减少重复的基础开发。', 'backend/introduction']
-    ],
-    buildLabel: '业务扩展',
-    buildTitle: '把业务规则变成应用',
-    buildDesc: '从模型和接口，到表单、列表与权限，在同一套应用结构中逐步实现你的业务。',
-    buildSteps: [
-      ['定义数据', '建立业务模型、关联关系与租户归属。'],
-      ['连接界面', '实现接口、列表与表单，补齐操作权限。'],
-      ['接入 AI', '为合适的任务提供受控工具，明确确认与执行边界。']
-    ],
-    buildLink: '开发第一个业务模块',
-    cliLabel: '开发与交付',
-    cliTitle: '一个 CLI，贯穿开发与部署',
-    cliDesc: '创建项目、初始化环境、启动开发服务，再构建并部署到自己的服务器。',
-    cliPrereq: '开始前准备 Git、uv、Node.js、pnpm，以及 PostgreSQL 和 Redis。完整安装步骤见快速开始。',
-    cliLink: '阅读快速开始',
-    deployLink: '查看部署指南',
-    terminalLabel: '创建并启动项目',
-    ownLabel: '开源与自主部署',
-    ownTitle: '掌握自己的代码与数据',
-    ownDesc: '阅读和修改源代码，在自己的基础设施上运行 HoHu。沿用熟悉的 Vue、Python 与数据库工具扩展应用。',
-    ownItems: [
-      ['开源代码', '查看实现、参与贡献，按项目许可证使用和扩展。'],
-      ['自主部署', '使用 CLI 与 Docker 交付到自己的基础设施。'],
-      ['开放的开发基础', '基于 FastAPI、Vue、PostgreSQL 和 Redis 构建。']
-    ],
-    ecosystemTitle: '协同工作的项目',
-    repos: [
-      ['hohu-admin', '后端与平台核心'],
-      ['hohu-admin-web', 'Web 应用界面'],
-      ['hohu-cli', '开发与部署工具']
-    ],
-    docsTitle: '找到你的下一步',
-    docs: [
-      ['使用指南', '了解账号、权限、设置和 AI 助手。', 'user/'],
-      ['开发指南', '构建业务模块，并连接 AI 工具。', 'development/'],
-      ['CLI', '从项目创建到构建部署的统一入口。', 'cli/'],
-      ['AI', '使用 Skills 开发项目，让应用助手处理业务。', 'ai/'],
-      ['部署与运维', '安装、升级、备份和维护应用。', 'operations/'],
-      ['参考资料', '查阅命令、配置项与接口约定。', 'reference/']
-    ],
-    footer: '面向 AI 原生业务应用的开源平台。',
-    license: '源码与许可',
-    feedback: '问题反馈',
-    contribute: '参与贡献'
+      copy: '复制命令',
+      copied: '已复制命令',
+      failed: '复制未完成，请选择下方命令手动复制。',
+      links: [
+        { title: '开发环境指南', text: '', path: 'quick-start', link: '开发环境指南' },
+        {
+          title: '掌握自己的代码与数据',
+          text: '阅读和修改源代码，在自己的基础设施上运行 HoHu。',
+          path: 'src',
+          link: '查看源码与许可'
+        },
+        {
+          title: '开发自己的业务模块',
+          text: '从数据模型、接口到业务页面，为应用接入 AI 工具。',
+          path: 'development/module',
+          link: '阅读模块开发指南'
+        }
+      ]
+    },
+    footer: {
+      title: '开始之前，你可能想了解',
+      description: '面向 AI 原生业务应用的开源平台。',
+      questions: [
+        {
+          title: '现在如何扩展自己的应用？',
+          answer:
+            '通过源码开发业务模型、接口和页面，再按需注册 AI 工具。文档提供业务便签与 AI 接入教程；教程模块需要自行开发和配置。'
+        },
+        {
+          title: 'AI 可以直接执行所有操作吗？',
+          answer:
+            '不可以。管理员需要配置模型、助手和工具权限；AI 只可使用已授权的能力，需要确认的操作必须先由用户核对并批准。'
+        },
+        {
+          title: '可以部署到企业自己的环境吗？',
+          answer:
+            '可以。HoHu 提供 CLI 与 Docker 部署流程，支持在自己的基础设施上运行和维护。环境准备、配置与升级步骤见部署文档。'
+        }
+      ],
+      limitations: '当前通过源码扩展业务；应用市场与第三方业务插件安装尚未开放。',
+      links: [
+        { title: '使用指南', text: '', path: 'user/', link: '使用指南' },
+        { title: '开发指南', text: '', path: 'development/', link: '开发指南' },
+        { title: '部署与运维', text: '', path: 'operations/', link: '部署与运维' },
+        { title: '源码与许可', text: '', path: 'src', link: '源码与许可' }
+      ],
+      license: '开源，自主部署。'
+    }
   },
   en: {
-    eyebrow: 'OPEN SOURCE · AI NATIVE · SELF HOSTED',
-    title: 'Build AI-native',
-    accent: 'business applications',
-    intro:
-      'Connect business interfaces, AI, permissions and data. HoHu gives your applications a shared foundation so you can focus on your business.',
-    start: 'Get started',
-    demo: 'Explore the demo',
-    source: 'View source',
-    panelTitle: 'Bring AI into your business',
-    panelLabel: 'Interaction walkthrough',
-    scenarios: [
-      {
-        title: 'Find users',
-        prompt: 'Find the users in the sales department.',
-        steps: ['Understand the search', 'Check permissions and data scope', 'Query accessible users'],
-        result: 'Review structured results and continue with a follow-up.'
-      },
-      {
-        title: 'Move a department',
-        prompt: 'Move this department under the East branch.',
-        steps: [
-          'Identify and verify the department',
-          'Preview the change for confirmation',
-          'Execute after confirmation'
-        ],
-        result: 'Clarify ambiguous requests and confirm consequential changes.'
-      },
-      {
-        title: 'Manage roles',
-        prompt: 'Create a customer support role.',
-        steps: [
-          'Confirm the name and required details',
-          'Check access and preview the action',
-          'Create the role after confirmation'
-        ],
-        result: 'An administrator then configures the permissions the role needs.'
-      }
-    ],
-    panelNote:
-      'An illustration of the interaction flow. Actual results depend on enabled capabilities and the current account’s permissions.',
-    foundationLabel: 'PLATFORM FOUNDATION',
-    foundationTitle: 'Start with your business',
-    foundationDesc:
-      'Identity, permissions, files and jobs are common building blocks. Connect them once, then build the features your application needs.',
-    foundations: [
-      [
-        'Identity and permissions',
-        'Users, roles, departments and data scope provide authorization boundaries for both interfaces and AI tools.',
-        'auth'
+    nav: {
+      platform: 'Platform',
+      workflow: 'AI assistant',
+      guides: [
+        { title: 'User guide', path: 'user/' },
+        { title: 'Developer guide', path: 'development/' },
+        { title: 'Deployment & operations', path: 'operations/' }
       ],
-      [
-        'AI in business workflows',
-        'Configure models and agents, then connect conversations to business actions through controlled tools.',
-        'user/ai'
-      ],
-      [
-        'Tenants and data',
-        'Organize users and business records in trusted tenant contexts, with single-tenant and hosted deployment options.',
-        'operations/tenants'
-      ],
-      [
-        'Files, jobs and settings',
-        'Reuse upload policies, scheduled jobs and system settings across your applications.',
-        'backend/introduction'
+      feedback: 'Report an issue',
+      menu: 'Open navigation',
+      close: 'Close navigation',
+      skip: 'Skip to content',
+      label: 'Site navigation'
+    },
+    hero: {
+      category: 'Open source · Self hosted',
+      title: 'The AI-native\nenterprise application platform',
+      intro:
+        'Build and deploy your business applications. Let people work in the interface or use an AI assistant to query data and help with business tasks.',
+      demo: 'Explore HoHu',
+      develop: 'Get started',
+      image: '/images/product/ai-assistant-en.png',
+      darkImage: '/images/product/ai-assistant-en.png',
+      alt: 'HoHu AI assistant: choose a business task and start a conversation',
+      caption: 'Start with a business task. Bring your application and AI together.',
+      proof: ['Open source', 'Self hosted', 'Web / Mobile / Desktop'],
+      screenTitle: 'HoHu workspace',
+      imageLink: 'View the full product image'
+    },
+    journey: {
+      title: 'One application. From building to everyday work.',
+      items: [
+        {
+          title: 'Developers build',
+          text: 'Build models and interfaces on a shared foundation. Use HoHu Skills to assist development and connect business tools to AI assistants.',
+          path: 'development/module',
+          link: 'Build your first module'
+        },
+        {
+          title: 'Organizations manage',
+          text: 'Run on your infrastructure. Configure tenants, roles and models, and manage the capabilities available to your team.',
+          path: 'operations/',
+          link: 'Explore deployment'
+        },
+        {
+          title: 'People work with AI assistants',
+          text: 'Use the interface or ask in natural language. Review results and confirm changes that need your approval.',
+          path: 'user/ai',
+          link: 'Meet the AI assistant'
+        }
       ]
-    ],
-    buildLabel: 'BUSINESS EXTENSIONS',
-    buildTitle: 'Turn business rules into applications',
-    buildDesc:
-      'Build your models, APIs, forms, tables and permissions together within a consistent application structure.',
-    buildSteps: [
-      ['Define your data', 'Model records, relationships and tenant ownership.'],
-      ['Connect the interface', 'Build APIs, lists and forms with explicit permissions.'],
-      [
-        'Add AI capabilities',
-        'Expose suitable tasks through controlled tools with clear confirmation and execution boundaries.'
+    },
+    workflow: {
+      title: 'Business questions?\nAsk your AI assistant.',
+      intro:
+        'Connect an AI assistant to your order, approval and project applications. Ask in natural language to understand pending work and progress.',
+      mode: 'extension-examples',
+      image: '/images/product/ai-conversation-en.png',
+      darkImage: '/images/product/ai-conversation-en.png',
+      alt: 'A real HoHu AI assistant conversation showing user statistics and a read-only tool execution record',
+      caption: 'AI assistant interface / user management example',
+      imageLink: 'Open the full conversation image',
+      disclosure:
+        'These scenarios require developed business applications and connected AI tools. The product image shows an existing read-only user management query.',
+      scenarios: [
+        {
+          id: 'orders',
+          title: 'Order management',
+          text: '“Which orders still need attention?”',
+          detail:
+            'Connect query tools to your order application. Filter pending orders by status and date to help your team plan follow-ups.'
+        },
+        {
+          id: 'approvals',
+          title: 'Approval management',
+          text: '“What is waiting for approval?”',
+          detail:
+            'Connect pending-item and detail query tools to your approval application. Summarize requests and their contents so an approver can make the decision.'
+        },
+        {
+          id: 'projects',
+          title: 'Project management',
+          text: '“Which project tasks are overdue?”',
+          detail:
+            'Connect task query tools to your project application. Bring together overdue tasks, owners and deadlines to help your team track progress.'
+        }
+      ],
+      guide: 'Connect AI to your business application',
+      guidePath: 'development/ai-tools',
+      scenarioLabel: 'Business application scenarios'
+    },
+    platform: {
+      title: 'Build on the foundation.\nFocus on your business.',
+      intro:
+        'Interfaces and AI tools share business services and authorization rules. Extend your application with familiar Python and Vue tools.',
+      clients: {
+        title: 'Build for web, mobile and desktop',
+        text: 'Build business applications for browsers, phones and desktop environments on a shared backend.'
+      },
+      items: [
+        {
+          title: 'Identity and permissions',
+          text: 'Users, departments, roles and data scope connect your team’s structure to business operations.',
+          path: 'auth',
+          link: 'Explore permissions'
+        },
+        {
+          title: 'Tenants and data',
+          text: 'Access business records in a trusted tenant context. Configure tenants for your deployment mode.',
+          path: 'operations/tenants',
+          link: 'Explore tenant management'
+        },
+        {
+          title: 'AI and business tools',
+          text: 'Configure assistants, models and tool access. Preview operations that require confirmation before approving execution.',
+          path: 'development/ai-tools',
+          link: 'Connect your module to AI'
+        },
+        {
+          title: 'Files, jobs and settings',
+          text: 'Reuse file management, scheduled jobs and application settings for everyday business needs.',
+          path: 'backend/introduction',
+          link: 'Explore the foundation'
+        }
       ]
-    ],
-    buildLink: 'Build your first business module',
-    cliLabel: 'DEVELOPMENT & DELIVERY',
-    cliTitle: 'One CLI, from development to deployment',
-    cliDesc:
-      'Create a project, initialize its environment and start development. Then build and deploy it on your own server.',
-    cliPrereq: 'Prepare Git, uv, Node.js, pnpm, PostgreSQL and Redis. The quick start covers the complete setup.',
-    cliLink: 'Read the quick start',
-    deployLink: 'Deployment guide',
-    terminalLabel: 'Create and start a project',
-    ownLabel: 'OPEN SOURCE & SELF HOSTED',
-    ownTitle: 'Your code. Your data.',
-    ownDesc:
-      'Read and modify the source, run HoHu on your infrastructure, and extend applications using familiar Vue, Python and database tools.',
-    ownItems: [
-      ['Open source', 'Inspect the implementation and contribute under the project’s license.'],
-      ['Self hosted', 'Deliver to your own infrastructure with the CLI and Docker.'],
-      ['An open development foundation', 'Build on FastAPI, Vue, PostgreSQL and Redis.']
-    ],
-    ecosystemTitle: 'Projects that work together',
-    repos: [
-      ['hohu-admin', 'Backend and platform core'],
-      ['hohu-admin-web', 'Web application interface'],
-      ['hohu-cli', 'Development and deployment tooling']
-    ],
-    docsTitle: 'Choose your next step',
-    docs: [
-      ['User guide', 'Learn accounts, permissions, settings and the AI assistant.', 'user/'],
-      ['Development', 'Run the source and build business features.', 'development/'],
-      ['CLI', 'Create, develop, build and deploy your project.', 'cli/'],
-      ['AI', 'Develop with Skills and use assistants in your application.', 'ai/'],
-      ['Deployment', 'Install, upgrade, back up and maintain applications.', 'operations/'],
-      ['Reference', 'Look up commands, configuration and API conventions.', 'reference/']
-    ],
-    footer: 'The open-source platform for AI-native business applications.',
-    license: 'Source and licensing',
-    feedback: 'Report an issue',
-    contribute: 'Contribute'
+    },
+    start: {
+      title: 'Start building\nwith AI or the CLI',
+      intro:
+        'Describe your needs to a coding assistant. HoHu Skills help create projects and develop modules. Or use the CLI to create, run and deploy your project.',
+      prerequisites:
+        'Prepare Git, uv, Node.js, pnpm, PostgreSQL and Redis, then configure your environment using the development guide.',
+      terminal: 'Create and start a project',
+      cliTitle: 'Create a project with the CLI',
+      cliIntro: 'Create a project, initialize its environment and start development from your terminal.',
+      ai: {
+        title: 'Create and develop with AI',
+        intro:
+          'Install HoHu Skills so your coding assistant follows project conventions for creation, development and validation.',
+        prompts: [
+          {
+            title: 'Create a project',
+            text: 'Use hohu-project to create an equipment project with Backend and Web. Check dependencies and database configuration, initialize and start it, then report the URL and validation results.'
+          },
+          {
+            title: 'Develop a business module',
+            text: 'Use hohu-business-module to build equipment loans with borrowing, returns and history. Users can only view and return their own loans. Prevent borrowing the same equipment twice.'
+          }
+        ],
+        note: 'For coding assistants such as Claude Code, Cursor and Codex. Prepare your development environment and install Skills first.',
+        guide: 'Read the AI development guide',
+        guidePath: 'ai-coding',
+        skills: 'Install HoHu Skills',
+        skillsPath: 'cli/skills'
+      },
+      copy: 'Copy commands',
+      copied: 'Commands copied',
+      failed: 'Could not copy. Select the commands below and copy them manually.',
+      links: [
+        { title: 'Development setup', text: '', path: 'quick-start', link: 'Development setup' },
+        {
+          title: 'Your code. Your data.',
+          text: 'Read and modify the source, and run HoHu on your own infrastructure.',
+          path: 'src',
+          link: 'View source and licensing'
+        },
+        {
+          title: 'Develop your business module',
+          text: 'Build models, APIs and interfaces, then connect AI tools to your application.',
+          path: 'development/module',
+          link: 'Read the module development guide'
+        }
+      ]
+    },
+    footer: {
+      title: 'A few things before you start',
+      description: 'The open-source platform for AI-native business applications.',
+      questions: [
+        {
+          title: 'How do I extend an application today?',
+          answer:
+            'Develop business models, APIs and pages in source, then register AI tools where needed. The docs include a business notes tutorial and AI integration guide. You build and configure the tutorial module yourself.'
+        },
+        {
+          title: 'Can AI execute every operation directly?',
+          answer:
+            'No. An administrator configures models, assistants and tool permissions. AI can only use authorized capabilities. Operations requiring confirmation must be reviewed and approved by a person.'
+        },
+        {
+          title: 'Can we deploy on our own infrastructure?',
+          answer:
+            'Yes. HoHu provides CLI and Docker deployment workflows to run and maintain your own instance. See the deployment docs for environment setup, configuration and upgrades.'
+        }
+      ],
+      limitations:
+        'Business extensions currently use source development. The application marketplace and third-party business plugin installation are not available yet.',
+      links: [
+        { title: 'User guide', text: '', path: 'user/', link: 'User guide' },
+        { title: 'Development', text: '', path: 'development/', link: 'Development' },
+        { title: 'Deployment', text: '', path: 'operations/', link: 'Deployment' },
+        { title: 'Source and licensing', text: '', path: 'src', link: 'Source and licensing' }
+      ],
+      license: 'Open source. Self hosted.'
+    }
   }
 };

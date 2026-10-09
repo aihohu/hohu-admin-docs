@@ -43,7 +43,10 @@ export default defineConfig({
         lastUpdated: { text: 'Last updated' },
         returnToTopLabel: 'Return to top',
         sidebarMenuLabel: 'Menu',
-        darkModeSwitchLabel: 'Appearance'
+        darkModeSwitchLabel: 'Appearance',
+        langMenuLabel: 'Change language',
+        lightModeSwitchTitle: 'Switch to light theme',
+        darkModeSwitchTitle: 'Switch to dark theme'
       }
     },
     zh: {
@@ -59,7 +62,10 @@ export default defineConfig({
         lastUpdated: { text: '最后更新' },
         returnToTopLabel: '回到顶部',
         sidebarMenuLabel: '菜单',
-        darkModeSwitchLabel: '外观'
+        darkModeSwitchLabel: '外观',
+        langMenuLabel: '切换语言',
+        lightModeSwitchTitle: '切换到浅色主题',
+        darkModeSwitchTitle: '切换到深色主题'
       }
     }
   },

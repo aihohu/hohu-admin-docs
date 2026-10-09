@@ -29,7 +29,10 @@ export default tseslint.config(
       parserOptions: { parser: tseslint.parser },
       globals: {
         document: 'readonly',
-        window: 'readonly'
+        window: 'readonly',
+        HTMLButtonElement: 'readonly',
+        HTMLElement: 'readonly',
+        MouseEvent: 'readonly'
       }
     }
   }

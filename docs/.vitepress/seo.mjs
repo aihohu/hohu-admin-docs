@@ -33,6 +33,8 @@ export function pageHead(file, title, description) {
     ['meta', { name: 'twitter:image', content: `${siteOrigin}/logo.png` }]
   ];
   if (home) {
+    head.push(['meta', { name: 'theme-color', content: '#ffffff', media: '(prefers-color-scheme: light)' }]);
+    head.push(['meta', { name: 'theme-color', content: '#111b2b', media: '(prefers-color-scheme: dark)' }]);
     head.push([
       'script',
       { type: 'application/ld+json' },
