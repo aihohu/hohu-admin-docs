@@ -45,11 +45,11 @@ hohu deploy --image-source official
 
 自动映射范围：
 
-| 官方仓库 | ACR 仓库 |
-| --- | --- |
-| `ghcr.io/aihohu/hohu-admin` | `registry.cn-beijing.aliyuncs.com/hohu/hohu-admin` |
-| `ghcr.io/aihohu/hohu-admin-web` | `registry.cn-beijing.aliyuncs.com/hohu/hohu-admin-web` |
-| Docker Hub 官方 `postgres`、`redis`、`nginx` | `registry.cn-beijing.aliyuncs.com/hohu/` 下的同名仓库 |
+| 官方仓库                                     | ACR 仓库                                               |
+| -------------------------------------------- | ------------------------------------------------------ |
+| `ghcr.io/aihohu/hohu-admin`                  | `registry.cn-beijing.aliyuncs.com/hohu/hohu-admin`     |
+| `ghcr.io/aihohu/hohu-admin-web`              | `registry.cn-beijing.aliyuncs.com/hohu/hohu-admin-web` |
+| Docker Hub 官方 `postgres`、`redis`、`nginx` | `registry.cn-beijing.aliyuncs.com/hohu/` 下的同名仓库  |
 
 换源保留原标签，不会降级到 `latest`。ACR 必须已同步该标签并允许公开拉取，普通部署不需要 ACR 登录。浮动标签对应最近一次同步快照，不能保证与此刻的上游实时一致。使用 `@sha256:...` 固定摘要的引用始终使用原地址，不自动映射，因为两个源的多架构 index 摘要可能不同。
 

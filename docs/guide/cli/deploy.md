@@ -45,10 +45,10 @@ Set `HOHU_IMAGE_SOURCE=acr` in `.hohu/deploy/.env` for a project default. Preced
 
 Supported mappings:
 
-| Official repository | ACR repository |
-| --- | --- |
-| `ghcr.io/aihohu/hohu-admin` | `registry.cn-beijing.aliyuncs.com/hohu/hohu-admin` |
-| `ghcr.io/aihohu/hohu-admin-web` | `registry.cn-beijing.aliyuncs.com/hohu/hohu-admin-web` |
+| Official repository                              | ACR repository                                                |
+| ------------------------------------------------ | ------------------------------------------------------------- |
+| `ghcr.io/aihohu/hohu-admin`                      | `registry.cn-beijing.aliyuncs.com/hohu/hohu-admin`            |
+| `ghcr.io/aihohu/hohu-admin-web`                  | `registry.cn-beijing.aliyuncs.com/hohu/hohu-admin-web`        |
 | Docker Hub official `postgres`, `redis`, `nginx` | The same names under `registry.cn-beijing.aliyuncs.com/hohu/` |
 
 Switching preserves the requested tag and never substitutes `latest`. That tag must already be synchronized to public ACR; deployment requires no ACR login. Floating tags represent the latest mirror snapshot, which may lag upstream. References pinned with `@sha256:...` always retain their original registry because multi-platform index digests can differ between registries.

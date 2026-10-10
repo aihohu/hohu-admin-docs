@@ -5,6 +5,10 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   docs:
@@ -25,3 +29,77 @@ jobs:
       - run: pnpm build
       - run: pnpm docs:check-dist
       - run: pnpm docs:check-seo
+      - name: Package checked website
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        run: |
+          mkdir -p .local/artifacts
+          tar -czf .local/artifacts/website.tar.gz -C docs/.vitepress/dist .
+      - name: Upload website artifact
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: actions/upload-artifact@v7
+        with:
+          name: hohu-website
+          path: .local/artifacts/website.tar.gz
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+  deploy:
+    needs: docs
+    if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    concurrency:
+      group: docs-production
+      cancel-in-progress: false
+    steps:
+      - name: Check deployment configuration
+        id: config
+        env:
+          DOCS_SSH_HOST: ${{ secrets.DOCS_SSH_HOST }}
+          DOCS_SSH_USER: ${{ secrets.DOCS_SSH_USER }}
+          DOCS_DEPLOY_PATH: ${{ secrets.DOCS_DEPLOY_PATH }}
+          DOCS_SITE_ORIGIN: ${{ vars.DOCS_SITE_ORIGIN }}
+        run: |
+          if [ -z "$DOCS_SSH_HOST$DOCS_SSH_USER$DOCS_DEPLOY_PATH$DOCS_SITE_ORIGIN" ]; then
+            echo 'enabled=false' >> "$GITHUB_OUTPUT"
+            echo 'Production deployment is not configured; build checks remain active.'
+          elif [ -z "$DOCS_SSH_HOST" ] || [ -z "$DOCS_SSH_USER" ] || [ -z "$DOCS_DEPLOY_PATH" ] || [ -z "$DOCS_SITE_ORIGIN" ]; then
+            echo 'Set DOCS_SSH_HOST, DOCS_SSH_USER, DOCS_DEPLOY_PATH and DOCS_SITE_ORIGIN together.' >&2
+            exit 1
+          else
+            echo 'enabled=true' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v6
+        if: steps.config.outputs.enabled == 'true'
+      - uses: actions/download-artifact@v8
+        if: steps.config.outputs.enabled == 'true'
+        with:
+          name: hohu-website
+          path: .local/artifacts
+      - name: Check production branch is still current
+        if: steps.config.outputs.enabled == 'true'
+        id: latest
+        env:
+          DEPLOY_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git fetch --no-tags --depth=1 origin "$DEPLOY_BRANCH"
+          if [ "$(git rev-parse FETCH_HEAD)" = "$GITHUB_SHA" ]; then
+            echo 'current=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'current=false' >> "$GITHUB_OUTPUT"
+            echo 'A newer commit exists; skipping this release.'
+          fi
+      - name: Publish website over SSH
+        if: steps.config.outputs.enabled == 'true' && steps.latest.outputs.current == 'true'
+        env:
+          DOCS_SSH_HOST: ${{ secrets.DOCS_SSH_HOST }}
+          DOCS_SSH_PORT: ${{ secrets.DOCS_SSH_PORT || '22' }}
+          DOCS_SSH_USER: ${{ secrets.DOCS_SSH_USER }}
+          DOCS_DEPLOY_PATH: ${{ secrets.DOCS_DEPLOY_PATH }}
+          DOCS_SITE_ORIGIN: ${{ vars.DOCS_SITE_ORIGIN }}
+          DOCS_SSH_KEY: ${{ secrets.DOCS_SSH_KEY }}
+          DOCS_SSH_KNOWN_HOSTS: ${{ secrets.DOCS_SSH_KNOWN_HOSTS }}
+          RELEASE_ID: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+        run: bash scripts/deploy/upload.sh
