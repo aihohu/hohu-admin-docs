@@ -1,9 +1,9 @@
 ---
-title: AI-assisted development
-description: Use HoHu Skills with a coding assistant to create projects, build business modules and verify pages, permissions and application AI tools.
+title: Build business applications with AI and HoHu Skills
+description: 'Use Claude Code, Cursor or Codex with HoHu Skills to create projects and develop business modules. Follow the workflow for pages, permissions, AI tools and validation.'
 ---
 
-# AI-assisted development
+# Build business applications with AI and HoHu Skills
 
 This guide is for developers working on HoHu source with Claude Code, Cursor, Codex, OpenCode, TRAE or another coding assistant. First [install Skills](./cli/skills) and prepare the [development environment](./quick-start).
 

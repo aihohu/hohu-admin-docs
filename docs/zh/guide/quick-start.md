@@ -1,9 +1,9 @@
 ---
-title: 快速开始
-description: '使用 hohu-cli 创建项目、配置 PostgreSQL 与 Redis、初始化并启动 HoHu，完成第一次登录。'
+title: 使用 HoHu 运行 FastAPI 与 Vue 应用
+description: '使用 HoHu CLI 创建并运行项目：准备 Python 与 Node.js，配置 PostgreSQL 和 Redis，初始化 FastAPI 后端与 Vue Web 应用，完成第一次登录。'
 ---
 
-# 快速开始
+# 使用 HoHu 运行 FastAPI 与 Vue 应用
 
 本教程带你在本机运行 HoHu 的后端和 Web 应用。完成后，你可以登录系统、查看基础功能，并开始开发自己的业务模块。部署到服务器请阅读[部署指南](./deploy)。
 

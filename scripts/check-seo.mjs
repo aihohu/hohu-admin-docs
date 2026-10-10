@@ -60,6 +60,24 @@ for (const file of pagePaths) {
     );
   }
   expect(html.includes(`<html lang="${file.startsWith('zh/') ? 'zh-CN' : 'en'}"`), 'incorrect document language');
+  const structured = [...head.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)];
+  expect(structured.length === 1, 'missing or duplicate structured data');
+  try {
+    const graph = JSON.parse(structured[0]?.[1] ?? '{}')['@graph'] ?? [];
+    const page = graph.find(node => node['@type'] === 'WebPage');
+    expect(
+      page?.url === canonical && page?.name === title && page?.description === description,
+      'structured page differs from visible metadata'
+    );
+    if (file === 'index.md' || file === 'zh/index.md') {
+      const software = graph.find(node => node['@type'] === 'SoftwareApplication');
+      expect(software?.['@id'] === `${siteOrigin}/#software`, 'missing product entity');
+      expect(page?.mainEntity?.['@id'] === software?.['@id'], 'homepage does not identify the product');
+      expect(!software?.offers && !software?.aggregateRating, 'unverified offer or rating');
+    }
+  } catch {
+    expect(false, 'invalid structured JSON');
+  }
   expect([...html.matchAll(/<h1\b/g)].length === 1, 'page needs exactly one rendered h1');
   expect(!/class="[^"]*\brelease-note\b/.test(html), 'retired release banner is present');
   for (const match of html.matchAll(/<(a|img)\b[^>]*>/g)) {

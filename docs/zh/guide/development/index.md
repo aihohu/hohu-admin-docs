@@ -1,11 +1,13 @@
 ---
-title: 开发指南
-description: 使用 CLI 运行 HoHu 源码，了解后端分层，并为业务模块接入权限、租户范围和基础服务。
+title: 使用 FastAPI 与 Vue 开发业务模块
+description: '使用 Python、FastAPI 和 Vue 3 扩展 HoHu，开发业务模型、接口与页面，复用权限、租户隔离和 AI 工具能力。'
 ---
 
-# 开发指南
+# 使用 FastAPI 与 Vue 开发业务模块
 
 本指南面向二次开发者；日常操作请看[使用指南](../user/index)。
+
+HoHu 提供 FastAPI 后端和 Vue 3 Web 界面。你可以从一个业务模块开始，复用平台的用户、权限与租户范围，再按需为 AI 助手接入业务工具。CLI 和 Skills 提供两种开发入口。
 
 1. 使用 CLI 准备[开发环境](../quick-start)，确认配套组件版本。
 2. 阅读[后端架构](../backend/introduction)与[目录结构](../backend/dir)，再[增加业务模块](./module)。

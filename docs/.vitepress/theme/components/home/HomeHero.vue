@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { type HomeContent } from '../../composables/home';
 import ProductScreen from './ProductScreen.vue';
+import HomeActions from './HomeActions.vue';
 defineProps<{ copy: HomeContent['hero'] }>();
 </script>
 
@@ -13,10 +14,7 @@ defineProps<{ copy: HomeContent['hero'] }>();
       </p>
       <h1 id="hero-title" class="hero-title">{{ copy.title }}</h1>
       <p class="hero-intro">{{ copy.intro }}</p>
-      <div class="home-actions">
-        <a class="home-button" href="https://show.hohu.org">{{ copy.demo }}</a>
-        <a class="home-button secondary" href="#start">{{ copy.develop }}</a>
-      </div>
+      <HomeActions :copy="copy" />
       <ul class="hero-proof">
         <li v-for="item in copy.proof" :key="item">
           <span aria-hidden="true">✓</span>

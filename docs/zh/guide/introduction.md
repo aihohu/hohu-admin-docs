@@ -1,11 +1,17 @@
 ---
-title: 认识 HoHu
-description: '了解 HoHu 开源企业应用平台的定位、AI 与业务能力、项目组成，以及使用、开发和部署的入门路径。'
+title: HoHu 开源 AI 企业应用平台介绍
+description: '了解 HoHu 的适用团队、能力与限制：基于 FastAPI 和 Vue 开发可自主部署的业务应用，复用权限、多租户与 AI 助手。'
 ---
 
-# 认识 HoHu
+# HoHu 开源 AI 企业应用平台介绍
 
 HoHu 是面向 AI 原生业务应用的开源企业应用平台。它把业务界面、AI 能力、权限与数据组织在一起，帮助团队构建和运行自己的业务应用。
+
+## HoHu 适合谁
+
+HoHu 面向使用 Python 和 Vue 开发业务应用、希望掌握源码与部署环境的开发者和团队。后端采用 FastAPI，Web 界面采用 Vue 3，也可以通过 [HoHu Skills](./cli/skills) 让编程助手辅助创建项目和实现业务模块。
+
+创建应用需要开发环境和业务代码。HoHu 不是无代码搭建工具，也不是开箱即用的 CRM、ERP 或审批套件。你可以先[体验现有平台](./show)，再按[快速开始](./quick-start)在本地运行，或了解如何[为业务接入 AI 工具](./development/ai-tools)。
 
 ## 你可以用它做什么
 

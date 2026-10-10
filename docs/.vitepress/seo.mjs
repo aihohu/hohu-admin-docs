@@ -35,18 +35,54 @@ export function pageHead(file, title, description) {
   if (home) {
     head.push(['meta', { name: 'theme-color', content: '#ffffff', media: '(prefers-color-scheme: light)' }]);
     head.push(['meta', { name: 'theme-color', content: '#111b2b', media: '(prefers-color-scheme: dark)' }]);
-    head.push([
-      'script',
-      { type: 'application/ld+json' },
-      JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'WebSite',
-        name: 'HoHu',
-        url,
-        description,
-        inLanguage: zh ? 'zh-CN' : 'en'
-      }).replaceAll('<', '\\u003c')
-    ]);
   }
+  const graph = [
+    {
+      '@type': 'WebPage',
+      '@id': `${url}#webpage`,
+      url,
+      name: fullTitle,
+      description,
+      inLanguage: zh ? 'zh-CN' : 'en',
+      isPartOf: { '@id': `${siteOrigin}/#website` },
+      [home ? 'mainEntity' : 'about']: { '@id': `${siteOrigin}/#software` }
+    }
+  ];
+  if (home)
+    graph.push(
+      {
+        '@type': 'WebSite',
+        '@id': `${siteOrigin}/#website`,
+        name: 'HoHu',
+        url: `${siteOrigin}/`,
+        inLanguage: ['en', 'zh-CN']
+      },
+      {
+        '@type': 'SoftwareApplication',
+        '@id': `${siteOrigin}/#software`,
+        name: 'HoHu',
+        url: `${siteOrigin}/`,
+        description,
+        applicationCategory: 'DeveloperApplication',
+        sameAs: ['https://github.com/aihohu/hohu-admin'],
+        featureList: zh
+          ? ['业务应用开发', '自主部署', 'AI 助手与业务工具', '角色权限与多租户', 'Web、移动端与桌面端开发']
+          : [
+              'Business application development',
+              'Self-hosting',
+              'AI assistants and business tools',
+              'Role permissions and multi-tenancy',
+              'Web, mobile and desktop development'
+            ]
+      }
+    );
+  head.push([
+    'script',
+    { type: 'application/ld+json' },
+    JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': graph
+    }).replaceAll('<', '\\u003c')
+  ]);
   return head;
 }

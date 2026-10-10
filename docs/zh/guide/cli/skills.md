@@ -1,9 +1,9 @@
 ---
-title: 安装 HoHu Skills
-description: 使用 npx 或 HoHu CLI 为 Claude Code、Cursor、Codex、OpenCode 和 TRAE 安装业务开发 Skills，并管理安装范围与更新。
+title: 为 Claude Code、Cursor 与 Codex 安装 HoHu Skills
+description: '使用 npx 或 CLI 安装 HoHu 项目创建与业务开发 Skills，配置编程助手识别、工作区或用户安装范围，并管理更新。'
 ---
 
-# 安装 HoHu Skills
+# 为 Claude Code、Cursor 与 Codex 安装 HoHu Skills
 
 HoHu Skills 帮助编程助手通过 CLI 创建、初始化和启动项目，并按 HoHu 项目约定开发业务模块，覆盖数据库迁移、接口、权限、页面、AI 工具和验证。各 Agent 共用同一份 Skill；安装器负责放入宿主可以发现的位置。
 

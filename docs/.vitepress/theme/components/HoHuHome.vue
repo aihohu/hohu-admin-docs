@@ -9,6 +9,7 @@ import HomePlatform from './home/HomePlatform.vue';
 import HomeStart from './home/HomeStart.vue';
 import HomeFooter from './home/HomeFooter.vue';
 import HomeFaq from './home/HomeFaq.vue';
+import HomeClosing from './home/HomeClosing.vue';
 import './home/home.css';
 
 const { locale, copy } = useHomeContent();
@@ -26,6 +27,7 @@ useHomeTheme();
       <HomePlatform :copy="copy.platform" :locale="locale" />
       <HomeStart :copy="copy.start" :locale="locale" />
       <HomeFaq :copy="copy.footer" />
+      <HomeClosing :copy="copy.closing" :actions="copy.hero" />
     </main>
     <HomeFooter :copy="copy.footer" :locale="locale" />
   </div>

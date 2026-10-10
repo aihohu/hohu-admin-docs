@@ -1,9 +1,9 @@
 ---
-title: Connect a business module to AI
-description: Add AI queries and confirmed creation to HoHu business notes, including tool registration, assistant access, result views and historical authorization.
+title: Connect an AI assistant to business data and actions
+description: 'Add permission-aware AI queries and confirmed writes to HoHu business modules. Follow a notes example covering tools, authorization, result views and shared services.'
 ---
 
-# Connect a business module to AI
+# Connect an AI assistant to business data and actions
 
 After [adding a business module](./module), notes are available through HTTP. This tutorial adds `note.list` and `note.create` so users can read notes and create them after confirmation in HoHu chat.
 

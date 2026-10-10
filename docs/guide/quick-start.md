@@ -1,9 +1,9 @@
 ---
-title: Quick start
-description: 'Create a HoHu project with the CLI, configure PostgreSQL and Redis, initialize the application and sign in for the first time.'
+title: Run a FastAPI and Vue application with HoHu
+description: 'Create and run HoHu locally with the CLI: prepare Python and Node.js, configure PostgreSQL and Redis, initialize the FastAPI backend and Vue Web app, then sign in.'
 ---
 
-# Quick start
+# Run a FastAPI and Vue application with HoHu
 
 This tutorial runs the HoHu backend and Web application locally. By the end, you can sign in, explore the built-in features and start a business module. For a server installation, follow the [deployment guide](./deploy).
 

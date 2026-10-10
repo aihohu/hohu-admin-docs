@@ -1,9 +1,9 @@
 ---
-title: AI 辅助开发
-description: 安装 HoHu Skills 后，使用编程助手创建项目、开发业务模块，并验证页面、权限和应用 AI 工具。
+title: 使用 AI 与 HoHu Skills 开发业务应用
+description: '使用 Claude Code、Cursor 或 Codex 配合 HoHu Skills 创建项目、开发业务模块，按工作流完成页面、权限、AI 工具接入与验证。'
 ---
 
-# AI 辅助开发
+# 使用 AI 与 HoHu Skills 开发业务应用
 
 本页面向使用 Claude Code、Cursor、Codex、OpenCode、TRAE 等编程助手开发 HoHu 源码的开发者。先按[安装 Skills](./cli/skills)安装所需工作流，并准备[开发环境](./quick-start)。
 

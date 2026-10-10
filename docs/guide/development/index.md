@@ -1,11 +1,13 @@
 ---
-title: Development guide
-description: Run HoHu locally with the CLI, understand backend layers and connect business modules to permissions, tenant scopes and shared services.
+title: Build business modules with FastAPI and Vue
+description: 'Extend HoHu with Python, FastAPI and Vue 3. Develop business models, APIs and pages with shared permissions, tenant isolation and AI tools.'
 ---
 
-# Development guide
+# Build business modules with FastAPI and Vue
 
 This guide is for developers extending the product. For everyday operations, use the [User guide](../user/index).
+
+HoHu provides a FastAPI backend and Vue 3 Web interface. Start with a business module, reuse the platform's users, permissions and tenant scope, then connect business tools to an AI assistant as needed. The CLI and Skills provide two ways to start development.
 
 1. Prepare the [development environment](../quick-start) with the CLI and matching component revisions.
 2. Read [Backend architecture](../backend/introduction) and [Repository structure](../backend/dir), then [add a business module](./module).

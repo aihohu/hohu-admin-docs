@@ -1,11 +1,17 @@
 ---
-title: Meet HoHu
-description: 'Discover HoHu’s open-source business application platform, AI capabilities, project components and paths for users, developers and deployers.'
+title: HoHu open-source AI application platform
+description: 'Learn who HoHu is for: build self-hosted business applications with FastAPI, Vue, permissions, multi-tenancy and AI assistants. Understand its capabilities and limits.'
 ---
 
-# Meet HoHu
+# HoHu open-source AI application platform
 
 HoHu is an open-source platform for AI-native business applications. It brings business interfaces, AI, permissions and data together so teams can build and run their own applications.
+
+## Who HoHu is for
+
+HoHu is for developers and teams building business applications with Python and Vue who want control of their code and deployment. Its backend uses FastAPI and its Web interface uses Vue 3. Coding assistants can help create projects and implement modules through [HoHu Skills](./cli/skills).
+
+Building an application requires a development environment and business code. HoHu is not a no-code builder or a ready-to-use CRM, ERP or approval suite. You can [try the existing platform](./show), follow the [local quick start](./quick-start), or learn how to [connect business tools to AI](./development/ai-tools).
 
 ## What you can do
 

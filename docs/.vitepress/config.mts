@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress';
 import { navigation, pagePaths } from './navigation.mjs';
 import { srcExclude } from './release.mjs';
 import { canonicalUrl, pageHead, siteOrigin } from './seo.mjs';
+import { analyticsBootstrap } from './analytics.mjs';
 
 export default defineConfig({
   appearance: true,
@@ -23,12 +24,7 @@ export default defineConfig({
   },
   head: [
     ['link', { rel: 'icon', type: 'image/png', href: '/logo.png' }],
-    ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-K5W3P408PS' }],
-    [
-      'script',
-      {},
-      `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-K5W3P408PS');`
-    ]
+    ['script', {}, analyticsBootstrap]
   ],
   locales: {
     root: {

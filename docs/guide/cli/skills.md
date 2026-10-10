@@ -1,9 +1,9 @@
 ---
-title: Install HoHu Skills
-description: Install business development skills for Claude Code, Cursor, Codex, OpenCode and TRAE using npx or HoHu CLI, and manage scope and updates.
+title: Install HoHu Skills for Claude Code, Cursor and Codex
+description: 'Install HoHu project and business development Skills with npx or the CLI. Configure coding assistant discovery, workspace or user scope, and updates.'
 ---
 
-# Install HoHu Skills
+# Install HoHu Skills for Claude Code, Cursor and Codex
 
 HoHu Skills guides coding assistants through CLI project creation, initialization and startup, then business module development using your project's conventions: migrations, APIs, permissions, pages, AI tools and validation. Agents share the same skill content; the installer places it where each host can discover it.
 

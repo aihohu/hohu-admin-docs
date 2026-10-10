@@ -1,15 +1,15 @@
 {
   "index": {
-    "en": "eaf476fd346acb50617807c69d0ae8f7d30e335f24c2cb48527f8cecf40751bb",
-    "zh": "df7dc74c8a341a2646209aeadc19e4a45a1342ac4de13daf544e43676d87910d"
+    "en": "ffb77846ed18feeaf65150b499f48e1d79c44373a8bd9fd11fd5bc8502f554c7",
+    "zh": "b5e46130cecfdec1ca08d89ba65c99dcaa68e8fdde1c9db33557c84911d0c82c"
   },
   "user/index": {
     "en": "be33659ae52211c0d57750ed9d4ef1c31315bc3f83ecb90d409a17318432de44",
     "zh": "2d7f9775226d38de7ebfe0168bf2a6edfb9befebf95a6a5726c6724ad5e1b011"
   },
   "introduction": {
-    "en": "3f9f4f3cf2f250c8fd74825fca326fd3f72825c7c5cbadbe78aef2baf1cf23f4",
-    "zh": "731067b81ce91129f47beda883bffb651d283c5b330a05fb84697cf20474f617"
+    "en": "a8c52e66ea5309e117f8099b6fbc4a8f838ce93cbd45d3e877bd908151b1df31",
+    "zh": "029cbb0f353cc4e635d691384ec93f7ffc1a5b2cd0197ad9210af011b500b861"
   },
   "user/account": {
     "en": "8b5fa43b1f9c2ea2b333264f2190e868805105369f5af8ff811f6332db56cc08",
@@ -64,12 +64,12 @@
     "zh": "d80d10d7c790bb2a91dd0e3ad93ecf0f9df4af6ad2ffafb25517080554d98882"
   },
   "development/index": {
-    "en": "1985bb599a6154d54662039790596321e3b748eecbdde02860bda2937ffb5938",
-    "zh": "1160b3ef2a238d50dcaa4360a1f5a8712d7afd84b59fc24c9ca5fbdd9d162e2a"
+    "en": "b57e53cab4d826c2fad4cb458aa6c68bade4bb9cc54a994cddd5924a40892e07",
+    "zh": "676061c872cdbcfc5565491e0cf470df3fb922b63afad1ef7d12b475cee881bb"
   },
   "quick-start": {
-    "en": "4505d866c3ea1628142179112b73a81e7122c394593770605a3610b25488be13",
-    "zh": "d5305cc77f956bc523f6b626c5d2a3686f7bf208324d5fc0bf4050ca39c4759e"
+    "en": "65ceae6f8865b5216260e80c78ac29f7b0ba2c2d59833c773181ed52af607f6e",
+    "zh": "a4237e3c102fbb929d10833e2bac4c0ea2f045256d85c7d3cc83871ff23686be"
   },
   "backend/introduction": {
     "en": "3d14b4d4189abf9a0a7f19ee195309608be3b039017620124b1d85cd395c5624",
@@ -112,8 +112,8 @@
     "zh": "e73d558efb7a758657bc54974db81374950cfe73b4e40bacbd8094f3c240d258"
   },
   "ai-coding": {
-    "en": "cc5ca75dba74f430a52cb50ede6061332332a969d53d98deb369653cf32b0f06",
-    "zh": "3565275ab023fb5f824f644adc3fc65166cb564c815a2636a9e399896cc5508b"
+    "en": "da7c79de285778532b9e5207ac196b6bb746f9fd657ad84347129d5e9f44f0ee",
+    "zh": "8ea18eeef9cae94f85c121348e29b8ccfd2baa029abc06dc1ea95dbf26327fcf"
   },
   "desktop/introduction": {
     "en": "6abed4ca233f59b5272825de939fca6f8172d34d4c3946af54129fc8ed506b26",
@@ -176,12 +176,12 @@
     "zh": "8898e8c78b0445d9ca2ba6046ce2a6cce197199dfc525e7e7958c5db7296f30c"
   },
   "development/ai-tools": {
-    "en": "762bcf1649141dbbc835f21db0eceb1a54b7b9435f6c674df980106cd830cf90",
-    "zh": "91a47ae67e123fa0c9dd525aeda5f609796dc727b15fd3606c8bd888218d67ed"
+    "en": "43a1c08315376fe7f096247bf727ccec194bf2b902787ef9260df70077676419",
+    "zh": "74cbe94bc22efe748638cebd211315ccb0426d4131ae11a12437bc5c2e39a789"
   },
   "cli/skills": {
-    "en": "9bca6defb85980b0c10a58bacc1735f01ec4250a0ad2c653231c2e892e6cb665",
-    "zh": "8d1c1230b0f5bca52e1badfd37d3234ca57b5a8e817dcc33029e2628cb381850"
+    "en": "13d2093ba33f5f85627d3362f53d73c0aeab4820c6c22fab38947726c401179d",
+    "zh": "f998dccc31b5021e13ec49dd0fef03ec3dca2a608a59c401ee7bfe475ae688dd"
   },
   "ai/index": {
     "en": "6d661ad0f49a94aedbbef37322dd5aa2bce2b053b19daf28faeb33d8ca78960c",

@@ -52,12 +52,19 @@ export interface HomeContent {
     title: string;
     intro: string;
     prerequisites: string;
-    terminal: string;
     cliTitle: string;
     cliIntro: string;
+    cliSteps: { title: string; text: string }[];
     ai: {
       title: string;
       intro: string;
+      installTitle: string;
+      installNote: string;
+      promptNote: string;
+      copyCommand: string;
+      copyPrompt: string;
+      copied: string;
+      failed: string;
       prompts: { title: string; text: string }[];
       note: string;
       guide: string;
@@ -70,6 +77,7 @@ export interface HomeContent {
     failed: string;
     links: GuideEntry[];
   };
+  closing: { title: string; text: string };
   footer: {
     title: string;
     description: string;
@@ -80,7 +88,9 @@ export interface HomeContent {
   };
 }
 
-export const commands = 'uv tool install hohu\nhohu create my-project\ncd my-project\nhohu init\nhohu dev';
+const cliCommands = ['uv tool install hohu', 'hohu create my-project\ncd my-project', 'hohu init\nhohu dev'];
+export const commands = cliCommands.join('\n');
+export const skillsInstallCommand = 'npx skills@latest add aihohu/hohu-skills';
 export function guideLink(locale: HomeLocale, path: string) {
   return `${locale === 'zh' ? '/zh' : ''}/guide/${path}${path.endsWith('/') ? '' : '.html'}`;
 }
@@ -210,12 +220,23 @@ export const homeContent: Record<HomeLocale, HomeContent> = {
       title: '用 AI 或 CLI，\n开始开发',
       intro: '告诉编程助手你的业务需求，让 HoHu Skills 辅助创建项目和开发模块；也可以使用 CLI 手动创建、运行与部署。',
       prerequisites: '先准备 Git、uv、Node.js、pnpm、PostgreSQL 和 Redis，并按开发环境指南完成配置。',
-      terminal: '创建并启动项目',
       cliTitle: '通过 CLI 创建项目',
       cliIntro: '在终端中创建项目、初始化环境并启动开发服务。',
+      cliSteps: [
+        { title: '安装 HoHu CLI', text: cliCommands[0] },
+        { title: '创建并进入项目', text: cliCommands[1] },
+        { title: '初始化并启动', text: cliCommands[2] }
+      ],
       ai: {
         title: '通过 AI 辅助创建与开发',
-        intro: '安装 HoHu Skills，让编程助手按项目规范完成创建、开发与验证。',
+        intro: '先安装 Skills，再把需求交给编程助手，按项目规范完成创建、开发与验证。',
+        installTitle: '安装 HoHu Skills',
+        installNote: '在工作区终端运行，按提示选择编程助手、安装范围和所需 Skills。',
+        promptNote: '在该工作区启动编程助手，发送以下需求。',
+        copyCommand: '复制命令',
+        copyPrompt: '复制需求',
+        copied: '已复制',
+        failed: '复制未完成，请选中内容手动复制。',
         prompts: [
           {
             title: '创建项目',
@@ -226,15 +247,15 @@ export const homeContent: Record<HomeLocale, HomeContent> = {
             text: '使用 hohu-business-module 新增设备借用模块，支持借用、归还和查看记录。普通用户只能查看和归还自己的记录，不能重复借用同一设备。'
           }
         ],
-        note: '用于 Claude Code、Cursor、Codex 等编程助手。先准备开发环境并安装 Skills。',
+        note: '支持 Claude Code、Cursor、Codex 等编程助手。安装需 Node.js / npx；创建和运行项目还需 HoHu CLI 与开发环境。',
         guide: '查看 AI 开发指南',
         guidePath: 'ai-coding',
-        skills: '安装 HoHu Skills',
+        skills: '安装选项与环境要求',
         skillsPath: 'cli/skills'
       },
       copy: '复制命令',
-      copied: '已复制命令',
-      failed: '复制未完成，请选择下方命令手动复制。',
+      copied: '已复制',
+      failed: '复制未完成，请选中命令手动复制。',
       links: [
         { title: '开发环境指南', text: '', path: 'quick-start', link: '开发环境指南' },
         {
@@ -250,6 +271,10 @@ export const homeContent: Record<HomeLocale, HomeContent> = {
           link: '阅读模块开发指南'
         }
       ]
+    },
+    closing: {
+      title: '从一个业务应用开始',
+      text: '先体验 HoHu 的界面与 AI 助手，或使用 Skills 与 CLI 开始创建自己的应用。'
     },
     footer: {
       title: '开始之前，你可能想了解',
@@ -414,13 +439,25 @@ export const homeContent: Record<HomeLocale, HomeContent> = {
         'Describe your needs to a coding assistant. HoHu Skills help create projects and develop modules. Or use the CLI to create, run and deploy your project.',
       prerequisites:
         'Prepare Git, uv, Node.js, pnpm, PostgreSQL and Redis, then configure your environment using the development guide.',
-      terminal: 'Create and start a project',
       cliTitle: 'Create a project with the CLI',
       cliIntro: 'Create a project, initialize its environment and start development from your terminal.',
+      cliSteps: [
+        { title: 'Install HoHu CLI', text: cliCommands[0] },
+        { title: 'Create and enter a project', text: cliCommands[1] },
+        { title: 'Initialize and start', text: cliCommands[2] }
+      ],
       ai: {
         title: 'Create and develop with AI',
         intro:
-          'Install HoHu Skills so your coding assistant follows project conventions for creation, development and validation.',
+          'Install Skills, then ask your coding assistant to create, develop and validate with project conventions.',
+        installTitle: 'Install HoHu Skills',
+        installNote:
+          'Run in your workspace terminal, then select your coding assistant, installation scope and Skills.',
+        promptNote: 'Start your coding assistant in that workspace and send this request.',
+        copyCommand: 'Copy',
+        copyPrompt: 'Copy',
+        copied: 'Copied',
+        failed: 'Could not copy. Select the text and copy it manually.',
         prompts: [
           {
             title: 'Create a project',
@@ -431,15 +468,15 @@ export const homeContent: Record<HomeLocale, HomeContent> = {
             text: 'Use hohu-business-module to build equipment loans with borrowing, returns and history. Users can only view and return their own loans. Prevent borrowing the same equipment twice.'
           }
         ],
-        note: 'For coding assistants such as Claude Code, Cursor and Codex. Prepare your development environment and install Skills first.',
+        note: 'Works with Claude Code, Cursor, Codex and more. Installation needs Node.js / npx; creating and running a project also needs HoHu CLI and a development environment.',
         guide: 'Read the AI development guide',
         guidePath: 'ai-coding',
-        skills: 'Install HoHu Skills',
+        skills: 'Installation options and requirements',
         skillsPath: 'cli/skills'
       },
-      copy: 'Copy commands',
-      copied: 'Commands copied',
-      failed: 'Could not copy. Select the commands below and copy them manually.',
+      copy: 'Copy',
+      copied: 'Copied',
+      failed: 'Could not copy. Select the commands and copy them manually.',
       links: [
         { title: 'Development setup', text: '', path: 'quick-start', link: 'Development setup' },
         {
@@ -455,6 +492,10 @@ export const homeContent: Record<HomeLocale, HomeContent> = {
           link: 'Read the module development guide'
         }
       ]
+    },
+    closing: {
+      title: 'Start with one business application',
+      text: 'Explore the HoHu interface and AI assistant, or use Skills and the CLI to start building your own application.'
     },
     footer: {
       title: 'A few things before you start',

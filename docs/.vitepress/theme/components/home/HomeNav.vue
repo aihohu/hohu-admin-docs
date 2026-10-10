@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { shallowRef, useTemplateRef } from 'vue';
 import { VPNavBarTranslations, VPSwitchAppearance, VPNavBarSocialLinks } from './native-theme.mjs';
-import { guideLink, type HomeContent, type HomeLocale } from '../../composables/home';
+import { type HomeContent, type HomeLocale } from '../../composables/home';
+import HomeNavLinks from './HomeNavLinks.vue';
 
 defineProps<{ copy: HomeContent['nav']; locale: HomeLocale }>();
 const open = shallowRef(false);
@@ -26,6 +27,11 @@ function closeLanguageMenu() {
 function closeMenu() {
   open.value = false;
 }
+function closeMenuOnFocusLeave(event: globalThis.FocusEvent) {
+  if (!(event.currentTarget as HTMLElement).contains(event.relatedTarget as globalThis.Node | null)) {
+    closeMenu();
+  }
+}
 function escapeMenu() {
   if (open.value) {
     closeMenu();
@@ -35,12 +41,15 @@ function escapeMenu() {
 </script>
 
 <template>
-  <header class="site-header" @keydown.esc="escapeMenu">
+  <header class="site-header" @keydown.esc="escapeMenu" @focusout="closeMenuOnFocusLeave">
     <div class="home-wrap nav-inner">
       <a class="home-brand" :href="locale === 'zh' ? '/zh/' : '/'" aria-label="HoHu" translate="no">
         <img src="/logo.png" alt="" width="32" height="36" />
         HoHu
       </a>
+      <div class="desktop-navigation">
+        <HomeNavLinks :copy="copy" :locale="locale" />
+      </div>
       <div ref="nav-tools" class="nav-tools" @click.capture="keepLanguageOpen" @keydown.esc.stop="closeLanguageMenu">
         <VPNavBarTranslations />
         <div class="theme-control">
@@ -72,18 +81,9 @@ function escapeMenu() {
           <path v-else d="M4 7h16M4 12h16M4 17h16" />
         </svg>
       </button>
-      <nav
-        id="home-navigation"
-        class="nav-links"
-        :class="{ 'is-open': open }"
-        :aria-label="copy.label"
-        @click="closeMenu"
-      >
-        <a href="#workflow">{{ copy.workflow }}</a>
-        <a href="#platform">{{ copy.platform }}</a>
-        <a v-for="guide in copy.guides" :key="guide.path" :href="guideLink(locale, guide.path)">{{ guide.title }}</a>
-        <a href="https://github.com/aihohu/hohu-admin/issues" target="_blank" rel="noopener">{{ copy.feedback }}</a>
-      </nav>
+      <div id="home-navigation" class="mobile-navigation" :class="{ 'is-open': open }" @click="closeMenu">
+        <HomeNavLinks class="home-wrap" :copy="copy" :locale="locale" />
+      </div>
     </div>
   </header>
 </template>
@@ -103,27 +103,16 @@ function escapeMenu() {
   min-height: 80px;
   gap: 24px;
 }
-.nav-links {
-  display: flex;
-  gap: 24px;
-  align-items: center;
-  font-size: 14px;
-  order: 1;
+.desktop-navigation {
   margin-left: auto;
 }
-.nav-links > a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-}
-.nav-links > a:hover {
-  color: var(--home-blue);
+.mobile-navigation {
+  display: none;
 }
 .nav-tools {
   display: flex;
   align-items: center;
   gap: 12px;
-  order: 2;
 }
 .nav-tools :deep(.VPNavBarTranslations) {
   display: flex;
@@ -167,18 +156,14 @@ function escapeMenu() {
   border: 1px solid var(--home-line);
   border-radius: 8px;
   cursor: pointer;
-  order: 3;
-}
-@media (max-width: 960px) {
-  .nav-links {
-    gap: 18px;
-  }
 }
 @media (max-width: 1100px) {
   .nav-inner {
     min-height: 68px;
-    flex-wrap: wrap;
     gap: 12px;
+  }
+  .desktop-navigation {
+    display: none;
   }
   .nav-tools {
     margin-left: auto;
@@ -186,21 +171,18 @@ function escapeMenu() {
   .menu-toggle {
     display: flex;
   }
-  .nav-links {
-    display: none;
-    width: 100%;
-    padding: 16px 0 24px;
-    gap: 4px;
-    align-items: stretch;
-    flex-direction: column;
-    order: 4;
-    margin-left: 0;
+  .mobile-navigation {
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    max-height: calc(100dvh - 69px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--home-bg);
+    border-bottom: 1px solid var(--home-line);
   }
-  .nav-links.is-open {
-    display: flex;
-  }
-  .nav-links > a {
-    padding-inline: 12px;
+  .mobile-navigation.is-open {
+    display: block;
   }
 }
 @media (max-width: 380px) {

@@ -64,6 +64,33 @@ test('404 is not indexed or described as a valid translated page', () => {
   assert.ok(!head.some(([, a]) => a.rel === 'canonical' || a.hreflang));
 });
 
+test('product graph identifies the real software without invented commercial claims', () => {
+  for (const file of ['index.md', 'zh/index.md']) {
+    const head = pageHead(file, 'HoHu', 'Build business applications.');
+    const graph = JSON.parse(head.find(([, attrs]) => attrs.type === 'application/ld+json')[2])['@graph'];
+    const app = graph.find(node => node['@type'] === 'SoftwareApplication');
+    assert.equal(app['@id'], 'https://hohu.org/#software');
+    assert.equal(app.name, 'HoHu');
+    assert.equal(app.applicationCategory, 'DeveloperApplication');
+    assert.ok(!('offers' in app) && !('aggregateRating' in app) && !('softwareVersion' in app));
+    const page = graph.find(node => node['@type'] === 'WebPage');
+    assert.equal(page.url, canonicalUrl(file));
+    assert.equal(page.mainEntity['@id'], app['@id']);
+  }
+});
+
+test('structured descriptions are JSON-safe and document entities match their visible page metadata', () => {
+  const description = '</script><script>alert("test")</script>';
+  const head = pageHead('zh/guide/ai-coding.md', 'AI development', description);
+  const script = head.find(([, attrs]) => attrs.type === 'application/ld+json')[2];
+  assert.ok(!script.includes('</script>'));
+  const [page] = JSON.parse(script)['@graph'];
+  assert.equal(page.description, description);
+  assert.equal(page.name, 'AI development | HoHu');
+  assert.equal(page.inLanguage, 'zh-CN');
+  assert.equal(page.about['@id'], 'https://hohu.org/#software');
+});
+
 test('each language and legacy route gets only its own section sidebar', () => {
   for (const lang of ['en', 'zh']) {
     const config = navigation(lang);

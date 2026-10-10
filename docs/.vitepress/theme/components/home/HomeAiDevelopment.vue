@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { guideLink, type HomeContent, type HomeLocale } from '../../composables/home';
+import { guideLink, skillsInstallCommand, type HomeContent, type HomeLocale } from '../../composables/home';
+import HomeDevelopmentStep from './HomeDevelopmentStep.vue';
 defineProps<{ copy: HomeContent['start']['ai']; locale: HomeLocale }>();
 </script>
 
@@ -7,12 +8,32 @@ defineProps<{ copy: HomeContent['start']['ai']; locale: HomeLocale }>();
   <article class="ai-development" aria-labelledby="ai-development-title">
     <h3 id="ai-development-title" class="development-title">{{ copy.title }}</h3>
     <p class="development-intro">{{ copy.intro }}</p>
-    <div class="ai-prompts">
-      <div v-for="prompt in copy.prompts" :key="prompt.title" class="ai-prompt">
-        <h4>{{ prompt.title }}</h4>
-        <blockquote>{{ prompt.text }}</blockquote>
-      </div>
-    </div>
+    <ol class="ai-steps" role="list">
+      <HomeDevelopmentStep
+        :step="1"
+        :title="copy.installTitle"
+        :text="skillsInstallCommand"
+        kind="command"
+        analytics-action="skills_install"
+        :description="copy.installNote"
+        :copy-label="copy.copyCommand"
+        :copied="copy.copied"
+        :failed="copy.failed"
+      />
+      <HomeDevelopmentStep
+        v-for="(prompt, index) in copy.prompts"
+        :key="prompt.title"
+        :step="index + 2"
+        :title="prompt.title"
+        :text="prompt.text"
+        kind="prompt"
+        :analytics-action="index === 0 ? 'ai_project' : 'ai_module'"
+        :description="index === 0 ? copy.promptNote : undefined"
+        :copy-label="copy.copyPrompt"
+        :copied="copy.copied"
+        :failed="copy.failed"
+      />
+    </ol>
     <p class="ai-note">{{ copy.note }}</p>
     <div class="ai-actions">
       <a class="home-link" :href="guideLink(locale, copy.skillsPath)">{{ copy.skills }}</a>
@@ -31,37 +52,22 @@ defineProps<{ copy: HomeContent['start']['ai']; locale: HomeLocale }>();
   font-weight: 600;
 }
 .development-intro {
-  margin-top: 12px;
+  margin-block: 12px 24px;
   color: var(--home-muted);
   font-size: 14px;
 }
-.ai-prompts {
-  margin-top: 24px;
+.ai-steps {
+  margin: 0;
   padding: 24px;
+  list-style: none;
   background: var(--home-bg);
   border: 1px solid var(--home-line);
   border-radius: 12px;
 }
-.ai-prompt + .ai-prompt {
-  border-top: 1px solid var(--home-line);
-  padding-top: 20px;
-  margin-top: 20px;
-}
-.ai-prompt h4 {
-  margin: 0 0 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--home-green);
-}
-.ai-prompt blockquote {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.9;
-  overflow-wrap: anywhere;
-}
 .ai-note {
   margin-top: 16px;
   font-size: 12px;
+  line-height: 1.8;
   color: var(--home-muted);
 }
 .ai-actions {
@@ -70,8 +76,16 @@ defineProps<{ copy: HomeContent['start']['ai']; locale: HomeLocale }>();
   gap: 4px 24px;
   margin-top: 8px;
 }
+@media (min-width: 761px) {
+  .ai-development {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 5;
+    row-gap: 0;
+  }
+}
 @media (max-width: 760px) {
-  .ai-prompts {
+  .ai-steps {
     padding: 20px;
   }
 }
