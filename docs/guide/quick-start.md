@@ -14,7 +14,7 @@ This tutorial runs the HoHu backend and Web application locally. By the end, you
 | Git        | Fetch project sources                               | `git --version`                      |
 | Python     | 3.12 or later for the backend                       | `python --version`                   |
 | uv         | Python dependency and CLI management                | `uv --version`                       |
-| Node.js    | Node 22 LTS, at least 22.12                         | `node --version`                     |
+| Node.js    | Node 22, at least 22.12                             | `node --version`                     |
 | pnpm       | 10.5 or later                                       | `pnpm --version`                     |
 | PostgreSQL | A running server and dedicated development database | Verify access with a database client |
 | Redis      | A running server accessible to the backend          | `redis-cli ping` returns `PONG`      |
@@ -100,6 +100,8 @@ The first two commands run only the backend or Web client. The third skips App. 
 | Not inside a project                   | Run inside the directory containing `.hohu/project.json`                                             |
 | PostgreSQL or Redis connection failure | Start the service, create the database and verify backend `.env` connection values                   |
 | Initialization failed                  | Fix the reported error and rerun `hohu init`; no database deletion is required                       |
-| Web loads but sign-in requests fail    | Check the API process and Web `.env.development` service/proxy settings                              |
+| Web loads but sign-in requests fail    | Check the API process and Web `.env.test / .env.test.local` service/proxy settings                   |
 | Windows symlink EPERM                  | Enable Windows Developer Mode and check directory write permissions before reinstalling dependencies |
 | Initial password fails                 | Verify that the backend uses the intended database; initialization does not reset existing passwords |
+
+See [Web pages and requests](./development/web) for proxy and mode configuration, and [debugging and validation](./development/testing) for checks and troubleshooting.

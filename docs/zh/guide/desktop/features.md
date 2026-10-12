@@ -1,120 +1,55 @@
 ---
-title: 桌面端已实现特性
-description: 了解 HoHu 桌面端的请求与认证、路由、存储、窗口、自动更新和通知能力及平台限制。
+title: 桌面端功能
+description: 按场景接入 HoHu 桌面端托盘、快捷键、通知、主题、更新和日志，并验证目标平台上的实际行为。
 ---
 
-# 已实现特性
+# 桌面端功能
 
-> 完整 roadmap 与设计理由见仓库内的 [`docs/framework-design.md`](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/framework-design.md)。本页是面向使用者的概览。
+桌面能力通过 `window.api` 调用主进程。完整类型位于 `src/shared/types.ts`，设置抽屉位于 `src/renderer/src/layouts/modules/settings/SettingsDrawer.vue`。
 
-## 基础能力
+## 能力速查
 
-### 请求层（HTTP 走主进程）
+| 能力       | 入口                      | 接入要点                                          |
+| ---------- | ------------------------- | ------------------------------------------------- |
+| 托盘       | api.tray 与设置抽屉       | 配置关闭窗口是否收起到托盘，验证退出行为          |
+| 全局快捷键 | api.shortcuts             | 读取和更新已定义 action 的快捷键；注册冲突会失败  |
+| 系统通知   | api.notification          | title、body、category；遵循应用设置与系统通知权限 |
+| 原生主题   | api.theme.setNativeSource | system、light、dark，与页面主题配套               |
+| 外部链接   | api.shell.openExternal    | 仅允许不含账号密码的 HTTPS URL                    |
+| 更新       | api.updater               | 检查、下载、安装及状态订阅                        |
+| 日志       | api.logger.error / warn   | 脱敏后记录错误或警告，不作为任意 console 转发     |
+| 应用信息   | api.app                   | 供设置中的版本与应用操作使用                      |
 
-- 渲染层所有 HTTP 请求经主进程 `net` 模块转发，**绕开 CORS**
-- Flat result shape：`{ data, error }`，无需 try/catch
-- Token 过期自动 single-flight refresh + retry 一次
-- `X-Request-Id` 自动注入用于链路追踪
+## 显示系统通知
 
-### 鉴权（JWT + Keychain）
+下面是渲染层异步事件处理函数内的调用片段：
 
-- 登录 / refreshToken / getUserInfo 完整流程
-- Token 用 `safeStorage` 加密落盘到 `userData/secure-store.json`
-- 永远不进 localStorage
-- 详见：[架构 - Token 存储](./architecture#token-存储与钥匙串)
+```typescript
+await window.api.notification.show({
+  title: 'Export completed',
+  body: 'Check the export result in the application.',
+  category: 'general'
+});
+```
 
-### 动态路由 + RBAC
+实际产品文案从语言资源读取。渲染层 payload 不接受任意 source 或 actionId；通知来源与点击动作由主进程控制。通知被禁用或系统抑制时，业务结果仍应在应用页面可见。
 
-- 后端拉菜单（dynamic mode）/ 前端写死（static mode）双模切换
-- glob 组件映射 + memory history
-- `v-permission` 指令、`hasAuth()` 函数、`TableHeaderOperation` 三层按钮级权限
-- 图标懒加载（按需拉 iconify json）
+## 主题与快捷键
 
-### 布局 + 主题 + i18n
+页面主题与原生主题需要同步，不能只修改 CSS。切换深浅色和跟随系统时，检查窗口、菜单、弹窗与表格。
 
-- 暗黑模式（同步到 `nativeTheme`，影响原生标题栏 / scrollbar）
-- 主色定制
-- 中英文（zh-cn / en-us）
-- 面包屑 / Sider 折叠
+快捷键只绑定主进程预定义 action。更新接口返回 false 时提示冲突并保留可用配置；不要让用户认为保存成功就一定注册成功。
 
----
+## 更新与发行
 
-## 桌面集成
+更新功能依赖真实的发行源和匹配版本的元数据。设置中可控制自动下载，用户也可手动检查；后台检查有节流，开发占位配置不会提供真实更新。
 
-### 日志 + 本地存储
+先按[桌面端开发](./quick-start)配置更新源，再使用两个版本的实际安装包验证：发现更新、下载进度、取消或错误恢复、安装以及更新后的登录。不同操作系统的签名、通知与安装行为需要分别验证。
 
-- **electron-log**：main / preload / renderer 三进程统一日志，写文件到 `~/Library/Logs/{appName}/`（macOS）
-- **electron-store**：非敏感配置（窗口状态、快捷键、托盘行为、通知开关等）持久化到 `userData/config.json`
-- ESM 切换：项目 `"type": "module"`，主进程输出 ESM
+订阅更新状态时保留返回的取消函数，在组件卸载时执行，避免设置抽屉反复打开后重复处理事件。
 
-> 详见 [spec-phase2.1](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.1-logging-store.md)
+## 会话存储与日志
 
-### 窗口 / 托盘 / 全局快捷键
+会话由主进程维护，密文保存于应用 userData 下的 `secure-store.json`，通过 Electron safeStorage 加解密。可用性取决于操作系统环境与密钥服务，尤其需要在目标 Linux 环境验证。渲染层没有通用凭据读取接口。
 
-- **WindowManager**：单例管理主窗口，窗口状态（位置、大小、最大化、全屏）跨重启持久化
-- **TrayManager**：托盘图标 + 右键菜单（Show/Hide / Reload / DevTools / Check for Updates / Quit），关闭按钮缩到托盘而不是退出
-- **ShortcutManager**：全局快捷键（默认 `Cmd/Ctrl+Shift+H` 呼出主窗口），可配置
-- **shortcuts IPC**：渲染层通过 `window.api.shortcuts.{list, update}` 读取 / 更新快捷键
-
-> 详见 [spec-phase2.2](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.2-window-tray-shortcut.md)
-
-### 自动更新
-
-- **electron-updater v6** 封装为 `UpdaterManager` 单例
-- 双 provider：GitHub Releases（默认）/ Generic（任意静态 URL，需提供 `latest.yml`）
-- **构建时决定 provider**：`.env` 设 `UPDATER_PROVIDER=github|generic`，由 `scripts/gen-publish-config.mjs` 注入到打包配置
-- **24h 限频**：启动后台检查通过 `store.updater.lastCheck` 节流；手动入口（托盘菜单「Check for Updates...」）绕过限频
-- **skipVersion**：用户跳过某版本，下次不再提示直到更高版本发布
-- 系统通知（下载完成时弹一次，点击聚焦主窗口）
-- dev 模式读 `dev-app-update.yml`，命中占位 URL 自动跳过避免日志噪音
-
-> 详见 [spec-phase2.3](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.3-auto-update.md)
-
-### 系统通知分发器
-
-- **NotificationManager 单例**：所有 `new Notification()` 调用必须经此入口 —— 一处 mute、一处日志、一处改行为
-- **渲染层 IPC 推送**：`window.api.notification.show({ source, category, title, body, actionId? })`，让渲染层能弹系统通知（web 做不到）
-- **全局 mute**：复用 `store.notifications.enabled`，一处关闭所有来源
-- **action 钩子**：payload 的 `actionId` 可选；不传 = 默认聚焦主窗口，传了则调主进程 `notificationManager.registerAction(id, fn)` 注册的回调
-- **GC 持引用**：`activeNotifications: Set<Notification>` 持强引用到通知关闭，防止 V8 GC 吞 click handler
-- **source 前瞻性预留**：`'system' | 'renderer' | 'backend'`，今天用前两个，等后端通知模块落地后加 `BackendNotificationConsumer`
-
-> 详见 [spec-phase2.4](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.4-notification-dispatcher.md)
-
----
-
-## 平台限制
-
-| 平台    | 自动更新                                                                       | 系统通知                                   |
-| ------- | ------------------------------------------------------------------------------ | ------------------------------------------ |
-| Windows | ✅ NSIS 开箱即用                                                               | ✅                                         |
-| macOS   | ⚠️ 需代码签名（Developer ID Application 证书），未签名则能检测能下载但安装被拒 | ✅                                         |
-| Linux   | ✅ AppImage（deb / snap 不支持自动更新）                                       | ⚠️ 需 libnotify，容器 / 无桌面环境会 no-op |
-
-公证（notarization）是 Apple 对**首次分发**的独立要求，与自动更新流程无关。两者都不在框架默认配置中 —— 开发者发布自家应用时需自行配置。
-
----
-
-## 适用边界
-
-以下功能**故意没做**，等真有需求再加：
-
-- 通知历史 / 通知中心（系统通知中心已有）
-- 通知分类静音、dedup、限频、自定义 action buttons（Reply / Snooze）
-- 渲染层「设置页」UI
-- Beta 通道 / 预发布过滤
-- AI 对话模块、AI 桌面场景（悬浮窗 / 划词 / 截图）
-- 完整复制 web 后台所有页面 —— 浪费
-- 数据可视化大屏、CRUD 表格 —— web 端更好
-
----
-
-## 工程化
-
-- ✅ ESLint + Prettier（对齐 web 的 oxfmt 配置）
-- ✅ TypeScript 严格模式 + 分包 tsconfig（node / web / shared）
-- ✅ Conventional Commits + commitlint + simple-git-hooks
-- ✅ GitHub Actions CI（typecheck / lint / fmt，PR 触发）
-- ✅ Release workflow（三平台构建，tag 触发）
-- ✅ 路径别名（`@renderer` / `@shared` / `@main` / `@resources` / `@iconify-json`）
-- ✅ `node:test` + tsx 纯函数单测
+排错收集版本、操作步骤与脱敏日志即可，不记录密码、token 或完整业务敏感数据。认证与请求边界见[桌面端架构](./architecture)。

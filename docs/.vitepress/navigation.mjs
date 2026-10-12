@@ -6,8 +6,14 @@ export const sections = [
     path: 'cli/index',
     pages: [
       ['cli/index', 'Overview and installation', '概览与安装'],
+      ['cli/create', 'Create a project', '创建项目'],
+      ['cli/init', 'Initialize a project', '初始化项目'],
+      ['cli/dev', 'Run development services', '启动开发服务'],
       ['cli/build', 'hohu build', 'hohu build'],
-      ['cli/deploy', 'hohu deploy', 'hohu deploy']
+      ['cli/deploy', 'Deployment and maintenance', '部署与维护'],
+      ['cli/migrate', 'Database migrations', '数据迁移'],
+      ['cli/monitoring', 'Monitoring', '监控管理'],
+      ['cli/configuration', 'Configuration and troubleshooting', '配置与排错']
     ]
   },
   {
@@ -29,13 +35,17 @@ export const sections = [
     path: 'user/index',
     pages: [
       ['user/index', 'Start here', '从这里开始'],
-      ['introduction', 'Introduction', '项目介绍'],
       ['user/account', 'Account and sign-in', '账号与登录'],
-      ['user/access', 'Users, roles and departments', '用户、角色与部门'],
+      ['user/access', 'Set up members and access', '成员与权限配置'],
+      ['user/users', 'User management', '用户管理'],
+      ['user/roles', 'Roles and permissions', '角色与权限'],
+      ['user/departments', 'Department management', '部门管理'],
+      ['user/user-import-export', 'User import and export', '用户导入与导出'],
       ['user/settings', 'System settings', '系统设置'],
       ['user/parameters', 'Custom parameters', '自定义参数'],
       ['user/files', 'Files and uploads', '文件与上传'],
       ['user/faq', 'Troubleshooting', '常见问题'],
+      ['introduction', 'Introduction', '项目介绍'],
       ['show', 'Live demo', '在线演示']
     ]
   },
@@ -49,6 +59,7 @@ export const sections = [
       ['backend/introduction', 'Backend architecture', '后端架构'],
       ['backend/dir', 'Repository structure', '目录结构'],
       ['development/module', 'Add a module', '新增业务模块'],
+      ['development/web', 'Web pages and requests', 'Web 页面与请求'],
       ['auth', 'API and button permissions', '接口与按钮权限'],
       ['data-permission', 'Data scope', '数据范围'],
       ['page', 'Pagination', '分页查询'],
@@ -56,6 +67,7 @@ export const sections = [
       ['backend/cache', 'Caching', '缓存'],
       ['scheduled-job', 'Scheduled jobs', '定时任务'],
       ['development/i18n', 'Internationalization', '国际化'],
+      ['development/testing', 'Debugging and validation', '调试与验证'],
       ['desktop/introduction', 'Desktop overview', '桌面端介绍'],
       ['desktop/quick-start', 'Desktop quick start', '桌面端开发'],
       ['desktop/architecture', 'Desktop architecture', '桌面端架构'],
@@ -69,6 +81,8 @@ export const sections = [
     pages: [
       ['operations/index', 'Deployment overview', '部署入口'],
       ['deploy', 'Deploy with CLI', '使用 CLI 部署'],
+      ['operations/network', 'Domains and HTTPS', '域名、代理与 HTTPS'],
+      ['operations/monitoring', 'Health checks and troubleshooting', '巡检与排错'],
       ['operations/upgrade', 'Upgrade and recovery', '升级、备份与恢复'],
       ['operations/tenants', 'Multi-tenancy', '多租户管理']
     ]
@@ -80,7 +94,7 @@ export const sections = [
     pages: [
       ['reference/index', 'Reference overview', '参考入口'],
       ['reference/versions', 'Release notes', '更新说明'],
-      ['reference/configuration', 'Configuration ownership', '配置项归属'],
+      ['reference/configuration', 'Configuration reference', '配置参考'],
       ['reference/settings', 'Settings API', '设置接口与上传策略'],
       ['reference/api', 'API reference', 'API 参考'],
       ['backend/error-code', 'Error handling', '错误处理'],

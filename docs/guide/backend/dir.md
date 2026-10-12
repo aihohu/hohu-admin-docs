@@ -97,3 +97,5 @@ Merge example locale resources into active locale files and `App.I18n.Schema`; a
 While the dev server runs, Elegant Router generates routes and types from `views/`. Do not edit generated files or assume `pnpm gen-route` is a non-interactive refresh command; the target version may use it for interactive page scaffolding.
 
 Follow [Add a module](../development/module), then [Connect business tools](../development/ai-tools), for the complete workflow.
+
+See [Web pages and requests](../development/web) for requests, components, and state ownership, and [debugging and validation](../development/testing) for checks.

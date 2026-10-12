@@ -97,3 +97,5 @@ hohu-admin-web/src/
 运行 dev server 后，Elegant Router 根据 `views/` 自动生成路由及类型。不要手改生成文件，也不要把 `pnpm gen-route` 当作无交互刷新命令；目标版本可能将它用于交互式页面创建。
 
 完整操作从[新增业务模块](../development/module)开始，再接入[应用 AI 工具](../development/ai-tools)。
+
+Web 请求、组件与状态分工见 [Web 页面与请求](../development/web)；检查命令见[调试与验证](../development/testing)。

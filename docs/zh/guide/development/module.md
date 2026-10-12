@@ -7,6 +7,17 @@ description: 通过业务便签示例接入 SQLAlchemy 模型、租户隔离、F
 
 本教程在已有 HoHu 项目中增加“业务便签”，完成创建和分页查看两个操作。先完成[开发环境](../quick-start)。示例是源码扩展，不是独立插件安装协议。
 
+## 步骤速查
+
+| 阶段     | 产出                                 |
+| -------- | ------------------------------------ |
+| 确定边界 | 接口、权限码与租户共享策略           |
+| 后端接入 | 模型、Schema、Service、API 与迁移    |
+| Web 接入 | 类型、请求、页面、翻译与菜单         |
+| 授权验收 | 普通测试角色、权限拒绝与租户隔离验证 |
+
+首次按顺序完成；已熟悉模块结构时，可直接通过右侧目录定位示例。
+
 ## 独立项目与文件清单
 
 首次学习请先按[开发环境](../quick-start)用 `hohu create notes-tutorial` 创建只包含 Backend 和 Frontend 的新项目，再执行 `hohu init` 和 `hohu dev`，完成首次登录。使用专用数据库和独立 Redis 实例；不要沿用已有应用的 `.env`、密钥或数据库。与其他项目并行运行时还需调整端口及前端代理，不能只修改浏览器地址。以下命令中的“后端目录”和“Web 目录”分别指这个新项目的 `hohu-admin/` 与 `hohu-admin-web/`。
@@ -207,7 +218,7 @@ MENU_DEFINITIONS.extend(NOTE_MENUS)
 
 ### 创建验收角色
 
-用开发实例管理员进入“权限管理 → 角色管理”，创建专用测试角色，授予“业务便签”页面及“查看便签”“创建便签”按钮。创建一个普通测试用户并分配该角色，使用独立浏览器会话登录，打开业务便签页面；不要只用管理员验证。管理员需要已有角色菜单授权和用户角色授权权限。
+用开发实例管理员进入“角色管理”，创建专用测试角色，授予“业务便签”页面及“查看便签”“创建便签”按钮。创建一个普通测试用户并分配该角色，使用独立浏览器会话登录，打开业务便签页面；不要只用管理员验证。管理员需要已有角色菜单授权和用户角色授权权限。
 
 菜单同步不等于自动授权，旧登录状态需退出再登录刷新。默认租户是本教程的首个验证范围；hosted 租户需要另外配置能力目录和菜单同步，见[多租户管理](../operations/tenants)。不要把“切换租户后菜单不存在”当成数据隔离验证成功。
 
@@ -241,16 +252,18 @@ PowerShell 中设置 `$env:HOHU_BACKEND_PATH` 与 `$env:PYTHONDONTWRITEBYTECODE`
 
 ## 完成时应有的文件
 
-| 位置                      | 新增或修改                                                                                                    |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| 后端 `app/modules/notes/` | 各包 `__init__.py`、`models/note.py`、`schemas/note.py`、`service/note.py`、`api/note.py`、`menu_seed.py`     |
-| 后端注册                  | `app/main.py`、`alembic/env.py`、`app/core/tenant_inventory.py`、`app/modules/system/menu_seed.py`            |
-| 数据库                    | `alembic/versions/` 中本次生成并审核的迁移文件                                                                |
-| Web                       | `src/typings/api/notes.d.ts`、`src/service/api/notes.ts`、`src/views/notes/index.vue`、`src/locales/notes.ts` |
-| Web 接线                  | 两个 `src/locales/langs/*.ts` 语言文件、`src/typings/app.d.ts`、自动生成的路由文件                            |
+| 位置                      | 新增或修改                                                                                                     |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| 后端 `app/modules/notes/` | 各包 `__init__.py`、`models/note.py`、`schemas/note.py`、`service/note.py`、`api/note.py`、`menu_seed.py`      |
+| 后端注册                  | `app/main.py`、`alembic/env.py`、`app/core/tenant_inventory.py`、`app/modules/system/menu_seed.py`             |
+| 数据库                    | `alembic/versions/` 中本次生成并审核的迁移文件                                                                 |
+| Web                       | `src/typings/api/notes.d.ts`、`src/service/api/notes.ts`、`src/views/notes/index.vue`、`src/locales/notes.ts`  |
+| Web 接线                  | `src/service/api/index.ts`、两个 `src/locales/langs/*.ts` 语言文件、`src/typings/app.d.ts`、自动生成的路由文件 |
 
 若菜单存在但页面加载失败，检查文件目标路径、dev server 路由生成日志以及 `component` 是否为 `layout.base$view.notes`。若页面出现语言键而非文字，检查资源是否合并到正确层级。若保存失败，不要直接在数据库插入记录绕过接口，先检查接口响应和当前角色权限。
 
 ## 下一步：接入 AI
 
 继续[让 AI 使用业务模块](./ai-tools)，为便签接入查询工具和确认后创建。HTTP 接口和菜单完成后，不会自动出现在 AI 工具集合中。
+
+页面状态与请求约定见 [Web 页面与请求](./web)；提交前检查和排错见[调试与验证](./testing)。

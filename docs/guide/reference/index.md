@@ -1,17 +1,20 @@
 ---
 title: Reference
-description: Look up HoHu CLI commands, environment configuration, settings APIs, error codes and component releases.
+description: Find HoHu releases, configuration, API conventions, settings contracts, error codes, and source repositories.
 ---
 
 # Reference
 
-Reference pages help look up known behavior; they do not replace tutorials or operational workflows.
+Use this section for development and operations lookups. Start with [deployment](../operations/) for installation or the [developer guide](../development/) for business features.
 
-- [Release notes](./versions): match documentation to your installation.
-- [Configuration ownership](./configuration): choose environment, system settings or per-model configuration.
-- [Settings and upload policies](./settings): grouped updates, revisions, secret values and resource limits.
-- [API](./api): instance OpenAPI and response conventions.
-- [CLI](../cli/index): create, initialize, develop, build, deploy and migrate.
-- [Error handling](../backend/error-code) and [Common error codes](../backend/error-code-list): stable identifiers and diagnosis.
+| Find                                                   | Reference                                        |
+| ------------------------------------------------------ | ------------------------------------------------ |
+| Component versions, release notes, and upgrade records | [Versions and releases](./versions)              |
+| Configuration ownership and when changes apply         | [Configuration reference](./configuration)       |
+| OpenAPI, authentication, responses, and pagination     | [API reference](./api)                           |
+| Settings writes, concurrency, mail, and upload limits  | [Settings API and upload policies](./settings)   |
+| HTTP statuses, parsing, and retries                    | [Error handling](../backend/error-code)          |
+| Diagnosis by business scenario                         | [Common error codes](../backend/error-code-list) |
+| Source, licensing, and issue reporting                 | [Source and licensing](../src)                   |
 
-Contribution rules, security policies, architecture boundaries and migration-maintenance constraints remain in the code repositories linked from [Source](../src). Update code definitions and tests before corresponding references. Manual summaries are not presented as complete, automatically generated API inventories.
+The target release's source and OpenAPI define exact parameters and endpoints. This site explains workflows and shared contracts without duplicating the full API inventory. Record the running version before consulting documentation; development-branch features may not be deployed yet.

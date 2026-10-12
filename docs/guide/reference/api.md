@@ -1,18 +1,53 @@
 ---
 title: API reference
-description: Find instance OpenAPI documentation and review HoHu response, authentication, string ID, pagination and error conventions.
+description: Find HoHu OpenAPI access, production restrictions, authentication, response formats, pagination, string IDs, and endpoint boundaries.
 ---
 
 # API reference
 
-The **target running instance's** OpenAPI defines exact routes, parameters, schemas and statuses. The local backend normally exposes `http://127.0.0.1:8000/docs` and `/openapi.json`; use the actual prefix behind a proxy. Deployers decide whether documentation is exposed in production.
+Use the **target release's** OpenAPI as the endpoint inventory. This site covers shared contracts and integration practices. Keep the admin UI, API, and CLI on a supported version combination.
 
-Ordinary APIs use JWT Bearer access tokens and `{code, msg, data}` responses with success code 200. Paginated data contains records, total, current and size. Snowflake IDs are JSON strings and schema aliases expose camelCase client fields.
+## Find the specification
 
-Confirm the target instance before supplying credentials. Swagger writes modify real data in that instance. Do not paste tokens into public sites, issues or shared screenshots. Platform maintenance and ordinary user endpoints have separate identity boundaries.
+| Runtime                                            | Address and behavior                                                                     |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Local backend with default development environment | `http://127.0.0.1:8000/docs`, `/redoc`, `/openapi.json`                                  |
+| Web / Nginx proxy                                  | Use the configured prefix; standard routing forwards browser `/api/` to the backend root |
+| Backend started with `ENV=prod`                    | docs, redoc, and openapi.json are disabled; their 404 is not a service failure           |
 
-## Avoid duplicate API inventories
+For production integration, run the same build in a controlled environment and export its specification. Do not switch a production instance to development mode to open Swagger. Swagger writes change data in the selected instance.
 
-This site explains workflows and cross-endpoint constraints instead of maintaining a second handwritten OpenAPI. For offline reference, export a specification matching the release build from a controlled instance. Review versions and sensitive examples before publishing; never use development business data as public samples.
+## Request and response conventions
 
-See [Error handling](../backend/error-code) and [Settings contracts](./settings). Unregistered source routes are not available APIs.
+| Item                  | Contract                                                                                                           |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Authentication        | `Authorization: Bearer <access_token>`; refresh tokens belong to the refresh flow and cannot replace access tokens |
+| Ordinary JSON success | code is 200, with msg and data                                                                                     |
+| Pagination            | data contains records, total, current, size; filters and sorting are endpoint-specific                             |
+| IDs                   | Snowflake IDs are strings; do not convert them to JavaScript Number                                                |
+| Field names           | Schema aliases expose camelCase; dictionaries such as settings values retain their defined keys                    |
+| Time                  | ISO 8601 UTC; convert for display in the user's timezone                                                           |
+| Failure               | HTTP status and business code, sometimes a stable errorCode; see [error handling](../backend/error-code)           |
+
+This pagination example illustrates structure and contains no real business data:
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "records": [{ "id": "123456789012345678", "name": "Example" }],
+    "total": 1,
+    "current": 1,
+    "size": 10
+  }
+}
+```
+
+## Identity and special responses
+
+Business endpoints validate the current user, tenant, and permissions. Platform maintenance has separate identity boundaries, but the `/platform/` prefix alone does not determine token type. For example, [tenant management](../operations/tenants) uses a default-tenant system-administrator session with audit headers. Follow each route's authentication dependencies.
+
+Downloads, AI SSE, `/health`, and `/metrics` do not use the ordinary JSON envelope. `/health` returns `{"status":"ok"}` for process liveness only; `/metrics` returns Prometheus text. SSE may report tool or business failures after HTTP 200, so consume final events. Do not apply a universal JSON parser to every response.
+
+Record HTTP status, errorCode, timestamp, and a redacted response before consulting [common error codes](../backend/error-code-list). Network or proxy HTML is not business JSON. Source routes not registered with the main application are not available endpoints.

@@ -1,33 +1,57 @@
 ---
-title: HoHu AI overview
-description: Use Skills to create HoHu projects and develop modules, or use application AI assistants to query business data and confirm operations.
+title: HoHu AI usage and development guide
+description: Create and develop HoHu applications with AI, or use application assistants for business queries and confirmed actions. Find prerequisites and current capabilities.
 ---
 
-# AI
+# AI usage and development
 
-HoHu supports AI-assisted source development and AI operations inside applications. Choose the entry for your task:
+HoHu supports two AI workflows: coding assistants use HoHu Skills to create and develop applications; application assistants query and process business data in a running application. Their models and permissions are configured separately.
 
-| Your task                                                  | Start here                                                                | Prerequisites                                                                               |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Have a coding assistant create a project or build a module | [Install Skills](../cli/skills) → [AI-assisted development](../ai-coding) | A Skills-capable agent and development environment; project creation also requires HoHu CLI |
-| Query or process business data in a deployed application   | [Application AI assistant](../user/ai)                                    | An account, an available model and assistant, and business permissions                      |
-| Let an application assistant use your module               | [Connect business tools](../development/ai-tools)                         | The module's Service, feature permissions and data scope                                    |
-| Configure models, assistants and runtime settings          | [Configuration and operations](../operations/ai)                          | Relevant administration access, a model connection and deployment configuration             |
+## Choose your task {#start}
 
-## Develop with Skills
+| Your task                                   | Recommended path                                                                          | Prerequisites                                                             |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Create a project or build a business module | [Install Skills](../cli/skills) → [AI-assisted development](../ai-coding)                 | A Skills-capable coding assistant, HoHu CLI and a development environment |
+| Query or process business data              | [Application AI assistant](../user/ai)                                                    | An account, an available assistant and model, and business permissions    |
+| Configure AI for the first time             | [Configuration and operations](../operations/ai#first-setup) → ordinary-user verification | Default-tenant system super-administrator and model service credentials   |
+| Connect your own module                     | [Connect business tools](../development/ai-tools)                                         | An existing Service, feature permissions and data visibility rules        |
 
-HoHu Skills provides project workflows for coding assistants including Claude Code, Cursor, Codex, OpenCode and TRAE. `hohu-project` uses the actual CLI to create, initialize and start projects. `hohu-business-module` implements data models, APIs, permissions, pages and application AI tools following the target project's conventions.
+## Create and develop with AI {#development}
 
-Follow the [installation guide](../cli/skills), then make a request from a workspace where the assistant can discover the skills:
+HoHu Skills provides workflows for Claude Code, Cursor, Codex, OpenCode, TRAE and other coding assistants:
 
-> Create equipment with Backend and Web only, initialize it and start it. Then build an equipment borrowing module with borrow, return and list operations. Use Chinese-only business content.
+| Skill                  | Responsibility                                                                                                             |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `hohu-project`         | Create, initialize, start and troubleshoot projects through the actual CLI                                                 |
+| `hohu-business-module` | Develop business modules following project conventions, connect permissions, pages and application AI tools, then validate |
 
-Business modules include application AI by default. Internationalization follows your explicit request, otherwise the target module conventions; HoHu's built-in internationalization retains its existing behavior. Review the actual pages, permissions, tests and AI tool execution records. Follow [AI-assisted development](../ai-coding) for the complete workflow.
+Install in the workspace where you will use your assistant:
 
-## Use AI inside an application
+```bash
+npx skills@latest add aihohu/hohu-skills
+```
 
-Application assistants query and process data through registered business tools. A tool call requests a specific capability, such as listing loans or returning equipment. It remains subject to the current account's feature permissions, tenant boundary and data scope.
+Choose skills, coding assistants and scope. Verify host discovery, then describe your request:
 
-Begin with a read-only query. Writes requiring approval display a confirmation card; review the target and impact before approving. Model text alone does not prove an operation succeeded: check tool results and application data. See the [Application AI assistant](../user/ai).
+> Create equipment with Backend and Web only, initialize it and start it. Then build equipment borrowing with borrow, return and list operations. Ordinary users may only view their own loans. Use Chinese-only business content.
 
-Installing Skills does not configure application models or grant business permissions. If an assistant is unavailable after development, follow [Configuration and operations](../operations/ai) to check model connectivity, assistant status and role authorization.
+Equipment borrowing is a development example, not a built-in application installed with Skills. Skills guide implementation and validation; review actual pages, permissions, tests and AI tool execution records. Follow [AI-assisted development](../ai-coding) for the complete process.
+
+See [Install Skills](../cli/skills) for prerequisites, assistant IDs and updates. Installing Skills does not install HoHu CLI, configure application models or grant business permissions.
+
+## Use an application assistant {#application}
+
+Open **AI Chat**, choose an available model and use automatic routing or select an assistant manually. Begin with a read-only query, then try a confirmed action: **describe the task → review targets and impact → approve → inspect tool results and the business page**.
+
+The following built-in assistants are currently published. Available operations also depend on enabled status, role bindings, feature permissions and data scope in your instance.
+
+| Assistant             | Current capabilities                                                                                                   | Boundaries                                                                                            |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| User management       | User queries, statistics, creation and updates, department and role assignments, import/export and controlled deletion | Writes and exports follow tool confirmation flows                                                     |
+| Role permissions      | Role queries, creation and updates of delegated roles, menu and assistant authorization sets                           | Grants remain within delegation limits; deletion uses the regular page                                |
+| Department management | Department queries, creation, updates and organizational tree moves                                                    | Department deletion uses the regular page                                                             |
+| Shared tools          | Parse uploaded files into structured summaries                                                                         | Requires file parsing permission and an effective tool policy; does not manage other business domains |
+
+System configuration, AI Provider and scheduled-job assistants are not yet published. Custom business capabilities require registered tools; a new HTTP API does not automatically become an AI tool.
+
+Tools remain subject to the current account's permissions, tenant boundary and data scope. Generated text does not prove success: inspect tool results and the business page. See [Application AI assistant](../user/ai) for usage and troubleshooting, and [Configuration and operations](../operations/ai) for administration.

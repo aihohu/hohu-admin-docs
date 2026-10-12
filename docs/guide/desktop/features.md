@@ -1,120 +1,55 @@
 ---
-title: Desktop Features
-description: Explore HoHu desktop authentication, routing, storage, windows, updates and notifications, including platform limits.
+title: Desktop features
+description: Integrate HoHu desktop tray, shortcuts, notifications, themes, updates, and logging, and validate behavior on target platforms.
 ---
 
-# Features
+# Desktop features
 
-> For the complete roadmap and design rationale, see the in-repo [`docs/framework-design.md`](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/framework-design.md). This page is a user-facing overview.
+Desktop capabilities call the main process through `window.api`. Types live in `src/shared/types.ts`; the settings drawer is `src/renderer/src/layouts/modules/settings/SettingsDrawer.vue`.
 
-## Application foundation
+## Capability reference
 
-### Request Layer (HTTP through main process)
+| Capability              | Entry point                  | Integration notes                                                          |
+| ----------------------- | ---------------------------- | -------------------------------------------------------------------------- |
+| Tray                    | api.tray and settings drawer | Configure close-to-tray and verify actual exit behavior                    |
+| Global shortcuts        | api.shortcuts                | Read or update shortcuts for predefined actions; registration may conflict |
+| System notifications    | api.notification             | title, body, category; respect app settings and OS permissions             |
+| Native theme            | api.theme.setNativeSource    | system, light, dark; coordinate with page themes                           |
+| External links          | api.shell.openExternal       | HTTPS URLs without embedded credentials only                               |
+| Updates                 | api.updater                  | Check, download, install, and subscribe to status                          |
+| Logging                 | api.logger.error / warn      | Redacted errors and warnings, not arbitrary console forwarding             |
+| Application information | api.app                      | Version and application operations used in settings                        |
 
-- All HTTP requests from the renderer go through the main process's `net` module, **bypassing CORS**
-- Flat result shape: `{ data, error }` — no try/catch needed
-- Token expiry triggers single-flight refresh + one retry
-- `X-Request-Id` auto-injected for tracing
+## Show a notification
 
-### Auth (JWT + Keychain)
+Use this fragment inside an async renderer event handler:
 
-- Full login / refreshToken / getUserInfo flow
-- Token encrypted via `safeStorage` to `userData/secure-store.json`
-- Never enters localStorage
-- See [Architecture — Token Storage](./architecture#token-storage-keychain)
+```typescript
+await window.api.notification.show({
+  title: 'Export completed',
+  body: 'Check the export result in the application.',
+  category: 'general'
+});
+```
 
-### Dynamic Routes + RBAC
+Read product text from language resources. Renderer payloads do not accept arbitrary source or actionId values; the main process controls notification origin and click actions. Keep business results visible in the application even when notifications are disabled or suppressed by the OS.
 
-- Backend-driven menu (dynamic mode) / frontend-defined (static mode), switchable
-- Glob-based component mapping + memory history
-- `v-permission` directive, `hasAuth()` function, `TableHeaderOperation` — three layers of button-level permission
-- Lazy icon loading (iconify json fetched on demand)
+## Themes and shortcuts
 
-### Layout + Theme + i18n
+Synchronize page and native themes instead of changing CSS alone. Check windows, menus, dialogs, and tables in light, dark, and system modes.
 
-- Dark mode (synced to `nativeTheme`, affects native title bar / scrollbar)
-- Primary color customization
-- Chinese / English (zh-cn / en-us)
-- Breadcrumb / Sider collapse
+Shortcuts bind only predefined main-process actions. If an update returns false, explain the conflict and retain usable settings. Saving a preference does not guarantee successful registration.
 
----
+## Updates and releases
 
-## Desktop integration
+Updates require a real distribution source and matching version metadata. Settings control automatic download, and users can check manually. Background checks are throttled; placeholder development configuration does not provide real updates.
 
-### Logging + Local Storage
+Configure the source through [desktop development](./quick-start), then use two actual packaged versions to verify discovery, progress, cancellation or failure recovery, installation, and sign-in after updating. Validate signing, notifications, and installation on each target OS.
 
-- **electron-log**: unified logging across main / preload / renderer, writes to `~/Library/Logs/{appName}/` (macOS)
-- **electron-store**: non-sensitive config (window state, shortcuts, tray behavior, notification toggle, etc.) persisted to `userData/config.json`
-- ESM transition: project is `"type": "module"`, main outputs ESM
+Keep the unsubscribe function returned by update subscriptions and call it on component unmount, avoiding duplicate handlers when settings are reopened.
 
-> See [spec-phase2.1](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.1-logging-store.md)
+## Session storage and logs
 
-### Window / Tray / Global Shortcuts
+The main process owns sessions. Encrypted values are stored in `secure-store.json` under application userData using Electron safeStorage. Availability depends on OS and key-service configuration, particularly on target Linux environments. The renderer has no general credential-reading bridge.
 
-- **WindowManager**: singleton managing the main window; window state (position, size, maximized, fullscreen) persists across restarts
-- **TrayManager**: tray icon + right-click menu (Show/Hide / Reload / DevTools / Check for Updates / Quit); close button minimizes to tray instead of quitting
-- **ShortcutManager**: global shortcuts (default `Cmd/Ctrl+Shift+H` summons the main window), configurable
-- **shortcuts IPC**: renderer reads/updates shortcuts via `window.api.shortcuts.{list, update}`
-
-> See [spec-phase2.2](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.2-window-tray-shortcut.md)
-
-### Auto-Update
-
-- Wraps **electron-updater v6** as an `UpdaterManager` singleton
-- Dual provider: GitHub Releases (default) / Generic (any static URL, requires `latest.yml`)
-- **Provider chosen at build time**: `.env` sets `UPDATER_PROVIDER=github|generic`; `scripts/gen-publish-config.mjs` injects it into the build config
-- **24h throttle**: background check on startup throttled via `store.updater.lastCheck`; manual entry (tray menu "Check for Updates...") bypasses throttle
-- **skipVersion**: user can skip a version; won't be prompted again until a higher version ships
-- System notification (fired once on download complete; click focuses main window)
-- dev mode reads `dev-app-update.yml`; placeholder URL auto-skipped to avoid log noise
-
-> See [spec-phase2.3](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.3-auto-update.md)
-
-### Notification Dispatcher
-
-- **NotificationManager singleton**: every `new Notification()` call must go through this — one place for muting, logging, and behavior changes
-- **Renderer pushes via IPC**: `window.api.notification.show({ source, category, title, body, actionId? })` lets the renderer fire system notifications (which the web cannot do)
-- **Global mute**: reuses `store.notifications.enabled`; turning it off mutes all sources
-- **Action hook**: payload's `actionId` is optional; unset = default "focus main window", set = calls the callback registered via `notificationManager.registerAction(id, fn)` in the main process
-- **GC retention**: `activeNotifications: Set<Notification>` holds strong references until notifications close, preventing V8 GC from swallowing click handlers
-- **Forward-looking source**: `'system' | 'renderer' | 'backend'` — first two today, `BackendNotificationConsumer` to be added once the backend notifications module lands
-
-> See [spec-phase2.4](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/spec-phase2.4-notification-dispatcher.md)
-
----
-
-## Platform Limitations
-
-| Platform | Auto-Update                                                                                                            | System Notifications                                               |
-| -------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| Windows  | ✅ NSIS, works out of the box                                                                                          | ✅                                                                 |
-| macOS    | ⚠️ Requires code signing (Developer ID Application cert). Without it, can detect and download but install is rejected. | ✅                                                                 |
-| Linux    | ✅ AppImage (deb / snap don't support auto-update)                                                                     | ⚠️ Requires libnotify; no-op in containers / headless environments |
-
-Notarization is Apple's independent requirement for **first-time distribution** (e.g., a downloaded DMG the first time it runs), unrelated to the auto-update flow. Neither signing nor notarization is configured by default — developers set these up when shipping their own apps.
-
----
-
-## Scope and limitations
-
-The following are deliberately omitted until there's real demand:
-
-- Notification history / notification center (the OS already has one)
-- Per-category mute, dedup, rate-limiting, custom action buttons (Reply / Snooze)
-- Renderer-side settings page UI
-- Beta channels / pre-release filtering
-- AI chat module, AI desktop scenarios (overlay / selection / screenshot)
-- Duplicating all web admin pages — wasteful
-- Data dashboards, CRUD tables — the web does it better
-
----
-
-## Engineering
-
-- ✅ ESLint + Prettier (aligned with the web's oxfmt config)
-- ✅ TypeScript strict mode + split tsconfig (node / web / shared)
-- ✅ Conventional Commits + commitlint + simple-git-hooks
-- ✅ GitHub Actions CI (typecheck / lint / fmt, on PR)
-- ✅ Release workflow (three-platform build, tag-triggered)
-- ✅ Path aliases (`@renderer` / `@shared` / `@main` / `@resources` / `@iconify-json`)
-- ✅ `node:test` + tsx for pure-function unit tests
+Collect versions, reproduction steps, and redacted logs for troubleshooting. Do not log passwords, tokens, or complete sensitive business data. See [desktop architecture](./architecture) for authentication and request boundaries.

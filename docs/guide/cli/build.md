@@ -1,96 +1,73 @@
 ---
-title: hohu build command
-description: Use hohu build to build backend and frontend Docker images from local source code, then deploy with hohu deploy
+title: hohu build — Build Docker images
+description: Build Docker images from Backend and Web source, select components and tags, inspect deployment configuration changes, and switch back to official images.
 ---
 
 # hohu build
 
-Build Docker images from local source code. After building, run `hohu deploy` to deploy using the local images.
+Build Docker images from local Backend/Web source and point deployment configuration at successfully built local images. It does not build App or desktop installers.
 
-## Usage
+## Prerequisites
+
+Install and start Docker. Ensure selected components have source directories and Dockerfiles. Run from the root containing `.hohu/project.json`, or a subdirectory. Without a component filter, both Backend and Web source directories are required.
+
+## Usage and options
 
 ```bash
-hohu build                  # Build all components
-hohu build --only=backend   # Build backend only
-hohu build --only=frontend  # Build frontend only
-hohu build --no-cache       # Build without cache
-hohu build --tag=v1.0.0     # Custom image tag
-hohu build --reset          # Reset to official GHCR images
+hohu build [OPTIONS]
 ```
 
-## Parameters
+| Option       | Description                                                                   | Default       |
+| ------------ | ----------------------------------------------------------------------------- | ------------- |
+| `--only`     | Build `backend` or `frontend` only; not repeatable, and `web` is not accepted | Backend + Web |
+| `--tag`      | Shared Docker tag for both images                                             | `source`      |
+| `--no-cache` | Disable Docker build cache                                                    | Off           |
+| `--reset`    | Skip building, clear local image settings and restore official sources        | Off           |
 
-| Parameter    | Description                                                          | Default  |
-| ------------ | -------------------------------------------------------------------- | -------- |
-| `--only`     | Only build specified component (`backend` or `frontend`)             | All      |
-| `--tag`      | Docker image tag                                                     | `source` |
-| `--no-cache` | Do not use Docker build cache                                        | `false`  |
-| `--reset`    | Clear local image configuration, switch back to official GHCR images | `false`  |
+## Examples
 
-## Workflow
-
-```
+```bash
+# Build Backend + Web
 hohu build
-    │
-    ├─ Auto-initialize .hohu/deploy/ (on first run)
-    │   ├─ docker-compose.yml
-    │   ├─ .env (auto-generated passwords and keys)
-    │   └─ nginx/
-    │
-    ├─ Build images
-    │   ├─ hohu-admin:<tag>      (backend)
-    │   └─ hohu-admin-web:<tag>  (frontend)
-    │
-    └─ Update .hohu/deploy/.env
-        ├─ API_IMAGE=hohu-admin
-        ├─ WEB_IMAGE=hohu-admin-web
-        └─ IMAGE_TAG=<tag>
+
+# Rebuild Backend only
+hohu build --only backend
+
+# Use one tag for both components
+hohu build --tag v1.2.0
+
+# Rebuild without cache
+hohu build --no-cache
 ```
 
-On first run, the `.hohu/deploy/` directory is automatically initialized (configuration files, `.env`, keys), so there is no need to run `hohu deploy init` manually.
+Building one component still updates the shared `IMAGE_TAG`. If you also change the tag, the other deployment image must provide that tag. Build both components for a complete release.
 
-After the build completes, the image configuration in `.env` is automatically updated to use local image names (without `/`), and `hohu deploy` will recognize them and skip remote pulling.
+## Results
 
-## Switch Back to Official Images
+1. Build `hohu-admin:<tag>` and/or `hohu-admin-web:<tag>`.
+2. After building images, prepare `.hohu/deploy/`, configuration and initial secrets if the deployment directory is missing.
+3. Write `API_IMAGE=hohu-admin` and/or `WEB_IMAGE=hohu-admin-web` for successful components to `.hohu/deploy/.env`, and update `IMAGE_TAG`.
+
+An ordinary build does not regenerate all existing deployment configuration. Check the summary and `.env`, including site, storage and credentials, then run [`hohu deploy`](./deploy#deploy). Local images are checked for availability rather than pulled remotely.
+
+## Switch to official images
 
 ```bash
 hohu build --reset
 ```
 
-Clears `API_IMAGE` and `WEB_IMAGE` from `.env` and resets `IMAGE_TAG` to `latest`. The next `hohu deploy` will pull the official GHCR images.
+This requires an existing deployment `.env`. It removes `API_IMAGE` and `WEB_IMAGE` and sets `IMAGE_TAG=latest`. It does not delete local images or business data, or restart services immediately.
 
-## Common Scenarios
+Before deploying, set `IMAGE_TAG` to an available, matching release and follow [deployment and maintenance](./deploy). Read [upgrade and recovery](../operations/upgrade) before production changes.
 
-### Daily Development Iteration
+## Troubleshooting
 
-```bash
-# Rebuild after source code changes
-hohu build --only=backend    # Only backend changed
-hohu deploy                  # Redeploy
+| Symptom                              | Action                                                                                      |
+| ------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Docker unavailable                   | Check installation, daemon status and user access                                           |
+| Project or source not found          | Check the marker and component directories; use `--only` for a single-component project     |
+| Dockerfile missing                   | Check source completeness and build scope; confirm the summary includes expected components |
+| Deployment cannot find a local image | Check that it exists in the same Docker environment with the configured name and shared tag |
+| Reset fails                          | Ensure `.hohu/deploy/.env` exists                                                           |
 
-# Full rebuild
-hohu build --no-cache
-hohu deploy
-```
-
-### Version Release
-
-```bash
-hohu build --tag=v1.2.0
-hohu deploy
-```
-
-### Switch from Official Images to Local Development
-
-```bash
-hohu build          # Build + auto-initialize
-hohu deploy         # Deploy local images
-```
-
-### Switch from Local Development Back to Official Images
-
-```bash
-hohu build --reset  # Reset configuration
-hohu deploy down
-hohu deploy         # Pull and deploy official images
-```
+The CLI does not push images to a registry. If build and deployment run on different machines, transfer the images or use an accessible registry yourself.

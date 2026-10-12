@@ -1,96 +1,73 @@
 ---
-title: hohu build 构建命令
-description: 使用 hohu build 从本地源码构建后端和前端 Docker 镜像，构建完成后通过 hohu deploy 部署
+title: hohu build — 构建 Docker 镜像
+description: 从 Backend 和 Web 源码构建 Docker 镜像，指定组件与标签，了解部署配置变化及切回官方镜像的方法。
 ---
 
 # hohu build
 
-从本地源码构建 Docker 镜像。构建完成后，运行 `hohu deploy` 即可使用本地镜像部署。
+从本地 Backend/Web 源码构建 Docker 镜像，并将部署配置指向成功构建的本地镜像。此命令不构建 App 或桌面安装包。
 
-## 用法
+## 前提条件
+
+安装并启动 Docker，确认目标组件有源码目录和 Dockerfile。在含 `.hohu/project.json` 的项目根目录或子目录运行。未指定组件时，Backend 和 Web 两个源码目录都必须存在。
+
+## 用法与参数
 
 ```bash
-hohu build                  # 构建所有组件
-hohu build --only=backend   # 仅构建后端
-hohu build --only=frontend  # 仅构建前端
-hohu build --no-cache       # 不使用构建缓存
-hohu build --tag=v1.0.0     # 自定义镜像标签
-hohu build --reset          # 重置为官方 GHCR 镜像
+hohu build [OPTIONS]
 ```
 
-## 参数
+| 参数         | 说明                                                        | 默认值        |
+| ------------ | ----------------------------------------------------------- | ------------- |
+| `--only`     | 仅构建 `backend` 或 `frontend`；不可重复，不接受 `web` 别名 | Backend + Web |
+| `--tag`      | 两个镜像共用的 Docker 标签                                  | `source`      |
+| `--no-cache` | 不使用 Docker 构建缓存                                      | 关闭          |
+| `--reset`    | 不构建，清除本地镜像配置并恢复官方来源                      | 关闭          |
 
-| 参数         | 说明                                      | 默认值   |
-| ------------ | ----------------------------------------- | -------- |
-| `--only`     | 仅构建指定组件（`backend` 或 `frontend`） | 全部     |
-| `--tag`      | Docker 镜像标签                           | `source` |
-| `--no-cache` | 不使用 Docker 构建缓存                    | `false`  |
-| `--reset`    | 清除本地镜像配置，切回官方 GHCR 镜像      | `false`  |
+## 常用示例
 
-## 工作流程
-
-```
+```bash
+# 构建 Backend + Web
 hohu build
-    │
-    ├─ 自动初始化 .hohu/deploy/（首次运行）
-    │   ├─ docker-compose.yml
-    │   ├─ .env（自动生成密码和密钥）
-    │   └─ nginx/
-    │
-    ├─ 构建镜像
-    │   ├─ hohu-admin:<tag>      （后端）
-    │   └─ hohu-admin-web:<tag>  （前端）
-    │
-    └─ 更新 .hohu/deploy/.env
-        ├─ API_IMAGE=hohu-admin
-        ├─ WEB_IMAGE=hohu-admin-web
-        └─ IMAGE_TAG=<tag>
+
+# 只重新构建后端
+hohu build --only backend
+
+# 为两个组件使用一致标签
+hohu build --tag v1.2.0
+
+# 完整重建
+hohu build --no-cache
 ```
 
-首次运行时自动初始化 `.hohu/deploy/` 目录（配置文件、`.env`、密钥），无需手动执行 `hohu deploy init`。
+只构建一个组件仍会更新共享的 `IMAGE_TAG`。如果同时修改标签，部署使用的另一镜像也必须具备该标签；发布完整版本时建议同时构建两个组件。
 
-构建完成后 `.env` 中的镜像配置会自动切换为本地镜像名称（不带 `/`），`hohu deploy` 会识别并跳过远程拉取。
+## 执行结果
 
-## 切换回官方镜像
+1. 构建 `hohu-admin:<tag>` 和/或 `hohu-admin-web:<tag>`。
+2. 镜像构建后，若部署目录不存在，自动准备 `.hohu/deploy/`、配置和首次密钥。
+3. 在 `.hohu/deploy/.env` 写入成功组件的 `API_IMAGE=hohu-admin` 和/或 `WEB_IMAGE=hohu-admin-web`，更新 `IMAGE_TAG`。
+
+已有部署配置不会因为普通构建被整体重新生成。检查构建摘要和生成的 `.env`，核对站点、存储与凭据，再执行 [`hohu deploy`](./deploy#deploy)。本地镜像会检查是否存在，不从远端拉取。
+
+## 切回官方镜像
 
 ```bash
 hohu build --reset
 ```
 
-清除 `.env` 中的 `API_IMAGE` 和 `WEB_IMAGE`，`IMAGE_TAG` 恢复为 `latest`。下次 `hohu deploy` 将拉取官方 GHCR 镜像。
+要求已有部署 `.env`。命令删除其中的 `API_IMAGE`、`WEB_IMAGE`，将 `IMAGE_TAG` 设置为 `latest`；不会删除本地镜像或业务数据，也不会立即重启服务。
 
-## 常用场景
+部署前把 `IMAGE_TAG` 调整为实际发布且配套的版本，按[部署与维护](./deploy)重新部署。生产变更先阅读[升级与恢复](../operations/upgrade)。
 
-### 日常开发迭代
+## 排错
 
-```bash
-# 修改源码后重新构建
-hohu build --only=backend    # 只改了后端
-hohu deploy                  # 重新部署
+| 现象               | 处理方式                                           |
+| ------------------ | -------------------------------------------------- |
+| Docker 不可用      | 确认安装、服务状态及当前用户访问权限               |
+| 找不到项目或源码   | 核对项目标记和组件目录；单组件项目使用 `--only`    |
+| 缺少 Dockerfile    | 检查源码完整性与构建范围；核对摘要是否包含预期组件 |
+| 部署找不到本地镜像 | 确认镜像在同一 Docker 环境中，名称与共享标签一致   |
+| 重置失败           | 确认 `.hohu/deploy/.env` 已存在                    |
 
-# 完整重建
-hohu build --no-cache
-hohu deploy
-```
-
-### 版本发布
-
-```bash
-hohu build --tag=v1.2.0
-hohu deploy
-```
-
-### 从官方镜像切换到本地开发
-
-```bash
-hohu build          # 构建 + 自动初始化
-hohu deploy         # 部署本地镜像
-```
-
-### 从本地开发切回官方镜像
-
-```bash
-hohu build --reset  # 重置配置
-hohu deploy down
-hohu deploy         # 拉取官方镜像部署
-```
+CLI 不推送镜像到仓库。构建与部署在不同机器上进行时，需要自行传递镜像或使用可访问的镜像仓库。

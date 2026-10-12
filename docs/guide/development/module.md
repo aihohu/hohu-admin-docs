@@ -7,6 +7,17 @@ description: Build a minimal business notes module with SQLAlchemy models, tenan
 
 Add business notes to an existing HoHu project, supporting creation and paginated reading. Complete the [development setup](../quick-start) first. This is a source extension, not a standalone plugin installation protocol.
 
+## Step reference
+
+| Stage               | Deliverable                                                    |
+| ------------------- | -------------------------------------------------------------- |
+| Define boundaries   | Endpoints, permission codes, and tenant-shared policy          |
+| Backend integration | Model, schemas, service, API, and migration                    |
+| Web integration     | Types, requests, page, translations, and menus                 |
+| Access validation   | Ordinary test role, permission rejection, and tenant isolation |
+
+Follow the steps in order the first time. Use the page outline to find examples on later visits.
+
 ## Separate project and file placement
 
 For a first run, follow [development setup](../quick-start): use `hohu create notes-tutorial` with Backend and Frontend, then `hohu init` and `hohu dev`, and complete the first sign-in. Use a dedicated database and separate Redis instance. Do not reuse an existing application's `.env`, keys or database. Running projects concurrently also requires separate ports and matching frontend proxy settings, not just a different browser URL. Backend and Web directories below mean `hohu-admin/` and `hohu-admin-web/` inside this new project.
@@ -207,7 +218,7 @@ This is incremental menu synchronization after module development, separate from
 
 ### Create a verification role
 
-With the development administrator, open Permission management → Role management. Create a dedicated test role and grant the Business notes page plus View notes and Create notes. Create an ordinary test user, assign that role, and sign in with a separate browser session. Do not verify only as administrator. The administrator needs existing menu-assignment and user-role-assignment permissions.
+With the development administrator, open Role management. Create a dedicated test role and grant the Business notes page plus View notes and Create notes. Create an ordinary test user, assign that role, and sign in with a separate browser session. Do not verify only as administrator. The administrator needs existing menu-assignment and user-role-assignment permissions.
 
 Synchronization does not automatically grant access. Sign out and back in to refresh old sessions. Begin in the default tenant; hosted tenants additionally need capability and menu provisioning described in [multi-tenancy](../operations/tenants). A missing menu in another tenant is not evidence that data isolation works.
 
@@ -247,10 +258,12 @@ Version the migration, module, menus, Web page and translations together. Produc
 | Backend registration         | `app/main.py`, `alembic/env.py`, `app/core/tenant_inventory.py`, `app/modules/system/menu_seed.py`                 |
 | Database                     | The generated and reviewed migration under `alembic/versions/`                                                     |
 | Web                          | `src/typings/api/notes.d.ts`, `src/service/api/notes.ts`, `src/views/notes/index.vue`, `src/locales/notes.ts`      |
-| Web wiring                   | Both `src/locales/langs/*.ts` files, `src/typings/app.d.ts`, generated router files                                |
+| Web wiring                   | `src/service/api/index.ts`, both `src/locales/langs/*.ts` files, `src/typings/app.d.ts`, generated router files    |
 
 If a menu appears but the page fails to load, check file placement, dev-server route generation and `component: layout.base$view.notes`. Untranslated keys usually mean messages were not merged at the correct level. If saving fails, inspect the response and current role permissions rather than inserting a database row to bypass the endpoint.
 
 ## Next: connect AI
 
 Continue with [Connect a business module to AI](./ai-tools) to add queries and confirmed creation. HTTP endpoints and menus do not automatically enter the AI tool catalog.
+
+See [Web pages and requests](./web) for page state and request conventions, and [debugging and validation](./testing) for delivery checks.

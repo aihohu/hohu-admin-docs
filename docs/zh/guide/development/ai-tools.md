@@ -9,6 +9,39 @@ description: '为 HoHu 业务模块接入遵循权限的 AI 数据查询与确�
 
 新增 API 不会自动成为 AI 工具。完整路径是：对话选择助手 → 工具可见性与权限过滤 → Gateway 校验及确认 → 工具调用已有 Service → 返回业务结果。HTTP API 提交自己的事务；AI 工具的事务由 Gateway 管理。
 
+## 接入流程 {#integration-flow}
+
+已有业务 Service → 定义查询与确认工具 → 注册工具与助手 → 历史结果访问校验 → 模型与角色授权 → 真实对话验证。
+
+下面使用租户共享便签完成一条纵向流程。先查询，再添加需要确认的创建操作；扩展其他业务时复用 Service，并把对象可见范围落实到查询、执行和历史结果。
+
+## 关键字段速查 {#tool-reference}
+
+| 字段/类型                              | 用途                                         | 本例                                      |
+| -------------------------------------- | -------------------------------------------- | ----------------------------------------- |
+| `name` / `agent`                       | 全局唯一工具名称及所属助手 code              | `note.list`、`note.create` / `notes`      |
+| `required_perms`                       | 调用者必须同时具备的功能权限                 | 查询与新增分别声明                        |
+| `risk` / `hitl_always`                 | 风险分级与强制确认                           | 创建为 `high`，强制确认                   |
+| `dry_run_supported`                    | 提供同模块预览函数，只校验和整理，不产生写入 | `_dry_run_note_create`                    |
+| `readonly` / `idempotent`              | 是否纯读、是否可安全重放                     | 查询为 True；创建不可任意重试             |
+| `projection_kind` / `ResultProjection` | 声明结果对象与范围，供历史访问再校验         | `scope_bound`，便签对象引用               |
+| `ToolResult.data` / `UIResult`         | 分别供模型和界面使用                         | 记录摘要 / 列表或 JSON 卡片               |
+| `result_view` / `chip_target`          | 结果视图及受支持的业务页筛选回放入口         | `data_list`、`plain_json`；本例无回放入口 |
+
+字段声明不能代替 Service 权限与数据范围校验。当前标准视图包括 `rows_affected`、`data_list`、`stats_chart`、`detail_card`、`plain_json`；按实际工具结果选用。
+
+### 注册位置清单
+
+| 位置                             | 必须完成的接入                         |
+| -------------------------------- | -------------------------------------- |
+| 业务模块 `ai_tools/`             | 工具、无副作用预览及批准快照核对       |
+| `BUILTIN_TOOL_MODULES`           | 加入实际工具模块路径                   |
+| `AGENT_SEED` / `DEFAULT_PROMPTS` | 注册助手 code 和业务边界提示词         |
+| 菜单、角色授权                   | 注册权限码，绑定助手并授予业务权限     |
+| 历史结果授权                     | 新对象类型的当前租户及可见性检查       |
+| Web 语言资源与工具名称映射       | 注册名称、确认摘要、字段标签和错误提示 |
+| 工具清单检查与测试               | 保留既有断言，增加实际新条目和权限测试 |
+
 ## 准备条件
 
 - 便签表迁移完成，`business:note:list` 和 `business:note:add` 已登记在菜单目录。
@@ -106,7 +139,7 @@ if subject_type == "note":
 ### 按身份完成配置
 
 1. **系统超级管理员**：按 [AI 配置与运维](../operations/ai)配置 Provider、可用模型与出站连接，并在同一登录会话中配置租户模型策略，先用内置助手确认模型能响应。
-2. **默认租户系统管理员**：使用普通应用登录会话打开系统 Agent 管理（接口为 `/platform/ai/agents`）。找到 code 为 `notes` 的助手，核对提示词，启用并保存；按页面要求填写变更原因、引用编号及影响确认。这个 Agent 入口使用系统管理员会话，不是模型维护的独立平台账号。
+2. **默认租户系统超级管理员**：使用普通应用登录会话打开系统 Agent 管理（接口为 `/platform/ai/agents`）。找到 code 为 `notes` 的助手，核对提示词，启用并保存；按页面要求填写变更原因、引用编号及影响确认。该入口要求默认租户系统超级管理员的普通登录会话，与模型维护使用同一身份。
 3. **角色管理员**：在角色管理中选中上一章的测试角色，授予 AI 对话页面和 `ai:chat:use`，保留便签页面与 `business:note:list`、`business:note:add`。通过该角色的 AI 助手授权操作勾选业务便签助手并保存，保留该角色原有的其他绑定；操作者需具备 `system:role:ai-agent-auth`。
 4. **普通测试用户**：退出后重新登录，打开 AI 对话，检查能选择业务便签助手和可用模型。助手缺失时不要用超级管理员测试来跳过授权问题。
 
@@ -160,7 +193,7 @@ if subject_type == "note":
 
 在后端 `.env` 设置 `TENANT_MODE=hosted`、`TENANT_HOSTED_LOGIN_ENABLED=true`，重启后端。这是本地测试配置；生产启用还需完成[多租户部署检查](../operations/tenants)。
 
-默认租户系统管理员在租户管理中依次创建、初始化并启用测试租户，例如代码 `notesbeta`。初始化时选择已配置模型并设置该租户管理员密码。对应接口为 `POST /platform/tenants`、`POST /platform/tenants/{tenantId}/bootstrap` 和 `POST /platform/tenants/{tenantId}/activate`；创建与初始化各需独立的 `Idempotency-Key`，以及运维页说明的审计头。
+默认租户系统超级管理员在租户管理中依次创建、初始化并启用测试租户，例如代码 `notesbeta`。初始化时选择已配置模型并设置该租户管理员密码。对应接口为 `POST /platform/tenants`、`POST /platform/tenants/{tenantId}/bootstrap` 和 `POST /platform/tenants/{tenantId}/activate`；创建与初始化各需独立的 `Idempotency-Key`，以及运维页说明的审计头。
 
 使用租户代码 `notesbeta` 及其管理员登录，在角色的助手授权中追加 `notes`，保留原有绑定。自定义助手不会因为已启用就自动绑定给每个新租户，无需为了测试修改全局 `PUBLISHED_AGENT_CODES`。然后为第二租户创建便签测试角色和普通用户，授予便签与 AI 对话权限。分别写入不同标题，核对两边 HTTP 列表、total、AI 查询和历史访问。已有租户新增模块时需显式同步该租户菜单并授权；重复初始化不能替代模块升级。
 

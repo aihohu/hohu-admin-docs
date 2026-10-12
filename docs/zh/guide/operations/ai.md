@@ -1,41 +1,76 @@
 ---
-title: AI 配置与运维
-description: 配置 HoHu AI 模型连接、访问权限、出站策略和执行进程，并排查运行故障。
+title: HoHu AI 首次配置与运维
+description: 按步骤配置 HoHu 模型、租户授权、助手与业务权限，验证普通用户使用，并查阅文件解析、运行模式和管理 API。
 ---
 
 # AI 配置与运维
 
-基础安装使用 [CLI 部署](../deploy)。AI 默认开启，不代表所有用户自动获得助手、模型或工具权限。
+完成 [CLI 部署](../deploy)或开发初始化后，按本页配置应用内 AI。编程助手的模型配置不会自动进入 HoHu。AI 默认开启，但模型、助手绑定和业务权限仍需分别满足。
 
-## 模型与授权
+## 首次配置 {#first-setup}
 
-1. 配套升级后端、Web 和 CLI，完成迁移与幂等初始化；不逐个手工运行种子脚本。
-2. 默认租户系统超级管理员通过「AI 管理 → 模型管理」配置 Provider 与模型，并通过当前登录会话管理系统 Agent 和租户模型授权。
-3. 为实际 endpoint 配置精确出站 origin、必要 CIDR 与受控代理，再测试连接。失败时排查策略，不关闭校验绕过。
-4. 显式授予 AI 入口、Role-Agent 绑定与工具权限，检查启用状态。shared 或超级管理员角色不是通用 AI 权限旁路。
-5. 验证授权用户对话、文件、人工确认，以及无权限、撤权、其他租户被拒绝的路径。
+### 1. 准备账号和模型连接
 
-`max_tokens` 控制模型输出 token 额度，`temperature` 调整生成采样；使用每模型 `config.generation`，留空不强制传参。具体支持情况取决于 Provider/模型，不配置已移除的全局 AI 参数。
+使用默认租户内拥有启用系统超级管理员角色的账号登录。全局模型、助手和租户模型授权使用同一普通登录会话；账号名称不决定权限，业务租户管理员不能维护全局配置。
 
-## 首次连接模型
+准备服务商编码、API Key、实际模型名称和 Base URL。OpenAI、Anthropic、DeepSeek 官方 API origin 已在内置出站允许列表中。其他地址须由部署者在后端 `.env` 设置精确的 `AI_PROVIDER_EGRESS_ALLOWED_ORIGINS`，origin 不包含 `/v1`；私有地址还需明确的 `AI_PROVIDER_EGRESS_ALLOWED_CIDRS`。修改部署配置后重启后端。
 
-使用默认租户内拥有启用系统超级管理员角色的账号登录后台。配置 Provider、模型、Agent 和租户模型授权都复用这次登录；账号名不决定权限，业务租户管理员不能修改全局配置。
+**完成标志：** 管理入口可访问，目标地址符合出站策略。策略允许不代表模型连接已成功。
 
-1. OpenAI、Anthropic 和 DeepSeek 的官方 API origin 已在内置出站允许列表中。使用其他服务商或兼容 API 地址时，在后端 `.env` 设置 `AI_PROVIDER_EGRESS_ALLOWED_ORIGINS`，值为服务商的精确 origin，不包含 `/v1`。私有地址还需要精确的 `AI_PROVIDER_EGRESS_ALLOWED_CIDRS`。修改后重启后端使配置生效。
-2. 进入「AI 管理 → 模型管理」，点击「新增」，填写服务商编码、名称、API Key 和 Base URL。例如编码 `deepseek`、名称 `DeepSeek`；模型名称及兼容 API 地址以服务商实际配置为准。点击「创建配置」保存；列表只显示密钥是否已配置，编辑时 API Key 留空保留原密钥。
-3. 在配置抽屉中点击「添加模型」，填写实际模型名称和能力（文本对话至少选 `text`）。API 地址、生成参数和排序位于默认折叠的「高级设置」中；API 地址留空使用 Provider 地址，生成参数留空使用模型默认值。新增配置时先点击「加入模型列表」，再点击「创建配置」；编辑已有配置时点击「保存模型」独立保存，外层「取消」不会撤销已经保存的模型变更。模型编辑未完成时需先完成或取消，再保存配置。Provider 的出站策略状态也显示在编辑抽屉中；修改 Provider 配置后需先保存，再查看重新计算的状态。新增或编辑模型时，模型表单操作区的取消按钮左侧提供同一个「测试模型」按钮，测试当前 Provider 和模型表单内容，不会保存修改。新增 Provider 需先填写 API Key；编辑 Provider 时 API Key 留空会使用已保存的密钥。测试会向服务商发送一次真实请求，可能产生费用；“出站允许”只说明已保存地址通过安全检查，当前表单仍需通过测试。
-4. 进入「租户管理」，在目标租户的「AI 授权」列点击「授权」，在抽屉列表中为需要的多个模型开启「允许使用」，从已授权且配置可用的模型中单选一个「租户默认」，点击「保存更改」统一保存。新安装项目使用默认租户时，也必须在「默认租户」（ID 为 `0`）行完成此步；默认租户支持 AI 授权，无需再次初始化。未初始化的业务租户须先完成初始化。全局模型启用不会自动为租户授权。
-5. 在「AI 管理 → Agent 管理」中启用所需助手，在角色管理中授予 AI 对话菜单、`ai:chat:use` 和助手绑定。普通用户重新登录后，应能选到模型与助手并完成一次真实查询。
+### 2. 创建并测试模型配置
 
-升级后若看不到「模型管理」，刷新页面或退出后重新登录，以重新获取用户信息与动态菜单；核查当前角色属于默认系统范围且已启用。
+1. 进入 **AI 管理 → 模型管理**，点击“新增”，填写服务商编码、名称、API Key 和 Base URL。例如编码 `deepseek`、名称 `DeepSeek`；使用服务商实际支持的模型和地址。
+2. 在配置抽屉点击“添加模型”，填写模型名称，文本对话至少选择 `text` 能力。
+3. 点击模型表单中的“测试模型”。测试当前 Provider 和模型表单，不会保存配置；新 Provider 需要 API Key，编辑时留空使用已保存密钥。测试发送真实请求，可能产生费用。
+4. 新建配置时点击“加入模型列表”，再点击“创建配置”。编辑已有配置时，“保存模型”独立保存模型变更。
 
-直接调用 API 时，使用同一系统超级管理员的普通 Bearer access token：Provider 和模型接口位于 `/platform/ai/providers`。统一表单测试为 `POST /platform/ai/providers/test`，提交可选字符串 `providerId`、`providerCode`、可留空的 `apiKey`、`baseUrl`、`config` 和 `model`（模型创建表单字段）；返回 `data.status=ok`，不写入配置，也不返回上游内容或密钥。已有的 `POST /platform/ai/providers/{providerId}/test` 继续兼容按已保存 ID 测试。租户授权接口为 `PUT /platform/tenants/{tenantId}/ai/model-policies/{modelId}`，请求体例如 `{"enabled":true,"isDefault":true}`。`/platform` 是兼容接口路径，不表示需要另一套登录。管理请求还需传入 `X-Platform-Reason`、`X-Platform-Ticket`、`X-Correlation-ID` 审计头，网页自动提供这些信息。
+**完成标志：** 测试成功，Provider 与模型配置已保存并启用。只看到“已启用”或“出站允许”不能代替连接测试。
 
-测试表单没有可用密钥时返回 `AI_PROVIDER_TEST_KEY_REQUIRED`；出站地址未获允许时返回 `AI_PROVIDER_URL_FORBIDDEN`。测试失败不会保存表单，密钥和上游响应不会出现在成功响应中。
+### 3. 为目标租户授权模型
 
-需要命令行配置时，在当前会话的 `HOHU_SYSTEM_ACCESS_TOKEN` 中设置普通系统超级管理员 access token，再使用 `uv run python -m tools.ops.platform_ai --help` 查看命令。旧 `HOHU_PLATFORM_ACCESS_TOKEN` 和独立平台 token 不适用于这些接口。凭据和包含密钥的临时文件只保存在本地私有目录，不提交 Git。
+1. 进入 **租户管理**，在目标租户的“AI 授权”列点击“授权”。
+2. 为需要的模型开启“允许使用”，从已授权且配置可用的模型中选择一个“租户默认”。
+3. 点击“保存更改”。默认租户（ID `0`）也需要此授权，无需重复初始化；业务租户须先完成初始化。
 
-## 管理多个模型的授权
+**完成标志：** 目标租户拥有允许使用的模型和可用默认模型。全局启用模型不会自动为租户授权。
+
+### 4. 启用助手并授予角色权限
+
+系统超级管理员在 **AI 管理 → AI Agent 管理**启用所需助手。由有权限的角色管理员为用户角色配置：
+
+| 条件     | 检查内容                                                               |
+| -------- | ---------------------------------------------------------------------- |
+| 对话入口 | AI 对话菜单及 `ai:chat:use`                                            |
+| 助手绑定 | 在角色的 AI 助手授权中绑定目标助手；操作需 `system:role:ai-agent-auth` |
+| 业务操作 | 助手工具要求的功能权限，如查询用户所需 `system:user:list`              |
+| 数据范围 | 普通用户可操作的对象、部门和租户范围                                   |
+
+当前发布的内置助手见 [能力清单](../ai/index#application)。启用助手不会自动绑定给所有角色，超级管理员角色也不是所有 AI 能力的旁路。
+
+**完成标志：** 测试角色具备入口、助手绑定和所需业务权限。
+
+### 5. 使用普通用户验证
+
+用测试用户重新登录，打开 AI 对话，检查模型和助手选项。先执行有权限的只读查询，再按业务需要测试确认操作；检查实际工具结果和业务页面。
+
+同时验证无权限请求被拒绝、取消确认不写入、撤权后历史结果不可越权访问。有多租户时再验证租户隔离。完整操作见 [应用内 AI 助手](../user/ai)。
+
+**完成标志：** 普通用户完成真实模型查询，允许的操作可用，未授权操作不可用。没有真实模型调用时，应记录为尚未完成 AI 使用验证。
+
+## 模型表单参考 {#model-fields}
+
+| 项目              | 行为                                                                                                              |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------- |
+| API Key           | 列表只显示是否已配置；编辑时留空保留原密钥                                                                        |
+| 模型 API 地址     | 位于“高级设置”；留空使用 Provider 地址                                                                            |
+| 生成参数          | 每模型 `config.generation`；`max_tokens` 控制输出额度，`temperature` 调整采样；留空不强制传参，支持情况依模型而定 |
+| 图片理解          | 需要 Provider/模型实际支持 `vision`，并向租户授权；不能仅添加能力标签就认为可用                                   |
+| 保存模型          | 编辑已有配置时独立保存，外层“取消”不会撤销已保存的模型变更                                                        |
+| Provider 出站状态 | 反映已保存地址；修改后先保存，再查看重新计算的状态                                                                |
+
+模型编辑未完成时，先完成或取消编辑，再保存 Provider。不要配置已移除的全局 AI 生成参数。升级后入口缺失时刷新或重新登录，确认角色启用且属于默认系统范围。
+
+## 管理多个模型的授权 {#model-access}
 
 授权抽屉显示提供商、模型、允许使用、租户默认和配置状态。可以搜索名称，按提供商或授权状态筛选；筛选只改变展示，不会丢失其他行的修改。退出或重新加载时，有未保存的修改会要求确认放弃。
 
@@ -45,9 +80,20 @@ description: 配置 HoHu AI 模型连接、访问权限、出站策略和执行�
 - 模型每日额度尚未用于运行时限额，授权页面暂不显示或编辑该字段；保存授权时保留已有额度值。
 - 租户默认模型用于没有显式指定模型的请求；Agent 的首选模型仍需获得当前租户授权。
 
-网页先调用 `GET /platform/tenants/{tenantId}/ai/model-policies/catalog` 获取 `models` 和 `revision`，再调用 `PUT /platform/tenants/{tenantId}/ai/model-policies`，提交 `{revision, policies}`。`policies` 必须包含目录内全部模型，每项包含字符串 `modelId`、`enabled`、`isDefault`、`dailyQuotaPerUser`（正整数或 `null`）。单次最多 10000 项，所有修改在一个事务内保存；任意失败全部回滚。模型目录或授权已变化时，返回 `PLATFORM_TENANT_MODEL_POLICIES_STALE`，重新加载后再编辑。保存失败保留当前草稿。旧单模型接口继续兼容。
+## 文件解析策略 {#file-parsing}
 
-## 运行模式
+`file.parse` 返回文件结构、行数和有限预览，不代表完整文档检索或全部行进入模型。使用它需要同时满足：
+
+1. `shared`（通用工具助手）已启用，并绑定到用户角色。
+2. 角色拥有 `ai:chat:use`、`ai:file:parse` 和相关上传权限。
+3. 当前租户有效的 `ai:enabled_tools` JSON 数组包含 `file.parse`。
+4. 文件符合 Web 入口、服务端白名单及上传/解析预算。
+
+工具元数据默认关闭；新安装和新业务租户初始化会在 `sys_setting` 中写入启用策略。升级保留已有策略，因此应核对目标租户的实际设置，不假定所有实例都已启用。系统设置的通用页面目前不提供 AI 工具策略编辑，缺少策略时由维护者按目标版本迁移与受控配置流程处理，不通过“自定义参数”创建保留键绕过。
+
+当前 Web 数据文件入口接受 CSV、XLSX、Markdown、JSON；图片接受 PNG/JPEG，走模型图片理解流程。后端解析器还接受部分文本类型，不能据此声称 Web 支持 TXT/PDF/Word。限制见 [文件与上传](../user/files)及 [上传策略](../reference/settings)。
+
+## 运行模式 {#runtime}
 
 | 模式                        | 约束                                                         |
 | --------------------------- | ------------------------------------------------------------ |
@@ -58,14 +104,30 @@ description: 配置 HoHu AI 模型连接、访问权限、出站策略和执行�
 
 Provider 请求使用允许列表、DNS/IP 校验、超时、响应大小、并发及重试边界。配置名和归属见[配置参考](../reference/configuration)。上传与解析预算独立限制，见[上传策略](../reference/settings)。
 
-## 排查与紧急停用
+## 排查与紧急停用 {#troubleshooting}
 
-没有助手时检查入口、角色绑定和工具授权；没有模型时检查租户策略及模型状态；确认超时检查运行模式、worker 数和 Redis。
+| 现象                         | 按顺序检查                                                              |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| 没有 AI 入口或助手           | AI 对话菜单、`ai:chat:use`、助手启用、角色绑定、有效工具权限            |
+| 已启用模型但对话没有可用模型 | 当前租户 AI 授权、`text` 能力、模型及 Provider 启用状态、出站策略和连接 |
+| 助手首选模型不可用           | 模型是否存在且当前租户获准使用；可改用默认选择器                        |
+| 文件已上传但不能解析         | `shared` 绑定、`ai:file:parse`、目标租户 `ai:enabled_tools`、格式与预算 |
+| 确认超时或恢复失败           | 运行模式、实际 API worker 数、Redis；状态不明先核对结果再重试           |
+| 无法加载 AI 可用状态         | `/ai/chat/models` 与 `/ai/agents` 的状态、响应错误码及后端日志          |
+| 历史结果被拒绝               | 当前权限、租户状态及业务对象可见性；不关闭授权校验                      |
 
-模型管理中已有启用模型，但助手显示「当前没有可用于对话的安全模型」时，先检查当前租户的「AI 授权」是否允许使用该模型，再检查模型具有 `text` 能力、模型与 Provider 均已启用，以及出站策略是否通过。旧库升级可能已为迁移时存在的模型补齐默认租户授权，新添加的模型仍需显式授权。
+旧库升级可能已为当时存在的模型补齐默认租户授权，新模型仍需显式授权。不要为了排错关闭出站策略或跳过确认。
 
-如果 Agent 配置了首选模型，确认该模型仍存在且当前租户获准使用；也可选择默认选项，使用统一模型选择器按租户授权选择。遇到「无法加载 AI 可用状态」时，检查 `/ai/chat/models` 和 `/ai/agents` 的 HTTP 状态及响应错误码，并结合后端日志定位接口失败。
+紧急停用时，将 `AI_MODULE_ENABLED=false` 实际传入进程并重启。AI 业务组件停止初始化，`/ai/**` 与 `/platform/ai/**` 返回 503 / `AI_MODULE_DISABLED`。核查非 AI 功能正常，修复原因后恢复。此开关是部署熔断，不替代日常角色授权。
 
-将 `AI_MODULE_ENABLED=false` 实际传入进程并重启，AI 业务组件停止初始化，`/ai/**` 和 `/platform/ai/**` 返回 503 / `AI_MODULE_DISABLED`。核查非 AI 功能正常，修复原因后再恢复。该开关是部署熔断，不替代日常角色授权。
+## 管理 API 与命令行参考 {#management-api}
 
-模型配置的命令行工具位于[后端仓库](https://github.com/aihohu/hohu-admin)的 `tools/ops/platform_ai.py`。它使用正常系统管理员会话并自动添加操作原因、工单及关联信息。
+直接调用 API 时，使用同一系统超级管理员的普通 Bearer access token：Provider 和模型接口位于 `/platform/ai/providers`。统一表单测试为 `POST /platform/ai/providers/test`，提交可选字符串 `providerId`、`providerCode`、可留空的 `apiKey`、`baseUrl`、`config` 和 `model`（模型创建表单字段）；返回 `data.status=ok`，不写入配置，也不返回上游内容或密钥。已有的 `POST /platform/ai/providers/{providerId}/test` 继续兼容按已保存 ID 测试。租户授权接口为 `PUT /platform/tenants/{tenantId}/ai/model-policies/{modelId}`，请求体例如 `{"enabled":true,"isDefault":true}`。`/platform` 是兼容接口路径，不表示需要另一套登录。管理请求还需传入 `X-Platform-Reason`、`X-Platform-Ticket`、`X-Correlation-ID` 审计头，网页自动提供这些信息。
+
+测试表单没有可用密钥时返回 `AI_PROVIDER_TEST_KEY_REQUIRED`；出站地址未获允许时返回 `AI_PROVIDER_URL_FORBIDDEN`。测试失败不会保存表单，密钥和上游响应不会出现在成功响应中。
+
+需要命令行配置时，在当前会话的 `HOHU_SYSTEM_ACCESS_TOKEN` 中设置普通系统超级管理员 access token，再使用 `uv run python -m tools.ops.platform_ai --help` 查看命令。旧 `HOHU_PLATFORM_ACCESS_TOKEN` 和独立平台 token 不适用于这些接口。凭据和包含密钥的临时文件只保存在本地私有目录，不提交 Git。
+
+### 批量模型授权
+
+网页先调用 `GET /platform/tenants/{tenantId}/ai/model-policies/catalog` 获取 `models` 和 `revision`，再调用 `PUT /platform/tenants/{tenantId}/ai/model-policies`，提交 `{revision, policies}`。`policies` 必须包含目录内全部模型，每项包含字符串 `modelId`、`enabled`、`isDefault`、`dailyQuotaPerUser`（正整数或 `null`）。单次最多 10000 项，所有修改在一个事务内保存；任意失败全部回滚。模型目录或授权已变化时，返回 `PLATFORM_TENANT_MODEL_POLICIES_STALE`，重新加载后再编辑。保存失败保留当前草稿。旧单模型接口继续兼容。

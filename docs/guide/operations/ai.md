@@ -1,41 +1,76 @@
 ---
-title: AI deployment
-description: Configure HoHu AI models, authorization, outbound access and execution processes, and diagnose operational failures.
+title: HoHu AI first setup and operations
+description: Configure models, tenant grants, assistants and business permissions, verify ordinary-user access, and reference file parsing, process modes and management APIs.
 ---
 
-# AI deployment
+# AI configuration and operations
 
-Use [CLI deployment](../deploy) for installation. AI is enabled by default, but users do not automatically receive assistant, model or tool access.
+After [CLI deployment](../deploy) or development initialization, configure application AI here. Coding assistant model settings are separate from HoHu. AI is enabled by default, but models, assistant bindings and business permissions must each be available.
 
-## Models and authorization
+## First setup {#first-setup}
 
-1. Upgrade matching backend, Web and CLI revisions and complete migrations and idempotent initialization; do not run individual seed scripts manually.
-2. The default tenant system super-administrator configures Providers and models in AI Management → Model Manage, and manages system Agents and tenant model authorization through the same login session.
-3. Configure exact egress origins, required CIDRs and controlled proxy settings for the actual endpoint, then test connectivity. Investigate rejected policies instead of disabling validation.
-4. Explicitly grant AI entry access, Role-Agent bindings and tool permissions, checking enabled status. Shared labels and super-administrator roles are not general AI bypasses.
-5. Verify authorized conversations, files and confirmations, plus rejection of unauthorized, revoked and cross-tenant requests.
+### 1. Prepare an account and model connection
 
-`max_tokens` controls the output token allowance and `temperature` affects sampling. Configure per-model `config.generation`; empty values do not force parameters. Provider/model support varies. Do not use removed global AI parameters.
+Sign in to the default tenant with an enabled system super-administrator role. Global models, assistants and tenant model grants use this ordinary login session. Account names grant no authority; business tenant administrators cannot manage global configuration.
 
-## Connect your first model
+Prepare a Provider code, API Key, actual model name and Base URL. Official OpenAI, Anthropic and DeepSeek API origins are included in the egress allowlist. For other endpoints, the deployer sets exact `AI_PROVIDER_EGRESS_ALLOWED_ORIGINS` in the backend `.env`, without `/v1`; private endpoints also require explicit `AI_PROVIDER_EGRESS_ALLOWED_CIDRS`. Restart the backend after changing deployment settings.
 
-Sign in to the default tenant with an enabled system super-administrator role. Provider, model, Agent and tenant model authorization management all use this login session. Account names grant no authority, and business tenant administrators cannot change global configuration.
+**Complete when:** management is accessible and the destination passes egress policy. Policy approval does not prove model connectivity.
 
-1. Official API origins for OpenAI, Anthropic and DeepSeek are included in the built-in egress allowlist. For other providers or compatible API endpoints, set `AI_PROVIDER_EGRESS_ALLOWED_ORIGINS` in the backend `.env` to the provider's exact origin, without `/v1`. Private endpoints also require explicit `AI_PROVIDER_EGRESS_ALLOWED_CIDRS`. Restart the backend after changing these settings.
-2. Open **AI Management → Model Manage**, click **Add**, and enter the provider code, name, API Key and Base URL. For example, use code `deepseek` and name `DeepSeek`; use your provider's actual model names and compatible API endpoint. Click **Create configuration** to save. The list only shows whether a credential is configured. Leave API Key empty when editing to retain the existing key.
-3. Click **Add Model** in the configuration drawer and enter the actual model name and capabilities (include `text` for text chat). The initially collapsed **Advanced settings** section contains the API URL, generation parameters and sort order. An empty API URL uses the Provider address; empty generation parameters use model defaults. For a new configuration, click **Add to model list**, then **Create configuration**. For an existing configuration, **Save model** saves independently; cancelling the outer drawer does not undo saved model changes. Finish or cancel model editing before saving the configuration. The Provider egress status appears in the edit drawer. Save Provider changes before reading the refreshed status. When adding or editing a model, the same **Test Model** button appears to the left of the form's cancel button. It tests the current Provider and model form without saving either configuration. Enter an API Key for a new Provider; a blank API Key when editing reuses the saved credential. A test sends a real request and may incur charges. An allowed egress status only confirms that the saved destination passed the policy check; test the current form separately.
-4. Open **Tenants** and click **Authorize** in the target tenant's **AI access** column. In the drawer, enable **Allow use** for the required models, select one authorized and available **Tenant default**, then click **Save changes** to save them together. A new installation using the default tenant must also complete this step in the **Default tenant** row (ID `0`). The default tenant supports AI authorization without being initialized again. Business tenants must complete initialization first. Enabling a global model does not automatically authorize tenants.
-5. Enable the required assistant in **AI Management → AI Agent Management**. Grant the role the AI conversation page, `ai:chat:use` and the assistant binding. After signing in again, an ordinary user should be able to select the model and assistant and complete a real query.
+### 2. Create and test a model configuration
 
-If Model Manage is missing after upgrading, refresh or sign out and in to reload user information and dynamic menus. Check that the current role is enabled and belongs to the default system scope.
+1. Open **AI Management → Model Management**, click **Add** and enter the Provider code, name, API Key and Base URL. For example, code `deepseek` and name `DeepSeek`; use the service's actual supported model and endpoint.
+2. Click **Add Model** in the drawer, enter the model name and include `text` for text chat.
+3. Click **Test Model** in the model form. It tests current Provider and model fields without saving. A new Provider requires an API Key; an empty key when editing reuses the stored credential. A real request may incur charges.
+4. For a new configuration, click **Add to model list**, then **Create configuration**. When editing an existing configuration, **Save model** saves model changes independently.
 
-Direct API calls use the same system administrator's ordinary Bearer access token. Provider and model endpoints are under `/platform/ai/providers`. The unified form test is `POST /platform/ai/providers/test` with optional string `providerId`, `providerCode`, optional `apiKey`, `baseUrl`, `config` and `model` (model creation fields). It returns `data.status=ok` without saving configuration or returning upstream content or credentials. The existing `POST /platform/ai/providers/{providerId}/test` remains compatible for testing saved IDs. Tenant authorization uses `PUT /platform/tenants/{tenantId}/ai/model-policies/{modelId}` with a body such as `{"enabled":true,"isDefault":true}`. The `/platform` compatibility path does not require another login. Management requests also require `X-Platform-Reason`, `X-Platform-Ticket` and `X-Correlation-ID` audit headers; the UI supplies them automatically.
+**Complete when:** the test passes, and enabled Provider and model configuration is saved. Enabled status or allowed egress does not replace a connection test.
 
-The form test returns `AI_PROVIDER_TEST_KEY_REQUIRED` if no credential is available and `AI_PROVIDER_URL_FORBIDDEN` if an outbound destination is disallowed. A failed test does not save the form, and successful responses contain neither credentials nor upstream content.
+### 3. Authorize the target tenant
 
-For command-line configuration, set the ordinary system administrator access token in the current session's `HOHU_SYSTEM_ACCESS_TOKEN`, then run `uv run python -m tools.ops.platform_ai --help`. The old `HOHU_PLATFORM_ACCESS_TOKEN` and independent platform tokens cannot access these endpoints. Keep credentials and temporary files containing keys in local private directories, outside Git.
+1. Open **Tenants** and click **Authorize** in the target tenant's **AI access** column.
+2. Enable **Allow use** for required models and choose one authorized, available **Tenant default**.
+3. Click **Save changes**. The default tenant (ID `0`) also requires this grant without repeated initialization; business tenants must be initialized first.
 
-## Authorize multiple models
+**Complete when:** the target tenant has authorized models and an available default. Enabling a global model does not authorize tenants automatically.
+
+### 4. Enable assistants and grant role access
+
+The system super-administrator enables required assistants in **AI Management → AI Agent Management**. An authorized role administrator configures:
+
+| Condition           | Check                                                                                            |
+| ------------------- | ------------------------------------------------------------------------------------------------ |
+| Chat entry          | AI Chat menu and `ai:chat:use`                                                                   |
+| Assistant binding   | Bind the assistant through role AI assistant authorization; requires `system:role:ai-agent-auth` |
+| Business operations | Tool feature permissions, such as `system:user:list` for user queries                            |
+| Data scope          | Objects, departments and tenant scope the user may operate                                       |
+
+See [Published assistants](../ai/index#application). Enabling an assistant does not bind it to all roles. A super-administrator role is not a universal AI bypass.
+
+**Complete when:** the test role has entry access, an assistant binding and required business permissions.
+
+### 5. Verify as an ordinary user
+
+Sign in again as the test user and inspect AI Chat model and assistant options. Run an authorized read-only query, then test confirmed actions as needed. Inspect actual tool results and the business page.
+
+Also verify unauthorized requests are denied, rejected confirmations do not write, and revoked access cannot expose historical results. Test tenant isolation in multi-tenant instances. See [Application AI assistant](../user/ai) for operating steps.
+
+**Complete when:** an ordinary user completes a real model query, authorized actions work and unauthorized ones do not. Without a real request, application AI usage remains unverified.
+
+## Model form reference {#model-fields}
+
+| Item                   | Behavior                                                                                                                                                  |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| API Key                | Lists only show configured status; leave empty when editing to preserve the key                                                                           |
+| Model API URL          | Under **Advanced settings**; empty uses the Provider address                                                                                              |
+| Generation             | Per-model `config.generation`; `max_tokens` controls output and `temperature` sampling; empty values do not force parameters, and support varies by model |
+| Image understanding    | Requires actual Provider/model `vision` support and tenant authorization; a capability label alone does not prove it works                                |
+| Save model             | Saves independently for existing configurations; cancelling the outer drawer does not undo saved model changes                                            |
+| Provider egress status | Reflects the saved address; save changes before inspecting the recalculated status                                                                        |
+
+Finish or cancel model editing before saving the Provider. Do not configure removed global generation settings. After upgrading, refresh or sign in again if entries are missing; check the enabled role belongs to the default system scope.
+
+## Authorize multiple models {#model-access}
 
 The drawer lists provider, model, allowed use, tenant default and configuration status. Search by name or filter by provider and authorization. Filters only affect display; changes in hidden rows are retained. Closing or reloading asks for confirmation before discarding unsaved changes.
 
@@ -45,9 +80,20 @@ The drawer lists provider, model, allowed use, tenant default and configuration 
 - Model daily quotas are not yet enforced at runtime, so the authorization page temporarily hides quota editing. Saving authorization preserves existing quota values.
 - The tenant default applies when a request does not explicitly select a model. An Agent's preferred model still requires authorization for the current tenant.
 
-The UI reads `models` and `revision` from `GET /platform/tenants/{tenantId}/ai/model-policies/catalog`, then sends `{revision, policies}` to `PUT /platform/tenants/{tenantId}/ai/model-policies`. Include every catalog model in `policies`, using string `modelId`, `enabled`, `isDefault` and `dailyQuotaPerUser` (a positive integer or `null`). A request accepts up to 10000 items and saves all changes in one transaction; any failure rolls them all back. Changes to the catalog or authorization return `PLATFORM_TENANT_MODEL_POLICIES_STALE`; reload before editing again. Failed saves retain the draft. The existing single-model endpoint remains supported.
+## File parsing policy {#file-parsing}
 
-## Process mode
+`file.parse` returns structure, row counts and limited previews, not full-document retrieval or every row in the model context. It requires:
+
+1. Enabled `shared` (Shared tools) assistant, bound to the user's role.
+2. `ai:chat:use`, `ai:file:parse` and relevant upload permissions.
+3. `file.parse` in the current tenant's effective `ai:enabled_tools` JSON array.
+4. Files meeting Web input, server allowlists and upload/parser budgets.
+
+Tool metadata defaults to disabled. Fresh installations and new business tenant initialization write an enabled policy to `sys_setting`; upgrades preserve existing policies. Check the target tenant's effective setting instead of assuming every instance enables it. The general settings page currently does not edit AI tool policy. Missing policies require maintainer review through the target version's migration and controlled configuration process, not reserved keys created as custom parameters.
+
+The current Web data-file input accepts CSV, XLSX, Markdown and JSON. PNG/JPEG images use model image understanding. Additional backend text parsing does not mean Web supports TXT, PDF or Word. See [Files and uploads](../user/files) and [Upload policies](../reference/settings).
+
+## Process mode {#runtime}
 
 | Mode                        | Constraint                                                                                                      |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------- |
@@ -58,14 +104,30 @@ Values must reach the process environment, not merely an unforwarded `.env` entr
 
 Provider calls enforce allowlists, DNS/IP checks, timeouts, response size, concurrency and retries. See [Configuration](../reference/configuration) for ownership and names. Upload and parser budgets are separate; see [Upload policies](../reference/settings).
 
-## Diagnosis and emergency disable
+## Diagnosis and emergency disable {#troubleshooting}
 
-For missing assistants, check entry permission, role bindings and tools. For missing models, check tenant policies and model status. For confirmation timeouts, inspect mode, worker count and Redis.
+| Symptom                                  | Check in order                                                                                         |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| No AI entry or assistant                 | AI Chat menu, `ai:chat:use`, assistant enabled status, role bindings and effective tool permissions    |
+| Enabled model missing from chat          | Current tenant authorization, `text` capability, model/Provider status, egress policy and connectivity |
+| Preferred assistant model unavailable    | Model existence and tenant authorization; use default selection if appropriate                         |
+| Uploaded file cannot parse               | `shared` binding, `ai:file:parse`, tenant `ai:enabled_tools`, format and budgets                       |
+| Confirmation timeout or recovery failure | Process mode, actual API workers and Redis; inspect results before retrying an uncertain action        |
+| AI availability cannot load              | HTTP status, response error codes from `/ai/chat/models` and `/ai/agents`, and backend logs            |
+| Historical results denied                | Current permissions, tenant status and object visibility; retain authorization checks                  |
 
-If Model Manage contains an enabled model but the assistant displays **No chat-safe model is currently available**, first check that the current tenant's **AI access** policy allows the model. Then check its `text` capability, enabled model and Provider status, and egress policy. Upgrades may have authorized models that already existed for the default tenant; newly added models still require explicit authorization.
+Upgrades may grant the default tenant access to models present at migration time; new models still require explicit grants. Do not disable egress checks or confirmation for diagnosis.
 
-If an Agent has a preferred model, confirm that the model still exists and the current tenant is authorized to use it. Select the default option to use the common selector with the tenant's authorized models. For **AI availability could not be loaded. Please try again later.**, inspect the HTTP status and response error code from `/ai/chat/models` and `/ai/agents`, together with backend logs.
+To stop AI in an emergency, pass `AI_MODULE_ENABLED=false` to the process and restart. AI business components stop initializing, and `/ai/**` plus `/platform/ai/**` return 503 / `AI_MODULE_DISABLED`. Verify non-AI features, fix the cause and then restore service. This is a deployment circuit breaker, not ordinary role authorization.
 
-Pass `AI_MODULE_ENABLED=false` to the process and restart. AI business components stop initializing, and `/ai/**` plus `/platform/ai/**` return 503 / `AI_MODULE_DISABLED`. Verify non-AI features, resolve the cause and then restore service. This is a deployment circuit breaker, not ordinary role authorization.
+## Management API and CLI reference {#management-api}
 
-The model configuration CLI is `tools/ops/platform_ai.py` in the [backend repository](https://github.com/aihohu/hohu-admin). It uses the ordinary system administrator session and adds reason, ticket and correlation audit information.
+Direct API calls use the same system administrator's ordinary Bearer access token. Provider and model endpoints are under `/platform/ai/providers`. The unified form test is `POST /platform/ai/providers/test` with optional string `providerId`, `providerCode`, optional `apiKey`, `baseUrl`, `config` and `model` (model creation fields). It returns `data.status=ok` without saving configuration or returning upstream content or credentials. The existing `POST /platform/ai/providers/{providerId}/test` remains compatible for testing saved IDs. Tenant authorization uses `PUT /platform/tenants/{tenantId}/ai/model-policies/{modelId}` with a body such as `{"enabled":true,"isDefault":true}`. The `/platform` compatibility path does not require another login. Management requests also require `X-Platform-Reason`, `X-Platform-Ticket` and `X-Correlation-ID` audit headers; the UI supplies them automatically.
+
+The form test returns `AI_PROVIDER_TEST_KEY_REQUIRED` if no credential is available and `AI_PROVIDER_URL_FORBIDDEN` if an outbound destination is disallowed. A failed test does not save the form, and successful responses contain neither credentials nor upstream content.
+
+For command-line configuration, set the ordinary system administrator access token in the current session's `HOHU_SYSTEM_ACCESS_TOKEN`, then run `uv run python -m tools.ops.platform_ai --help`. The old `HOHU_PLATFORM_ACCESS_TOKEN` and independent platform tokens cannot access these endpoints. Keep credentials and temporary files containing keys in local private directories, outside Git.
+
+### Batch model authorization
+
+The UI reads `models` and `revision` from `GET /platform/tenants/{tenantId}/ai/model-policies/catalog`, then sends `{revision, policies}` to `PUT /platform/tenants/{tenantId}/ai/model-policies`. Include every catalog model in `policies`, using string `modelId`, `enabled`, `isDefault` and `dailyQuotaPerUser` (a positive integer or `null`). A request accepts up to 10000 items and saves all changes in one transaction; any failure rolls them all back. Changes to the catalog or authorization return `PLATFORM_TENANT_MODEL_POLICIES_STALE`; reload before editing again. Failed saves retain the draft. The existing single-model endpoint remains supported.

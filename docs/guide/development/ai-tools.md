@@ -9,6 +9,39 @@ After [adding a business module](./module), notes are available through HTTP. Th
 
 An HTTP endpoint does not automatically become an AI tool. The execution path is assistant selection → tool visibility and permissions → Gateway authorization and confirmation → shared Service → results. HTTP endpoints commit their own transactions; the Gateway owns transactions for AI tools.
 
+## Integration flow {#integration-flow}
+
+Existing business Service → query and confirmed tools → register tools and assistant → historical result authorization → model and role access → real conversation validation.
+
+This tenant-shared note example covers one complete flow: query, then confirmed creation. For other domains, reuse the Service and apply object visibility to queries, execution and historical results.
+
+## Tool field reference {#tool-reference}
+
+| Field/type                             | Purpose                                                             | This example                                            |
+| -------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------- |
+| `name` / `agent`                       | Globally unique tool name and owning assistant code                 | `note.list`, `note.create` / `notes`                    |
+| `required_perms`                       | All required caller feature permissions                             | Separate query and create permissions                   |
+| `risk` / `hitl_always`                 | Risk classification and mandatory confirmation                      | Creation is `high` with mandatory confirmation          |
+| `dry_run_supported`                    | A preview in the same module validates and prepares without writing | `_dry_run_note_create`                                  |
+| `readonly` / `idempotent`              | Side-effect-free reading and safe replay                            | True for queries; creation is not arbitrarily retryable |
+| `projection_kind` / `ResultProjection` | Result objects and scope for historical access checks               | `scope_bound` and note references                       |
+| `ToolResult.data` / `UIResult`         | Model data and interface data respectively                          | Record summary / list or JSON card                      |
+| `result_view` / `chip_target`          | Result view and supported business-page filter replay               | `data_list`, `plain_json`; no replay in this example    |
+
+Declarations do not replace Service authorization and data-scope checks. Standard views are `rows_affected`, `data_list`, `stats_chart`, `detail_card` and `plain_json`; select one matching the actual result.
+
+### Registration checklist
+
+| Location                            | Required integration                                                    |
+| ----------------------------------- | ----------------------------------------------------------------------- |
+| Business module `ai_tools/`         | Tools, side-effect-free previews and approved snapshot checks           |
+| `BUILTIN_TOOL_MODULES`              | Actual tool module path                                                 |
+| `AGENT_SEED` / `DEFAULT_PROMPTS`    | Assistant code and business-boundary prompt                             |
+| Menus and role authorization        | Register permissions, bind the assistant and grant business permissions |
+| Historical result authorization     | Current tenant and visibility checks for new object types               |
+| Web resources and tool-name mapping | Names, confirmation summaries, field labels and errors                  |
+| Tool inventory checks and tests     | Preserve assertions and add new entries and authorization tests         |
+
 ## Prerequisites
 
 - Apply the notes migration and register `business:note:list` and `business:note:add` in the menu catalog.
@@ -104,7 +137,7 @@ The previous chapter's `src/locales/notes.ts` already supplies page, permission 
 ### Configure each identity explicitly
 
 1. **System super-administrator**: follow [AI operations](../operations/ai) to configure the Provider, available models and outbound access and configure tenant model policy in the same login session. First verify a response with a built-in assistant.
-2. **Default-tenant system administrator**: use the ordinary application session to open system Agent management (`/platform/ai/agents`). Find code `notes`, inspect its prompt, enable it and save. Supply the required change reason, reference and impact acknowledgment. Agent management uses the system administrator session, not the separate model-operator account.
+2. **Default-tenant system super-administrator**: use the ordinary application session to open system Agent management (`/platform/ai/agents`). Find code `notes`, inspect its prompt, enable it and save. Supply the required change reason, reference and impact acknowledgment. Agent management requires the default-tenant system super-administrator session, the same identity used for model maintenance.
 3. **Role administrator**: select the previous chapter's test role. Grant the AI chat page and `ai:chat:use`, retaining the notes page and `business:note:list` / `business:note:add`. In the role's AI assistant authorization action, select the business notes assistant and save while preserving other existing bindings. The operator needs `system:role:ai-agent-auth`.
 4. **Ordinary test user**: sign out and back in. Open chat and verify that the notes assistant and a model are selectable. Do not switch to super-administrator testing to avoid missing grants.
 
@@ -158,7 +191,7 @@ Before testing hosted mode in an isolated development instance, add `notes` to `
 
 Set `TENANT_MODE=hosted` and `TENANT_HOSTED_LOGIN_ENABLED=true` in the backend `.env`, then restart. This is local test configuration; production activation also requires the [multi-tenant deployment checks](../operations/tenants).
 
-As the default tenant's system administrator, create, initialize and activate a test tenant such as `notesbeta` in tenant management. Choose the configured model and set the new tenant's administrator password during initialization. The APIs are `POST /platform/tenants`, `POST /platform/tenants/{tenantId}/bootstrap` and `POST /platform/tenants/{tenantId}/activate`. Creation and initialization each require a separate `Idempotency-Key`, plus the audit headers described in the operations guide.
+As the default tenant's system super-administrator, create, initialize and activate a test tenant such as `notesbeta` in tenant management. Choose the configured model and set the new tenant's administrator password during initialization. The APIs are `POST /platform/tenants`, `POST /platform/tenants/{tenantId}/bootstrap` and `POST /platform/tenants/{tenantId}/activate`. Creation and initialization each require a separate `Idempotency-Key`, plus the audit headers described in the operations guide.
 
 Sign in with tenant code `notesbeta` and its administrator. Append `notes` to the role's assistant bindings, preserving existing bindings. Enabling a custom assistant does not automatically bind it to every tenant; changing global `PUBLISHED_AGENT_CODES` is unnecessary for this test. Create a test role and ordinary user in this tenant, granting notes and AI conversation access. Write distinct titles in each tenant and compare HTTP records, totals, AI queries and history access. Adding a module to an existing tenant requires explicit menu synchronization and authorization; repeating tenant initialization is not a module upgrade mechanism.
 

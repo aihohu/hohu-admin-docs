@@ -1,92 +1,96 @@
 ---
-title: HoHu CLI 概览与安装
-description: 安装和升级 hohu-cli，使用统一命令创建项目、初始化环境、启动开发服务并构建部署。
+title: HoHu CLI 使用手册与命令速查
+description: 安装和升级 HoHu CLI，快速查找项目创建、初始化、开发、Docker 构建、部署、迁移、监控和 Skills 安装命令。
 ---
 
-# CLI 概览
+# HoHu CLI
 
-hohu-cli 是项目创建、初始化、开发和部署的统一入口。安装来源及配套要求见[版本说明](../reference/versions)。
+HoHu CLI 是创建、开发和部署 HoHu 项目的命令行工具。第一次运行应用，请按[开发环境教程](../quick-start)完成配置；需要部署到服务器，请阅读[部署指南](../deploy)。本部分用于查找命令、参数和执行结果。
 
-## 安装与升级
+## 命令速查 {#command-reference}
 
-准备 Python 3.10 或更新版本及 uv，在终端执行：
+点击命令查看参数与示例。方括号表示可选参数，`...` 表示可以传入多个值，使用时不输入这些标记。
+
+终端中使用 `hohu <命令> --help` 查看帮助，例如 `hohu create --help` 或 `hohu deploy logs --help`。
+
+| 命令                                                            | 用途                                  |
+| --------------------------------------------------------------- | ------------------------------------- |
+| [`hohu create [NAME]`](./create)                                | 创建项目，选择 Backend、Web 和 App    |
+| [`hohu init`](./init)                                           | 安装项目依赖，执行后端初始化          |
+| [`hohu dev`](./dev)                                             | 在前台启动开发服务                    |
+| [`hohu build`](./build)                                         | 从源码构建 Backend/Web 的 Docker 镜像 |
+| [`hohu deploy init`](./deploy#init)                             | 生成部署配置与首次凭据                |
+| [`hohu deploy`](./deploy#deploy)                                | 准备镜像、迁移数据并启动应用          |
+| [`hohu deploy ps`](./deploy#ps)                                 | 查看部署服务状态                      |
+| [`hohu deploy logs [SERVICES...]`](./deploy#logs)               | 查看日志，支持 `-f` 持续跟踪          |
+| [`hohu deploy restart [SERVICES...]`](./deploy#restart)         | 重启全部或指定服务                    |
+| [`hohu deploy down`](./deploy#down)                             | 停止并移除部署容器                    |
+| [`hohu deploy pull`](./deploy#pull)                             | 更新镜像，执行迁移并启动服务          |
+| [`hohu deploy upgrade`](./deploy#upgrade)                       | 更新项目根仓库源码、构建并重新部署    |
+| [`hohu migrate`](./migrate)                                     | 单独运行部署环境迁移与种子同步        |
+| [`hohu monitoring init`](./monitoring#init)                     | 准备 Prometheus/Grafana 配置          |
+| [`hohu monitoring up`](./monitoring#up)                         | 启动监控服务                          |
+| [`hohu monitoring ps`](./monitoring#ps)                         | 查看监控服务状态                      |
+| [`hohu monitoring logs [SERVICES...]`](./monitoring#logs)       | 查看监控日志                          |
+| [`hohu monitoring restart [SERVICES...]`](./monitoring#restart) | 重启监控服务                          |
+| [`hohu monitoring down`](./monitoring#down)                     | 停止并移除监控容器                    |
+| [`hohu skills install`](./skills)                               | 为编程助手安装 HoHu Skills            |
+| [`hohu lang`](./configuration#language)                         | 选择 CLI 语言                         |
+| [`hohu info`](./configuration#info)                             | 查看 CLI 版本和全局配置位置           |
+| `hohu --version`                                                | 查看 CLI 版本                         |
+| `hohu --help`                                                   | 查看命令列表                          |
+| [`hohu --show-completion`](./configuration#completion)          | 输出当前 Shell 的补全脚本             |
+| [`hohu --install-completion`](./configuration#completion)       | 为当前 Shell 安装命令补全             |
+
+`hohu system lang` 和 `hohu system info` 分别与 `hohu lang`、`hohu info` 等价。
+
+## 安装与升级 {#installation}
+
+CLI 需要 Python **3.10+**，推荐使用 uv 安装：
 
 ```bash
 uv tool install hohu
 hohu --version
+hohu --help
 ```
 
-升级已安装的 CLI：
+安装 uv 请参考 [uv 安装说明](https://docs.astral.sh/uv/getting-started/installation/)。如果提示找不到 `hohu`，执行 `uv tool update-shell`，按提示刷新 PATH 或重新打开终端。
+
+升级 CLI：
 
 ```bash
 uv tool upgrade hohu
 ```
 
-CLI 本身的 Python 要求与后端不同；创建后端项目还需满足[开发环境](../quick-start)中的 Python、Node.js、数据库和 Redis 要求。
+升级 CLI 不会自动更新已创建项目的源码、依赖或部署镜像。组件发布记录见[更新说明](../reference/versions)。如果已安装版本缺少本文中的参数，先检查该命令的 `--help`，再升级到支持所需功能的版本。
 
-## 创建项目
+CLI 的 Python 要求与应用不同。开发 Backend/Web 还需 Git、后端 Python、Node.js、pnpm、PostgreSQL 和 Redis；版本要求见[开发环境](../quick-start)。构建和部署还需 Docker，部署与监控需 Docker Compose。
 
-```bash
-hohu --version
-hohu --help
-hohu create my-project
-```
+## 开始使用 {#quick-start}
 
-创建时逐项选择 Backend、Frontend 和 App。成功后核对项目标记 `.hohu/project.json` 及所选组件目录；创建命令只克隆源码，不安装依赖或启动服务。
-
-### 非交互创建
-
-先运行 `hohu create --help`。包含 `--component` 和 `--non-interactive` 的版本可供 Agent 或脚本使用：
+准备好开发环境后，创建 Backend + Web 项目：
 
 ```bash
 hohu create my-project --component backend --component web --non-interactive
-```
-
-`--component` 可重复，支持 `backend`、`frontend`（别名 `web`）和 `app`。非交互模式必须指定组件。旧版没有这些参数时，使用交互创建或安装包含此功能的 CLI 版本。
-
-项目名应为当前目录下的单个文件夹名。已有同名路径会拒绝创建；克隆失败可能留下部分文件，检查实际目录后恢复缺失步骤，不要直接覆盖重试。`--repo` 会统一替换所有所选组件的源码来源，不能用于分别指定 Backend 和 Web 仓库。
-
-## 初始化并启动
-
-先按[开发环境](../quick-start)准备数据库、Redis 和组件所需环境配置。确认所选组件已完整克隆，再进入项目目录：
-
-```bash
 cd my-project
 hohu init
 hohu dev
 ```
 
-`hohu init` 安装依赖并运行组件初始化，可能执行数据库迁移和种子同步。核对目标数据库后再运行；完成后检查各组件的实际结果。`hohu dev` 在前台运行，按终端输出访问页面，验证后端可用及登录情况；在启动终端按 Ctrl+C 停止开发服务。
+`create` 获取源码；`init` 安装依赖并执行初始化；`dev` 持续运行开发服务。数据库连接的首次配置、管理员凭据和登录步骤见[开发环境教程](../quick-start)。
 
-## 安装 Skills
+使用编程助手时，先[安装 HoHu Skills](./skills)，再按 [AI 辅助开发](../ai-coding)创建项目或开发业务模块。
 
-在 Agent 将要打开的工作区运行：
+## 命令在哪里运行 {#working-directory}
 
-```bash
-hohu skills install
-hohu skills install --agent claude-code --agent cursor
-```
+| 操作                                  | 运行位置                                                   |
+| ------------------------------------- | ---------------------------------------------------------- |
+| `create`                              | 新项目的父目录                                             |
+| `init`、`dev`、`build`                | 含 `.hohu/project.json` 的项目根目录，或其子目录           |
+| `deploy init`                         | 计划保存部署配置的目录；配置写入当前目录的 `.hohu/deploy/` |
+| 其他部署、迁移与监控命令              | 已初始化部署目录的上级目录，或其子目录                     |
+| `deploy upgrade`                      | 同时满足项目标记、部署配置和根目录 Git 仓库要求的项目内    |
+| `skills install`                      | 编程助手准备使用的工作区；也可选择用户范围安装             |
+| `lang`、`info`、`--help`、`--version` | 任意目录                                                   |
 
-先用 `hohu skills --help` 确认当前版本支持。命令需要 Node.js 22.20.0+ 和 npm/npx，调用固定版本的上游安装器；完整前提、范围和更新方式见 [AI · 安装 Skills](./skills)。不包含此命令的 CLI 可使用该指南的 npx 入口。
-
-新建项目时在父工作区安装并确认 Agent 能发现 Skills。安装后按 [AI 辅助开发](../ai-coding)使用 `hohu-project` 创建项目，或使用 `hohu-business-module` 开发业务功能。
-
-## 命令速查
-
-| 命令                               | 当前职责                             |
-| ---------------------------------- | ------------------------------------ |
-| `hohu skills install`              | 为编程助手安装 HoHu Skills           |
-| `hohu create`                      | 创建项目并选择组件                   |
-| `hohu init`                        | 安装依赖，编排后端环境、迁移与初始化 |
-| `hohu dev`                         | 启动开发服务                         |
-| `hohu build`                       | 从源码构建 Docker 镜像               |
-| `hohu deploy init`                 | 准备部署目录与配置                   |
-| `hohu deploy`                      | 基础服务、迁移、种子同步与启动       |
-| `hohu migrate`                     | 在部署环境运行迁移及种子同步         |
-| `hohu deploy ps/logs/restart/down` | 状态、日志、重启、停止               |
-| `hohu deploy pull/upgrade`         | 镜像更新或源码构建升级，详见部署参考 |
-| `hohu lang` / `hohu info`          | CLI 语言与配置信息                   |
-
-使用 `hohu <command> --help` 查看子命令参数与示例。`hohu init` 和部署初始化不是清库操作，已包含基础种子同步。开发新模块后按[模块教程](../development/module)执行必要的增量同步；常规安装无需重复执行内部脚本。
-
-源码构建见 [hohu build](./build)，部署命令见 [hohu deploy](./deploy)，完整操作流程见[部署指南](../deploy)。
+开发后端使用 `hohu-admin/.env`，部署使用 `.hohu/deploy/.env`。遇到错误时先核对运行目录和目标配置，见[配置与排错](./configuration)。

@@ -25,3 +25,15 @@ Components version independently. Use the combination documented by the release;
 4. Follow [Upgrade and recovery](../operations/upgrade).
 
 For installation, see the [quick start](../quick-start) or [server deployment](../deploy).
+
+## Keep a runtime version record
+
+| Item          | Record                                                                                       |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| Images        | Repository, configured tag, actual image ID / digest; latest changes across pulls            |
+| Source        | Tag or full commit SHA for each independent component                                        |
+| CLI           | Output of hohu --version                                                                     |
+| Database      | Current Alembic revision, database major version, and backup time                            |
+| Configuration | Protected locations of matching configuration and secrets; publish only redacted information |
+
+Source commits, image tags, and migration revisions identify different things. They are not interchangeable. This site does not claim that every latest component combination is release-tested.

@@ -1,132 +1,70 @@
 ---
 title: 桌面端架构
-description: 三进程模型、请求层、typed IPC、Token 存储和安全模型的完整设计说明
+description: 了解 HoHu 桌面端的 main、preload、renderer 分层、主进程会话、受限请求和可信 IPC 扩展方式。
 ---
 
-# 架构详解
+# 桌面端架构
 
-## 🏗️ 三进程模型
+桌面端分为 main、preload、renderer 三层，共享类型放在 `src/shared/types.ts`。业务页面不直接使用 Node.js 或 Electron 模块。
 
-```
-┌─────────────────────────────────────────────────┐
-│  Main Process（main/）                          │
-│  - Node.js 运行时                               │
-│  - 服务单例：WindowManager / TrayManager /     │
-│    ShortcutManager / UpdaterManager /          │
-│    NotificationManager                          │
-│  - HTTP 转发（net 模块）                        │
-│  - 加密存储（safeStorage）                      │
-└──────────────┬──────────────────────────────────┘
-               │ ipcMain.handle / webContents.send
-               │
-┌──────────────┴──────────────────────────────────┐
-│  Preload（preload/）                             │
-│  - contextBridge.exposeInMainWorld('api', ...) │
-│  - 白名单方法，typed                            │
-│  - sandboxed（contextIsolation: true）         │
-└──────────────┬──────────────────────────────────┘
-               │ window.api.*
-               │
-┌──────────────┴──────────────────────────────────┐
-│  Renderer（renderer/）                           │
-│  - 浏览器环境（Vue 3 + NaiveUI + Pinia）       │
-│  - 只能通过 window.api 调主进程能力            │
-│  - 无 Node API（contextIsolation）             │
-└─────────────────────────────────────────────────┘
-```
+## 目录与调用链
 
-`src/shared/types.ts` 是三个进程共享的类型契约源。
+| 目录                  | 职责                                     |
+| --------------------- | ---------------------------------------- |
+| `src/main/services/`  | 窗口、会话、网络、存储和系统能力         |
+| `src/main/ipc/`       | 校验调用来源和参数，调用主进程服务       |
+| `src/preload/`        | 通过 contextBridge 暴露有限的 window.api |
+| `src/renderer/src/`   | Vue 页面、路由、状态和业务请求           |
+| `src/shared/types.ts` | 主进程与渲染层共同使用的桥接类型         |
 
-## 🌐 请求层：所有 HTTP 走主进程
+请求链路为：Vue 页面 → 统一 request → `window.api.auth.request` → IPC → 主进程会话与网络服务 → 配置的后端。
 
-**为什么不在渲染层直接用 axios**？
+主窗口启用 `sandbox`、`contextIsolation`，关闭 `nodeIntegration` 与 `webviewTag`。preload 构建为可用于沙箱的 CJS。新窗口和页面导航受限制；不要为了接入业务关闭这些边界。
 
-- 浏览器 CORS 在 dev 模式下会让你抓狂（electron-vite 的 `server.proxy` 还有 [bug](https://github.com/alex8088/electron-vite/issues/631)）
-- 主进程的 `net` 模块是 Electron 原生 API，**不受 CORS 限制**
-- 集中日志、统一鉴权头、统一错误处理
+## 认证与业务请求
 
-**调用链**：
+| 桥接方法                 | 用途                                                                 |
+| ------------------------ | -------------------------------------------------------------------- |
+| `auth.login(input)`      | 使用 userName、password 和可选 tenantCode 登录，返回 success/message |
+| `auth.getSessionState()` | 返回 authenticated 状态，不返回 token                                |
+| `auth.request(config)`   | 经主进程会话访问固定后端                                             |
+| `auth.logout()`          | 清理本机会话并尝试远程注销                                           |
 
-```
-renderer               preload                  main
-fetchXxx()  ──→  window.api.http.request(cfg)  ──→  net.request()
-                                                       │
-                  { data, error }   ←────────────────  │
-                                                       ↓
-                                                    后端 API
+access token 和 refresh token 留在主进程，通过 safeStorage 存储；刷新由主进程合并并发处理。渲染层不读取凭据，也不设置 Authorization。当前不再暴露 `window.api.http` 或 `window.api.secureStore`。
+
+业务页面沿用 `src/renderer/src/service/request/` 的统一封装，API 文件使用 `/business/notes` 这样的路径。底层 auth.request 返回 HTTP 响应，统一业务 request 再解包 `{code, msg, data}` 并返回 `{data, error}`；直接调用桥接可能抛异常，按调用方式处理失败。
+
+主进程仅允许配置 origin 下的路径，拒绝绝对 URL、重定向和越界路径；认证专用接口由会话服务调用。可透传的请求头、方法、正文大小和超时也受限制。更换服务使用 `MAIN_VITE_BACKEND_ORIGIN`，不要从渲染层传任意服务地址。
+
+## 新增一个 IPC 能力
+
+以只读的 greet 为例，先在 `src/shared/types.ts` 的已有 `AppApi` 中增加：
+
+```typescript
+greet: (name: string) => Promise<string>;
 ```
 
-渲染层用 flat result shape：
+创建 `src/main/ipc/greet.ts`，复用可信调用校验并验证运行时输入：
 
-```ts
-const { data, error } = await fetchUserInfo();
-if (error) {
-  // 错误处理
-} else {
-  // 用 data
+```typescript
+import { trustedHandle } from './security';
+
+export function registerGreetIpc(): void {
+  trustedHandle('greet', (_event, name: unknown) => {
+    if (typeof name !== 'string' || name.trim().length === 0 || name.length > 80) {
+      throw new Error('Invalid name');
+    }
+    return `Hello, ${name.trim()}`;
+  });
 }
 ```
 
-不需要 try/catch —— 错误是返回值而不是异常。Token 过期自动 single-flight 刷新 + 重试一次。
+在 `src/main/ipc/index.ts` 导入并在已有 `registerAllIpc()` 内调用 `registerGreetIpc()`。在 `src/preload/index.ts` 的已有 api 对象中增加：
 
-详见 [`src/main/services/http.ts`](https://github.com/aihohu/hohu-admin-desktop/blob/main/src/main/services/http.ts) 和渲染层 [`service/request/factory.ts`](https://github.com/aihohu/hohu-admin-desktop/blob/main/src/renderer/src/service/request/factory.ts)。
-
-## 🔐 Token 存储与钥匙串 {#token-存储与钥匙串}
-
-**Token 永远不进 localStorage**。
-
-- 用 Electron 的 `safeStorage` 加密：底层是 macOS Keychain / Windows DPAPI / Linux libsecret
-- 文件落地：`userData/secure-store.json`（权限 0600）
-- 渲染层通过 `window.api.secureStore.get/set/delete/clear` 调用（IPC）
-
-```ts
-// 渲染层用法
-await window.api.secureStore.set('token', authToken);
-const token = await window.api.secureStore.get('token');
+```typescript
+greet: (name: string) => ipcRenderer.invoke('greet', name);
 ```
 
-登出时调 `clear()`，文件清空。Token refresh 由 `service/request/index.ts` 中央化处理：expired-token code 触发单飞 refresh，并发请求共享同一个 refresh Promise，retry 一次。
+渲染层即可 `await window.api.greet('HoHu')`。`trustedHandle` 检查调用来自主窗口顶层的可信页面；TypeScript 类型不能替代运行时参数校验。不要暴露任意 channel 的 invoke，也不要直接注册无来源校验的 ipcMain.handle。
 
-## 📡 Typed IPC 桥
-
-**单一类型来源**：所有跨进程类型定义在 `src/shared/types.ts`，三个进程都通过 `@shared/types` 别名导入。
-
-**白名单暴露**：preload 用 `contextBridge.exposeInMainWorld('api', api)`，`api` 对象的字段是**所有允许渲染层调用的 IPC**。**绝不直接暴露 `ipcRenderer`**。
-
-**加新通道的固定流程**：
-
-1. 在 `src/shared/types.ts` 定义 interface 并 extend `AppApi`
-2. 在 `src/main/ipc/<name>.ts` 用 `ipcMain.handle` 注册
-3. 在 `src/main/ipc/index.ts` 的 `registerAllIpc()` 调一次
-4. 在 `src/preload/index.ts` 加一个 `as const` 的 bridge 对象放进 `api`
-
-详见 [快速上手 - 第一个 IPC 通道](./quick-start#_5-第一个-ipc-通道-hello-world)。
-
-## 🛡️ 安全模型
-
-| 防护层               | 配置                                                                                             |
-| -------------------- | ------------------------------------------------------------------------------------------------ |
-| **contextIsolation** | `true`（默认）—— preload 与 renderer 隔离                                                        |
-| **nodeIntegration**  | `false`（默认）—— 渲染层无 Node API                                                              |
-| **sandbox**          | `false`（当前）—— preload 可用 Node API                                                          |
-| **CSP**              | 在 `src/renderer/index.html` 配置 —— 加新域名（CDN / WebSocket）需更新 `connect-src` / `img-src` |
-| **外链**             | 走 `shell.openExternal`，可加协议白名单                                                          |
-| **DevTools**         | dev 模式 F12 切换；prod 自动禁用                                                                 |
-
-## 📁 路径别名
-
-| 别名            | 解析到                            | 用途                               |
-| --------------- | --------------------------------- | ---------------------------------- |
-| `@renderer/*`   | `src/renderer/src/*`              | 渲染层                             |
-| `@shared/*`     | `src/shared/*`                    | main / preload / renderer 三方共享 |
-| `@main/*`       | `src/main/*`                      | 主进程                             |
-| `@resources/*`  | `resources/*`                     | 静态资源（图标等）                 |
-| `@iconify-json` | `node_modules/@iconify/json/json` | 图标                               |
-
-配置在 `tsconfig.{node,web}.json` 和 `electron.vite.config.ts`。
-
-## 📚 更多
-
-- [已实现特性](./features) —— 看每个 manager 具体做了什么
-- [CLAUDE.md 的 Common Pitfalls](https://github.com/aihohu/hohu-admin-desktop/blob/main/CLAUDE.md) —— 必读，避坑指南
-- [framework-design.md](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/framework-design.md) —— 完整设计稿
+涉及文件、系统操作或网络的新能力，还需分别限制路径、操作类型与目标，并在主进程测试拒绝无效输入。事件订阅应返回取消函数，在 Vue 组件卸载时释放。

@@ -1,35 +1,88 @@
 ---
-title: AI assistant
-description: Select an AI assistant, describe a business task, review tool confirmations and resolve model, permission or attachment issues.
+title: Use HoHu application AI assistants
+description: Route tasks automatically or select an assistant and model, query business data, confirm actions, use files and images, inspect results and history, and resolve issues.
 ---
 
-# AI assistant
+# Use an AI assistant
 
-A deployer must configure an available model, and administrators must grant AI entry access, role-to-assistant bindings and tool permissions. Signing in, holding a super-administrator role or seeing a shared label does not grant every AI capability.
+This guide is for users of a running HoHu application. Assistants use business tools authorized for your account. See [Configuration and operations](../operations/ai#first-setup) for initial models and access, or [AI-assisted development](../ai-coding) for coding workflows.
 
-## Start a conversation
+## Run your first query {#first-query}
 
-1. Open the AI assistant, select an assistant available to your account and start a conversation.
-2. Identify the objects to query or change. Add attachments through the upload entry and follow [File limits](./files).
-3. When an action requires confirmation, review its targets, scope and parameters before approving. A cancelled or expired confirmation cannot be reused.
-4. Use the actual execution result to determine success, rather than treating generated text as proof of a completed change.
+1. Open **AI Chat**, start a new conversation and check for available models and assistants.
+2. Select a model. Use **AI Auto Routing**, or choose a business assistant such as User management.
+3. Enter a specific query, such as “Find enabled users I am allowed to view.” Send with the button or Enter; Shift+Enter inserts a new line.
+4. Inspect actual tool execution and results. Add criteria in follow-ups, such as “Only the sales department.” Answer clarification prompts when an object or task type is unclear.
 
-Changes to permissions or tenant status can revoke access to old results, attachments and pending actions. Do not bypass current authorization with old links. Approval does not guarantee execution will continue after the browser disconnects.
+Results follow your account's data scope and do not necessarily cover the entire system. Use the troubleshooting table below if assistants or models are missing.
 
-Contact an administrator when no assistant or model is available, or the deployer when AI is disabled. See [AI deployment](../operations/ai) for operational diagnosis.
+<img src="/images/product/ai-assistant-en.png" width="1050" height="864" loading="lazy" alt="AI assistant start page with assistant selection and task input" />
 
-## Interface example
+## Choose an assistant and model {#selection}
 
-![AI assistant start page with assistant selection and task input](/images/product/ai-assistant-en.png)
+| Option                     | Usage                                                                                                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| AI Auto Routing            | Chooses an authorized assistant from the current question and recent conversation, including follow-ups and topic changes; may ask you to select a task type |
+| Manual assistant selection | Select a known business domain, such as users or departments; see [Published assistants](../ai/index#application)                                            |
+| Model                      | Choose from chat-safe models authorized for your tenant; refresh options or contact an administrator when unavailable                                        |
 
-Start with a read-only task such as “Find users I am allowed to view.” Specify the search criteria and inspect the results. For a change, identify the target and new values, then review the confirmation card. Available operations depend on the tools bound to the selected assistant.
+Routing does not expand permissions. Installing Skills, holding a super-administrator role or seeing a `shared` label does not grant every business tool.
 
-## Troubleshooting
+## Confirm an action {#confirmation}
 
-| Symptom                              | Next step                                                                    |
-| ------------------------------------ | ---------------------------------------------------------------------------- |
-| No assistant to select               | Ask an administrator to check assistant status and role bindings             |
-| Chat works but business actions fail | Check tool bindings and your business permissions                            |
-| Confirmation has expired             | Start the task again and review the new confirmation                         |
-| Attachment fails to upload           | Check file type and size limits in the file guide                            |
-| Model does not respond               | Ask the deployer to inspect model connectivity, credentials and service logs |
+For example, replace the account below with an actual account you may manage:
+
+> Change the nickname of “example-user” to “Equipment manager”.
+
+An action requiring approval displays a confirmation card or drawer:
+
+1. Review targets, new values, impact and expiry. For batches, authorization and deletion, check the complete set and affected count.
+2. Approve correct actions. Otherwise reject and describe the task again. Expired or handled confirmations cannot be reused.
+3. Wait for the tool's actual result, then refresh the business page to verify the change.
+
+After a confirmation error or disconnect, restore connectivity, refresh the conversation and inspect execution status before retrying a write. Authorized users can inspect AI Trace when an operation remains running. Approval does not guarantee completion after the browser disconnects.
+
+## Read results {#results}
+
+| Interface element               | Meaning                                                                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Assistant text                  | Explanation and summary; verify against tool records                                                                     |
+| Tool card                       | Running, awaiting approval, successful or failed execution; inspect failure reasons                                      |
+| List, statistics or detail card | Tool data; summaries and previews may omit records                                                                       |
+| View full data                  | Available on some tools; opens the business page with supported filter replay                                            |
+| Download file                   | Available on file-producing tools; download rechecks authorization; re-export or contact an administrator if unavailable |
+
+Permission, tenant or object changes may revoke access to old results and attachments. Current authorization also applies to conversation history.
+
+## Files and images {#attachments}
+
+Choose attachments or drag files into the input area. Wait for uploads to finish before sending. Removing an attachment removes its reference from the current message.
+
+| Current Web attachment formats           | Prerequisites and result                                                                                                                        |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Data files: CSV, XLSX, Markdown and JSON | An available Shared tools assistant, `ai:file:parse` permission and enabled `file.parse`; returns structure and limited previews, not every row |
+| Images: PNG and JPEG                     | An available image-understanding (`vision`) model; otherwise remove the image or ask an administrator to configure one                          |
+
+Sending an image may switch to an available vision model; follow the interface notice. Declared capability does not replace a real request test. See [Files and uploads](./files) for format, size and access limits, and [Configuration and operations](../operations/ai#file-parsing) for parsing policy.
+
+## History and stopping a reply {#history}
+
+- Start a new task with **New Chat**. Search conversation titles and reopen history.
+- Deletion requires confirmation and cannot be undone. Deleting a conversation does not undo completed business actions.
+- Stopping a reply interrupts reception of that reply; it does not mean pending actions are cancelled or completed changes are rolled back. Reject an action using its confirmation card.
+- Editing and resending historical messages and regeneration are currently unavailable. Send a follow-up or start a new conversation to change your request.
+
+## Troubleshooting {#troubleshooting}
+
+| Symptom                                 | Action                                                                                        |
+| --------------------------------------- | --------------------------------------------------------------------------------------------- |
+| No AI Chat entry or access denied       | Check the AI Chat menu and `ai:chat:use` permission                                           |
+| No assistant to select                  | Ask an administrator to check enabled status, role bindings and effective tool permissions    |
+| No available model                      | Check tenant grants, text capability, model and Provider status, and outbound connectivity    |
+| Chat works but business actions fail    | Check that the selected assistant offers the action, plus business permissions and data scope |
+| File cannot upload or parse             | Check format, size, Shared tools access, parsing permission and tool policy                   |
+| Image cannot be understood              | Check for an available vision model; remove the image for a text-only request if needed       |
+| Confirmation expired                    | Start the task again and review a new confirmation; do not reuse the old card                 |
+| Confirmation failed or status uncertain | Restore connectivity, refresh history and inspect tool or business state before retrying      |
+| Old results or attachments unavailable  | Check current authorization and object status; do not bypass it with old links                |
+| Model unresponsive or AI disabled       | Ask the deployer to inspect connectivity, logs and the AI switch                              |

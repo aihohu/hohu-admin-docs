@@ -7,6 +7,34 @@ description: '使用 npx 或 CLI 安装 HoHu 项目创建与业务开发 Skills�
 
 HoHu Skills 帮助编程助手通过 CLI 创建、初始化和启动项目，并按 HoHu 项目约定开发业务模块，覆盖数据库迁移、接口、权限、页面、AI 工具和验证。各 Agent 共用同一份 Skill；安装器负责放入宿主可以发现的位置。
 
+## 快速开始 {#quick-start}
+
+在准备打开编程助手的工作区执行：
+
+```bash
+npx skills@latest add aihohu/hohu-skills
+```
+
+1. 安装时选择 `hohu-project` 和 `hohu-business-module`、你的编程助手及安装范围。
+2. 在该工作区启动或重新打开助手，确认能识别两个 Skill；新建项目时先安装在父工作区，或明确选择用户范围。
+3. 提出“使用 hohu-project 创建 equipment 项目，只需要 Backend 和 Web，初始化并启动”。然后按 [AI 辅助开发](../ai-coding)继续开发模块。
+
+先准备下方环境。安装只提供工作流，不安装 HoHu CLI、数据库或应用模型。无需创建项目时可以只选业务模块 Skill。
+
+## 命令速查 {#command-reference}
+
+| 任务                    | 命令                                                                                          |
+| ----------------------- | --------------------------------------------------------------------------------------------- |
+| 安装官方 Skills         | `npx skills@latest add aihohu/hohu-skills`                                                    |
+| 为 Codex 安装两个 Skill | `npx skills@latest add aihohu/hohu-skills --skill hohu-project hohu-business-module -a codex` |
+| 使用 HoHu CLI 安装      | `hohu skills install --agent codex`                                                           |
+| 查看工作区安装记录      | `npx skills@latest list`                                                                      |
+| 查看用户范围安装记录    | `npx skills@latest list --global`                                                             |
+| 更新项目业务模块 Skill  | `npx skills@latest update hohu-business-module --project`                                     |
+| 移除项目业务模块 Skill  | `npx skills@latest remove hohu-business-module`                                               |
+
+安装与移除默认使用项目范围，用户范围加 `--global`；更新项目范围显式使用 `--project`。创建项目工作流更新时将名称换为 `hohu-project`。更新或重复安装前备份定制内容，安装后仍需确认宿主识别。
+
 ## 准备环境
 
 - 稳定版 Node.js **22.20.0 或更新版本**，包含 npm/npx；这是配套安装器 1.7.0 的要求。
@@ -17,10 +45,6 @@ HoHu Skills 帮助编程助手通过 CLI 创建、初始化和启动项目，并
 新建项目时，先在准备启动助手的父工作区安装 `hohu-project`，确认宿主可以发现它，或明确选择用户范围安装。已有项目则进入准备使用助手的业务项目目录。对于 CLI 创建的多组件项目，建议在 Backend/Web 的共同项目根目录安装并启动助手；如果在组件 Git 仓库内启动，须确认宿主能够发现安装位置。
 
 ## 方式一：npx
-
-```bash
-npx skills@latest add aihohu/hohu-skills
-```
 
 按安装器提示选择 Skill、Agent、范围和安装方式。终端或 Agent 环境会影响是否出现交互；需要确定目标时显式指定 Agent：
 
@@ -61,7 +85,7 @@ hohu skills install --agent claude-code --agent cursor
 
 `--yes` 会跳过确认，重复安装可能覆盖已有 Skill。更新前先备份定制内容。上游交互仍使用上游文案，HoHu 命令帮助和错误提示支持中英文。
 
-## 确认安装并使用
+## 确认安装并使用 {#verify}
 
 安装器应列出所选 Skill 和实际目标路径。`hohu-project` 包含项目生命周期工作流；`hohu-business-module` 还包含 `references/` 和 `scripts/`。可查看安装记录：
 

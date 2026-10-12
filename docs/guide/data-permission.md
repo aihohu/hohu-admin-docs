@@ -7,6 +7,16 @@ description: 'HoHu data scope: steps, scope and limitations'
 
 Feature permissions control actions; data scope controls records within the tenant. Concrete scopes from enabled roles form a union, rather than choosing one numeric "highest role".
 
+## Choose a resource policy
+
+| Policy          | Filters                                                  | Example                     |
+| --------------- | -------------------------------------------------------- | --------------------------- |
+| Tenant-shared   | Trusted tenant + action permission                       | This guide's business notes |
+| Owner-private   | Trusted tenant + owner + action permission               | Personal drafts             |
+| Role data scope | Trusted tenant + resolved role scope + action permission | Department records          |
+
+The latter examples describe policies, not bundled modules. Define ownership fields before adding filters. Configuring a role's scope does not automatically rewrite every business query.
+
 ## Shared entry points
 
 `app/utils/data_scope.py` provides `resolve_data_scope`, generic `get_data_scope_filters`, and `get_user_data_scope_filters` for the User model's many-to-many departments. Pass `tenant=tenant` explicitly. `get_best_scope` remains for historical audits, not new business code.

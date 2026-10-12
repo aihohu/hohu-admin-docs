@@ -1,132 +1,70 @@
 ---
-title: Desktop Architecture
-description: Three-process model, request layer, typed IPC, token storage, and the full security model
+title: Desktop architecture
+description: Understand HoHu desktop main, preload, and renderer layers, main-process sessions, restricted requests, and trusted IPC extensions.
 ---
 
-# Architecture
+# Desktop architecture
 
-## 🏗️ Three-Process Model
+Desktop has main, preload, and renderer layers, with shared types in `src/shared/types.ts`. Business pages do not directly import Node.js or Electron modules.
 
-```
-┌─────────────────────────────────────────────────┐
-│  Main Process (main/)                           │
-│  - Node.js runtime                              │
-│  - Service singletons: WindowManager /          │
-│    TrayManager / ShortcutManager /              │
-│    UpdaterManager / NotificationManager         │
-│  - HTTP forwarding (net module)                 │
-│  - Encrypted storage (safeStorage)              │
-└──────────────┬──────────────────────────────────┘
-               │ ipcMain.handle / webContents.send
-               │
-┌──────────────┴──────────────────────────────────┐
-│  Preload (preload/)                             │
-│  - contextBridge.exposeInMainWorld('api', ...) │
-│  - Whitelisted methods, typed                   │
-│  - Sandboxed (contextIsolation: true)          │
-└──────────────┬──────────────────────────────────┘
-               │ window.api.*
-               │
-┌──────────────┴──────────────────────────────────┐
-│  Renderer (renderer/)                           │
-│  - Browser environment (Vue 3 + NaiveUI + Pinia)│
-│  - Can only reach main via window.api           │
-│  - No Node API (contextIsolation)              │
-└─────────────────────────────────────────────────┘
-```
+## Directories and request flow
 
-`src/shared/types.ts` is the single source of type contracts shared by all three processes.
+| Directory             | Responsibility                                                  |
+| --------------------- | --------------------------------------------------------------- |
+| `src/main/services/`  | Windows, sessions, networking, storage, and native capabilities |
+| `src/main/ipc/`       | Validate caller and inputs, then call main-process services     |
+| `src/preload/`        | Expose a limited window.api through contextBridge               |
+| `src/renderer/src/`   | Vue pages, routes, state, and business requests                 |
+| `src/shared/types.ts` | Bridge types shared by main and renderer                        |
 
-## 🌐 Request Layer: All HTTP Through the Main Process
+Requests flow from Vue → shared request client → `window.api.auth.request` → IPC → main-process session/network service → configured backend.
 
-**Why not just use axios in the renderer?**
+The main window enables `sandbox` and `contextIsolation`, and disables `nodeIntegration` and `webviewTag`. Preload builds as sandbox-compatible CJS. Window creation and navigation are restricted; keep these boundaries when extending business functionality.
 
-- Browser CORS will drive you crazy in dev (and electron-vite's `server.proxy` is [broken](https://github.com/alex8088/electron-vite/issues/631))
-- The main process's `net` module is Electron-native and **not subject to CORS**
-- Centralized logging, unified auth headers, unified error handling
+## Authentication and requests
 
-**Call chain:**
+| Bridge method            | Purpose                                                                           |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| `auth.login(input)`      | Sign in with userName, password, and optional tenantCode; returns success/message |
+| `auth.getSessionState()` | Return authenticated state without tokens                                         |
+| `auth.request(config)`   | Access the fixed backend through the main-process session                         |
+| `auth.logout()`          | Clear the local session and attempt remote sign-out                               |
 
-```
-renderer               preload                  main
-fetchXxx()  ──→  window.api.http.request(cfg)  ──→  net.request()
-                                                       │
-                  { data, error }   ←────────────────  │
-                                                       ↓
-                                                    Backend API
+Access and refresh tokens remain in the main process and use safeStorage. Main-process refresh handling combines concurrent requests. The renderer neither reads credentials nor sets Authorization. `window.api.http` and `window.api.secureStore` are no longer exposed.
+
+Pages use the shared client in `src/renderer/src/service/request/`, with API paths such as `/business/notes`. The underlying auth.request returns an HTTP response; the business client unwraps `{code, msg, data}` into `{data, error}`. Direct bridge calls can reject, so handle failures according to the interface used.
+
+The main process allows paths under its configured origin and rejects absolute URLs, redirects, and escaping paths. Authentication-only endpoints belong to the session service. Forwarded headers, methods, body sizes, and timeouts are restricted. Change services through `MAIN_VITE_BACKEND_ORIGIN`, not arbitrary renderer-supplied addresses.
+
+## Add an IPC capability
+
+For a read-only greet example, add this member to the existing `AppApi` in `src/shared/types.ts`:
+
+```typescript
+greet: (name: string) => Promise<string>;
 ```
 
-The renderer uses a flat result shape:
+Create `src/main/ipc/greet.ts`, reusing trusted-caller checks and validating runtime input:
 
-```ts
-const { data, error } = await fetchUserInfo();
-if (error) {
-  // handle error
-} else {
-  // use data
+```typescript
+import { trustedHandle } from './security';
+
+export function registerGreetIpc(): void {
+  trustedHandle('greet', (_event, name: unknown) => {
+    if (typeof name !== 'string' || name.trim().length === 0 || name.length > 80) {
+      throw new Error('Invalid name');
+    }
+    return `Hello, ${name.trim()}`;
+  });
 }
 ```
 
-No try/catch needed — errors are return values, not exceptions. Token expiry triggers single-flight refresh + one retry.
+Import it in `src/main/ipc/index.ts` and call `registerGreetIpc()` inside the existing `registerAllIpc()`. Add this member to the existing api object in `src/preload/index.ts`:
 
-See [`src/main/services/http.ts`](https://github.com/aihohu/hohu-admin-desktop/blob/main/src/main/services/http.ts) and the renderer's [`service/request/factory.ts`](https://github.com/aihohu/hohu-admin-desktop/blob/main/src/renderer/src/service/request/factory.ts).
-
-## 🔐 Token Storage & Keychain {#token-storage-keychain}
-
-**Tokens never enter localStorage.**
-
-- Encrypted via Electron's `safeStorage`: backed by macOS Keychain / Windows DPAPI / Linux libsecret
-- File-backed at `userData/secure-store.json` (mode 0600)
-- Renderer accesses via `window.api.secureStore.get/set/delete/clear` (IPC)
-
-```ts
-// Renderer usage
-await window.api.secureStore.set('token', authToken);
-const token = await window.api.secureStore.get('token');
+```typescript
+greet: (name: string) => ipcRenderer.invoke('greet', name);
 ```
 
-Logout calls `clear()` and the file is emptied. Token refresh is centralized in `service/request/index.ts`: expired-token codes trigger single-flight refresh, concurrent requests share one refresh Promise, retry once.
+The renderer can now call `await window.api.greet('HoHu')`. `trustedHandle` checks the main window's trusted top-level page. TypeScript does not replace runtime validation. Do not expose arbitrary-channel invoke or register ipcMain.handle without caller validation.
 
-## 📡 Typed IPC Bridge
-
-**Single source of types:** all cross-process types live in `src/shared/types.ts`. All three processes import via the `@shared/types` alias.
-
-**Whitelisted exposure:** preload uses `contextBridge.exposeInMainWorld('api', api)`. The fields on `api` are **the complete set of IPC calls the renderer is allowed to make**. **Never expose `ipcRenderer` directly.**
-
-**Fixed workflow for adding a channel:**
-
-1. Define an interface in `src/shared/types.ts` and extend `AppApi`
-2. Register with `ipcMain.handle` in `src/main/ipc/<name>.ts`
-3. Call it once in `src/main/ipc/index.ts`'s `registerAllIpc()`
-4. Add an `as const` bridge object to `src/preload/index.ts` and include it in `api`
-
-See [Quick Start — Your First IPC Channel](./quick-start#_5-your-first-ipc-channel-hello-world).
-
-## 🛡️ Security Model
-
-| Layer                | Configuration                                                                                                              |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| **contextIsolation** | `true` (default) — isolates preload from renderer                                                                          |
-| **nodeIntegration**  | `false` (default) — renderer has no Node API                                                                               |
-| **sandbox**          | `false` (current) — preload can use Node API                                                                               |
-| **CSP**              | configured in `src/renderer/index.html` — adding new origins (CDN / WebSocket) requires updating `connect-src` / `img-src` |
-| **External links**   | go through `shell.openExternal`; protocol whitelist optional                                                               |
-| **DevTools**         | F12 toggle in dev; auto-disabled in prod                                                                                   |
-
-## 📁 Path Aliases
-
-| Alias           | Resolves to                       | Used by             |
-| --------------- | --------------------------------- | ------------------- |
-| `@renderer/*`   | `src/renderer/src/*`              | renderer            |
-| `@shared/*`     | `src/shared/*`                    | all three processes |
-| `@main/*`       | `src/main/*`                      | main                |
-| `@resources/*`  | `resources/*`                     | main, renderer      |
-| `@iconify-json` | `node_modules/@iconify/json/json` | renderer            |
-
-Configured in `tsconfig.{node,web}.json` and `electron.vite.config.ts`.
-
-## 📚 More
-
-- [Features](./features) — what each manager actually does
-- [CLAUDE.md — Common Pitfalls](https://github.com/aihohu/hohu-admin-desktop/blob/main/CLAUDE.md) — required reading; pitfall reference
-- [framework-design.md](https://github.com/aihohu/hohu-admin-desktop/blob/main/docs/framework-design.md) — full design document
+New filesystem, system, or network capabilities also need explicit path, operation, and target restrictions, with main-process tests for invalid inputs. Event subscriptions should return an unsubscribe function and be released when Vue components unmount.

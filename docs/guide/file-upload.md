@@ -1,24 +1,51 @@
 ---
 title: Upload integration
-description: 'HoHu upload integration: steps, scope and limitations'
+description: Integrate HoHu FileUpload and file APIs for image uploads, file ID binding, edit previews, and runtime upload policies.
 ---
 
 # Upload integration
 
-This page is for developers integrating uploads. User steps are in [Files and uploads](./user/files).
+The shared Web component is `src/components/custom/file-upload.vue`, using `fetchUploadFile`. The general image upload currently supports JPEG and PNG. Business files such as user imports use dedicated endpoints rather than this image component.
 
-## Client
+## Minimal example
 
-Web's reusable component is `src/components/custom/file-upload.vue`. Bind file IDs using its actual props and submit dependent forms after upload success. Obtain size and extension capabilities from the current tenant's backend runtime response instead of maintaining separate fixed limits.
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+import FileUpload from '@/components/custom/file-upload.vue';
 
-Browser accept filters and client validation improve UX, not security. The server rechecks tenant, owner and business association when saving; client-supplied IDs do not grant access.
+const imageId = ref<string | string[] | undefined>();
+</script>
 
-## Backend
+<template>
+  <FileUpload v-model:value="imageId" accept="image/jpeg,image/png" list-type="image-card" :max="1" />
+</template>
+```
 
-Reuse file services and scenario policies with explicit trusted tenant, user and purpose. Reads also enforce ownership; do not copy old `get_list` examples without tenant parameters.
+Single-file mode returns a string ID, or undefined when cleared. Multiple-file mode returns a string array. The public update event uses a union type, so this model keeps that union; validate the single-file case before submitting the business form.
 
-Effective size is the minimum of deployment, tenant and scenario limits. Extensions are the intersection of tenant and scenario allowlists. MIME, image decoding, XLSX expansion budgets, row counts and path checks remain independent. Do not mount private attachments as public static files.
+## Props and events
 
-`UPLOAD_MAX_SIZE` and `UPLOAD_ALLOWED_EXTENSIONS` were removed. Business preferences are system settings; `UPLOAD_HARD_MAX_BYTES` is the deployment ceiling, and the CLI derives proxy request limits. See [Settings and upload policies](./reference/settings).
+| Prop or event                  | Purpose                                                                              |
+| ------------------------------ | ------------------------------------------------------------------------------------ |
+| `v-model:value`                | Completed fileId or fileId array                                                     |
+| `business-type`, `business-id` | Business association sent with upload; not a replacement for server ownership checks |
+| `accept`                       | File-picker hint, not a security check                                               |
+| `multiple`, `max`              | Multiple selection and count; max greater than 1 also enables multiple mode          |
+| `list-type`                    | text, image, or image-card                                                           |
+| `file-urls`                    | fileId → fileUrl mapping for edit previews                                           |
+| `disabled`                     | Disable interaction                                                                  |
+| `change`                       | One completed upload: fileId, fileUrl, fileName                                      |
+| `v-model:file-list`            | UploadFileInfo[] when the full upload list is needed                                 |
 
-General public uploads currently validate JPEG/PNG content. Expanding client accept values does not implement arbitrary document uploads. AI private text parsing is separate from general public uploads.
+For editing, provide both saved IDs and their URL mapping. Submit IDs with business data and validate ownership and reference permissions on the backend. Do not persist only temporary preview URLs.
+
+## Upload policy and removal
+
+`fetchUploadFile` performs preliminary checks using the scenario's runtime uploads policy. The server still validates type, size, and content. Deployment hard limits, tenant settings, and business parsers all apply; the server has the final say. See [settings API and upload policies](./reference/settings).
+
+Removing an item from the component only changes the page selection; it does not call a backend deletion endpoint. Define unlinking, physical deletion, and cleanup of unreferenced uploads in the business workflow, checking permissions and other references before deletion.
+
+## Validation and troubleshooting
+
+Test successful uploads, oversized and unsupported files, network failure, edit previews, and saving after removal. Preserve a recoverable state if upload succeeds but the form fails to save. Keep file IDs, URLs, and business IDs as strings, never Number values.

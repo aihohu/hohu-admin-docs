@@ -1,64 +1,147 @@
 ---
-title: hohu deploy and migrations
-description: 'HoHu hohu deploy and migrations: steps, scope and limitations'
+title: hohu deploy — Deployment and maintenance
+description: Find HoHu deployment commands, options and examples to initialize configuration, deploy applications, inspect logs, update images and upgrade from source.
 ---
 
-# hohu deploy and migrations
+# hohu deploy
 
-Install a CLI release compatible with your application. Run `hohu deploy --help` for available options and see [release notes](../reference/versions) for component releases.
+Manage HoHu deployments with Docker Compose. See the [deployment guide](../deploy) for first-time server setup and the [upgrade guide](../operations/upgrade) for backups and recovery.
 
-| Command                             | Behavior                                                                                                |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `hohu deploy init`                  | Generate/complete `.hohu/deploy`; --force replaces outdated templates, so preserve custom content first |
-| `hohu deploy`                       | Pull applicable images, prepare infrastructure, migrate, synchronize seeds and start                    |
-| `hohu deploy --no-migrate`          | Skip migrations and seed synchronization in that stage; only for controlled cases that need no update   |
-| `hohu migrate`                      | Run deployment migration and seeds separately, without an additional initialization switch              |
-| `hohu deploy pull`                  | Update images, migrate, synchronize and start; not download-only                                        |
-| `hohu deploy upgrade`               | Pull source, build, stop and redeploy; accepts --no-cache and involves downtime                         |
-| `hohu deploy restart [SERVICES...]` | Restart services; does not replace migration                                                            |
-| `hohu deploy down`                  | Stop Compose services; not a business-data reset command                                                |
+## Prerequisites
+
+Install and start Docker and verify `docker compose version`. Run `hohu deploy init` in the intended deployment directory, then run other commands there or below it. Check connections, credentials, versions, networking and persistence in `.hohu/deploy/.env`.
+
+## Initialize configuration {#init}
+
+```bash
+hohu deploy init
+```
+
+Generate `.hohu/deploy/`, templates, storage directories and initial secrets under the **current directory**. This does not clone source or start the application. Official image deployments do not require `.hohu/project.json`.
+
+| Option    | Description                                             | Default |
+| --------- | ------------------------------------------------------- | ------- |
+| `--force` | Overwrite outdated templates; save custom changes first | Off     |
+
+Repeated initialization fills missing templates. Template version changes prompt for confirmation before overwriting outdated files; `--force` skips that prompt. Existing valid credentials are preserved. This does not reset the database or administrator password.
+
+## Deploy the application {#deploy}
+
+```bash
+hohu deploy
+hohu deploy --image-source acr
+```
+
+| Option           | Description                                                                   | Default                                          |
+| ---------------- | ----------------------------------------------------------------------------- | ------------------------------------------------ |
+| `--image-source` | Image source: `auto`, `official`, `acr`                                       | Resolved by source precedence, ultimately `auto` |
+| `--no-migrate`   | Skip migrations and their seed synchronization; only when no update is needed | Off                                              |
+
+Order: prepare images → start enabled infrastructure → migrate and synchronize seeds → start application services and enabled Nginx. Image, migration or seed failures block subsequent normal startup.
+
+Deployment includes built-in data synchronization; do not use `hohu deploy --init`. Repeated synchronization preserves existing passwords, customizations and permissions. Check `hohu deploy ps`, read logs and sign in afterwards; completion does not constitute business acceptance.
+
+## Status and logs {#ps}
 
 ```bash
 hohu deploy ps
+```
+
+Show deployment service status. No additional options.
+
+### Read logs {#logs}
+
+```bash
+hohu deploy logs
 hohu deploy logs -f hohu-admin-api
+```
+
+| Argument or option | Description                         | Default      |
+| ------------------ | ----------------------------------- | ------------ |
+| `SERVICES...`      | One or more Compose service names   | All services |
+| `--follow` / `-f`  | Follow output; press Ctrl+C to exit | Off          |
+
+Use service names from the current Compose configuration. Exiting log streaming does not stop services.
+
+## Restart and stop {#restart}
+
+```bash
+hohu deploy restart
 hohu deploy restart hohu-admin-api
 ```
 
-Normal deployment synchronizes seed data automatically. **Do not use `hohu deploy --init` or `hohu migrate --init`.** Repeated runs preserve passwords, custom content and existing grants. Migration/seed failure prevents normal startup.
+Supply one or more services, or omit them to restart all. Restart does not update images or run migrations. Redeploy to recreate containers with changed configuration.
+
+### Stop deployment {#down}
+
+```bash
+hohu deploy down
+```
+
+Stop and remove Compose containers and associated networks without a volume removal option. This is not a business data reset. Persistence still depends on actual storage mounts. The command does not accept service filters.
+
+## Update images {#pull}
+
+```bash
+hohu deploy pull
+hohu deploy pull --image-source acr
+```
+
+Accepts `--image-source` with the same resolution as `hohu deploy`. It prepares images, starts infrastructure, migrates and synchronizes seeds, then starts or updates application containers. It is not download-only and does not accept `--no-migrate`.
+
+To change versions, first set deployment `IMAGE_TAG` to an available, matching release. `pull` does not rebuild local source images.
+
+## Upgrade from source {#upgrade}
+
+```bash
+hohu deploy upgrade
+hohu deploy upgrade --no-cache
+```
+
+| Option           | Description                                       | Default           |
+| ---------------- | ------------------------------------------------- | ----------------- |
+| `--no-cache`     | Disable source image build cache                  | Off               |
+| `--no-migrate`   | Skip migrations and their seed synchronization    | Off               |
+| `--image-source` | Deployment image source, resolved as for `deploy` | Ultimately `auto` |
+
+Requires a project marker, Backend/Web source, deployment configuration and **a pullable Git repository at the project root**. It runs one `git pull` at that root and does not update independent component repositories separately. `hohu create` does not create a root repository. For its generated layout, update component source yourself, then use `hohu build` and `hohu deploy`.
+
+Order: root `git pull` → build both `source` images → update deployment image configuration → prepare images → stop old services → start infrastructure, migrate and start applications. There is downtime. The command does not back up or roll back automatically.
+
+See [`hohu migrate`](./migrate) for standalone migrations and their limitations.
 
 ## Image sources
 
-`hohu deploy`, `hohu deploy pull`, and `hohu deploy upgrade` default to `auto`: pull from the official registry first, then try the same tag on ACR after network timeouts, connection failures, rate limits or temporary server errors. Authentication failures, missing images or platforms, certificate validation failures and local Docker errors stop deployment.
+| Source     | Behavior                                                                                                                     |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `auto`     | Try original references, then matching ACR mirrors on timeouts, connection failures, rate limits or transient service errors |
+| `official` | Use only configured original references                                                                                      |
+| `acr`      | Use ACR directly for supported official images; retain other references                                                      |
 
-```bash
-# Automatic fallback (default)
-hohu deploy
-# Use the public ACR mirrors directly
-hohu deploy --image-source acr
-hohu deploy pull --image-source acr
-hohu deploy upgrade --image-source acr
-# Use only the configured original references
-hohu deploy --image-source official
-```
+Authentication failures, missing images or platforms, certificate errors and local Docker failures fail directly. Precedence: command option → process `HOHU_IMAGE_SOURCE` → deployment `.env` value → `auto`.
 
-Set `HOHU_IMAGE_SOURCE=acr` in `.hohu/deploy/.env` for a project default. Precedence is the command option, process environment variable `HOHU_IMAGE_SOURCE`, project `.env`, then `auto`.
+| Official repository                              | ACR repository                                                       |
+| ------------------------------------------------ | -------------------------------------------------------------------- |
+| `ghcr.io/aihohu/hohu-admin`                      | `registry.cn-beijing.aliyuncs.com/hohu/hohu-admin`                   |
+| `ghcr.io/aihohu/hohu-admin-web`                  | `registry.cn-beijing.aliyuncs.com/hohu/hohu-admin-web`               |
+| Official Docker Hub `postgres`, `redis`, `nginx` | Matching repositories under `registry.cn-beijing.aliyuncs.com/hohu/` |
 
-Supported mappings:
+Mapping preserves tags without falling back to `latest`. The target tag must be synchronized and pullable; floating tags represent the latest synchronized snapshot. Fixed `@sha256:...` digests and custom repositories are not mapped. CLI-built local images and custom images with explicit `pull_policy: never` are only checked locally.
 
-| Official repository                              | ACR repository                                                |
-| ------------------------------------------------ | ------------------------------------------------------------- |
-| `ghcr.io/aihohu/hohu-admin`                      | `registry.cn-beijing.aliyuncs.com/hohu/hohu-admin`            |
-| `ghcr.io/aihohu/hohu-admin-web`                  | `registry.cn-beijing.aliyuncs.com/hohu/hohu-admin-web`        |
-| Docker Hub official `postgres`, `redis`, `nginx` | The same names under `registry.cn-beijing.aliyuncs.com/hohu/` |
+Each pull waits at most 300 seconds. Failure on both sources stops deployment rather than treating an old local image as a successful pull. This excludes Certbot, monitoring images and Dockerfile build stages and does not change global Docker configuration. Successful ACR pulls receive the original local reference; migrations and startup use `--pull never`. Direct Compose commands do not include CLI source fallback.
 
-Switching preserves the requested tag and never substitutes `latest`. That tag must already be synchronized to public ACR; deployment requires no ACR login. Floating tags represent the latest mirror snapshot, which may lag upstream. References pinned with `@sha256:...` always retain their original registry because multi-platform index digests can differ between registries.
+## Configuration and troubleshooting
 
-The CLI resolves Compose configuration before pulling images for enabled deployment services. Custom repositories are not remapped. Local `hohu-admin` and `hohu-admin-web` images produced by `hohu build` are checked for existence without a registry pull. Custom images with explicit `pull_policy: never` are also checked locally. Certbot, monitoring services and base images pulled during Dockerfile builds are outside this feature's scope.
+CLI infrastructure overrides use `docker-compose.infra.yml`; user `docker-compose.override.yml` loads last. Overrides generated by older versions are preserved. Check that old ports or external service settings do not override new configuration when upgrading.
 
-Each pull has a 300-second timeout. If both sources fail, deployment stops without treating a cached image as a successful update. Image preparation precedes migration and startup; `upgrade` also prepares images before stopping services. After an ACR pull, the CLI adds the original reference as a local tag and uses `--pull never` for migration and startup. Global Docker registry mirrors and credentials are unchanged. Direct `docker compose` commands do not include the CLI fallback flow.
+| Symptom                                 | Action                                                                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Deployment not initialized              | Run `hohu deploy init` in the intended directory and review configuration                        |
+| Image preparation fails                 | Check references, tags, network and access; do not skip missing images                           |
+| Migration fails                         | Preserve the error, check database and target version, recover using the upgrade guide and retry |
+| `.env` changes are absent after restart | Redeploy to update container configuration; `restart` does not recreate containers               |
+| `upgrade` reports a Git error           | Check the root repository is pullable; maintain independent component sources separately         |
 
-Generated infrastructure settings use `docker-compose.infra.yml`. User configuration stays in `docker-compose.override.yml`, loaded last. An override generated by an older CLI is preserved too; review legacy port and external database settings when upgrading, since they can override new infrastructure switches.
+For external PostgreSQL/Redis, `deploy`, `pull` and `upgrade` respect enable flags. Standalone `migrate` behaves differently; see [migration limitations](./migrate#limitations). See [configuration and troubleshooting](./configuration) for other locations and issues.
 
-For external database/Redis deployments, verify infrastructure orchestration for each command in your revision; do not assume every maintenance subcommand recognizes identical external-service settings.
-
-See [Upgrade guidance](../operations/upgrade) for configuration, backups, maintenance windows and recovery, and [hohu build](./build) for source images.
+Generated external-service overrides currently omit scheduler connections and API Redis port / database values. Add these entries to the user override when using external services; see [external-service deployment](../deploy#external-services).

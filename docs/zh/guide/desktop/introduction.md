@@ -1,60 +1,37 @@
 ---
 title: 桌面端介绍
-description: hohu-admin-desktop 是 hohu 生态的 Electron + Vue 3 桌面应用框架，专注做 web 做不到的事 —— 托盘、全局快捷键、系统通知、自动更新、OS 钥匙串
+description: 了解 HoHu Electron 桌面端的 Vue 界面、主进程认证、系统托盘、快捷键、通知和更新能力。
 ---
 
 # 桌面端介绍
 
-### hohu 生态的桌面端成员
+HoHu 桌面端是独立的 Electron + Vue 3 客户端仓库，通过后端 API 使用业务能力。它适合需要系统托盘、全局快捷键、桌面通知和安装包分发的应用。
 
-**hohu-admin-desktop** 是 [hohu 生态](https://github.com/aihohu)的 Electron + Vue 3 桌面应用框架，与 [hohu-admin-web](https://github.com/aihohu/hohu-admin-web)（浏览器端）、[hohu-admin-app](https://github.com/aihohu/hohu-admin-app)（移动端）共用同一个 [FastAPI 后端](https://github.com/aihohu/hohu-admin)。
+## 技术与职责
 
-**定位**：开发者脚手架，不是终端用户产品。开发者 clone 它来构建自己的桌面应用，自带完整的 hohu-admin 后端集成。
+| 部分       | 当前实现                                                     |
+| ---------- | ------------------------------------------------------------ |
+| 界面       | Vue 3、TypeScript、Naive UI、Pinia、Vue Router               |
+| 主进程     | Electron，管理窗口、认证会话、网络请求与系统能力             |
+| 桥接       | contextBridge 暴露类型化 window.api，通过受限 IPC 调用主进程 |
+| 开发与构建 | electron-vite                                                |
+| 打包与更新 | electron-builder、electron-updater                           |
 
-## 🎯 为什么需要桌面端
+具体依赖版本以桌面仓库 `package.json` 与锁文件为准。当前构建脚本使用 electron-vite 和 electron-builder。
 
-桌面端**只在 web 做不到或体验差的地方发力**。它能做的事：
+## 已有能力
 
-- 🖥️ **系统托盘 + 关闭到托盘** —— 后台常驻，右键菜单快捷操作
-- ⌨️ **全局快捷键** —— `Cmd/Ctrl+Shift+H` 一键呼出窗口，无需切到浏览器
-- 🔔 **系统通知** —— 真正的系统级通知（web Notification API 受限多），最小化时也能弹
-- 🔄 **自动更新** —— electron-updater 静默检查、后台下载、退出时安装
-- 🔐 **OS 钥匙串存储** —— Token 存在 Keychain（macOS）/ DPAPI（Windows）/ libsecret（Linux），不进 localStorage
-- 🌐 **绕开 CORS** —— HTTP 请求走主进程的 `net` 模块转发，dev 模式也无需后端配 CORS
+- 登录会话由主进程管理，渲染层通过业务请求封装访问固定后端。
+- 窗口状态保存、托盘行为、全局快捷键、系统通知和原生主题同步。
+- 设置抽屉提供托盘、快捷键、通知、更新和应用信息等配置。
+- 安装包与更新流程的基础接入；发行前仍需配置更新源、签名及目标平台验证。
 
-**不做的事**：完整复制 web 后台所有页面、数据可视化大屏、CRUD 表格 —— web 已经做得更好，桌面端重复就是浪费。
+桌面端与 Web 是不同代码仓库。复用后端接口和业务类型时，页面、路由、权限与翻译仍需在桌面端接入，Web 新页面不会自动同步进桌面安装包。
 
-## 🛠️ 技术栈
+## 从哪里开始
 
-| 层       | 技术                                                    |
-| -------- | ------------------------------------------------------- |
-| 框架     | Electron 39 / electron-vite 5                           |
-| 渲染层   | Vue 3.5 / TypeScript 5.9 / NaiveUI / Pinia 3 / Vite 7   |
-| 构建     | electron-builder（NSIS / DMG / AppImage）               |
-| 主进程库 | electron-store / electron-log / electron-updater        |
-| 类型契约 | `src/shared/types.ts` —— main / preload / renderer 共享 |
+1. 按[桌面端开发](./quick-start)启动客户端并连接本地后端。
+2. 阅读[桌面端架构](./architecture)，了解 renderer、preload 与 main 的边界。
+3. 按[桌面端功能](./features)接入所需系统能力，验证实际安装包行为。
 
-## 📦 三进程架构
-
-```
-src/
-├── main/         # 主进程（Node.js 运行时）
-│   ├── services/ # 单例服务（window/tray/shortcut/updater/notification/...）
-│   └── ipc/      # ipcMain.handle 注册（typed）
-├── preload/      # 预加载脚本（沙箱桥）
-└── renderer/     # 渲染进程（浏览器环境，复用 hohu-admin-web 的代码模式）
-└── shared/       # 跨进程类型定义
-```
-
-关键约束：
-
-- **所有 HTTP 走主进程**（renderer 不发 axios，调 `window.api.http.request()` → IPC → main `net.request`）
-- **所有 Token 走 OS 钥匙串**（不进 localStorage）
-- **typed IPC**（`shared/types.ts` 是单一来源，preload 通过 `contextBridge` 暴露白名单）
-
-## 📚 更多
-
-- [快速上手](./quick-start) —— 5 分钟跑起来
-- [架构详解](./architecture) —— 三进程、请求层、IPC、安全
-- [已实现特性](./features) —— 桌面端能力清单
-- [源码仓库](https://github.com/aihohu/hohu-admin-desktop)
+需要先准备后端时，阅读[开发环境](../quick-start)。源码入口见[源码与许可](../src)。

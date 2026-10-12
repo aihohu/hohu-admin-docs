@@ -1,24 +1,37 @@
 ---
-title: Users, roles and departments
-description: Manage HoHu users, roles and departments, including feature permissions, data scopes and AI access.
+title: Set up members and access
+description: Configure HoHu departments, roles and users in order, then verify menus, actions and data scope with an onboarding example.
 ---
 
-# Users, roles and departments
+# Set up members and access
 
-This page is for administrators authorized to manage users, roles or departments. These permissions are separate; list access does not imply edit access.
+This page helps administrators configure initial access. User, role and department management have separate permissions. List access does not grant editing or authorization rights.
 
 ## Setup order
 
-1. Create the required department hierarchy, then assign users to departments.
-2. Create or select roles and assign menu and button permissions.
-3. Select each role's data scope: all, own department, own department and descendants, custom departments, or self. Custom scope requires specific departments.
-4. Assign roles to users and check that both users and roles are enabled.
-5. Verify menus, actions and visible records with an ordinary test account, not only a super administrator.
+| Step | Action                              | Purpose                                                            |
+| ---- | ----------------------------------- | ------------------------------------------------------------------ |
+| 1    | [Create departments](./departments) | Establish organization structure and membership                    |
+| 2    | [Configure roles](./roles)          | Assign menus, buttons and data scope                               |
+| 3    | [Create or edit users](./users)     | Set departments and a primary department, and assign enabled roles |
+| 4    | Verify with an ordinary account     | Check accessible pages, permitted actions and visible records      |
 
-## Combining scopes
+## Example: onboard a colleague
 
-The concrete scopes of enabled roles are combined as a union. A role granting the user's department and another granting selected departments contribute both sets; the system does not simply pick one numeric priority. All data still means data within the current tenant.
+The following example uses an Operations department. Use department and role names appropriate for your organization.
 
-The default tenant's system super administrator can perform authorized system-wide administration. Other tenant administrators remain within their tenant. Role authority alone does not grant AI assistant access: explicit entry permission, assistant bindings and tool permissions are also required.
+1. Create or locate Operations in Department management.
+2. Create a business role in Role management and select the menus and buttons needed for the job. Choose an appropriate data scope if visibility of people needs to be restricted.
+3. Create an account in User management, select its roles and departments, and check its primary department and user/role status.
+4. Give the colleague the site address, tenant and initial sign-in details. Ask them to change their password and verify a recovery email.
+5. Use that account to check the intended menus, buttons and records. Configure [AI access](./roles#ai-access) if an assistant is needed.
 
-For missing records, check departments, role status and data scope. For missing menus, check grants and refreshed session information. Developers should read [API permissions](../auth) and [Data scope](../data-permission).
+Menu permissions control access to features; button permissions control actions. Data scope restricts records in business endpoints that apply it. Department membership alone grants no business action permissions.
+
+## Authorization boundaries
+
+Administrators can manage users, departments and assignable roles only within their own authority. System super administrators in the default tenant can perform authorized system operations; administrators in other tenants manage their own tenant.
+
+Data scopes from enabled roles are combined as a union; see [Roles and permissions](./roles#data-scope). Verify as the target user rather than relying on results visible to a super administrator.
+
+For missing menus, unexpected data visibility or denied actions after a change, follow [Permission troubleshooting](./faq#permissions).

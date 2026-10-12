@@ -1,41 +1,66 @@
 ---
 title: Build business applications with AI and HoHu Skills
-description: 'Use Claude Code, Cursor or Codex with HoHu Skills to create projects and develop business modules. Follow the workflow for pages, permissions, AI tools and validation.'
+description: Use coding assistants and HoHu Skills to create a project, develop equipment borrowing, refine requirements, connect application AI and verify delivery.
 ---
 
-# Build business applications with AI and HoHu Skills
+# Develop business applications with AI
 
-This guide is for developers working on HoHu source with Claude Code, Cursor, Codex, OpenCode, TRAE or another coding assistant. First [install Skills](./cli/skills) and prepare the [development environment](./quick-start).
+This guide is for developers using Claude Code, Cursor, Codex, OpenCode, TRAE or another coding assistant to work on HoHu source. Equipment borrowing below is a development example, not a built-in module.
 
-## Create and run a project
+## Prepare {#prerequisites}
 
-Start your agent in the intended parent workspace and confirm it discovers `hohu-project`. Project creation requires HoHu CLI and terminal execution capability. Ask:
+1. [Install Skills](./cli/skills): `hohu-project` and `hohu-business-module`. Verify discovery in the current workspace.
+2. Install [HoHu CLI](./cli/index#installation), prepare the [development environment](./quick-start), and use dedicated development databases and Redis.
+3. For creation, start the assistant in the parent workspace. For an existing project, open the common Backend/Web root. Provide explicit paths to avoid changes to other projects.
 
-> Use hohu-project to create equipment with Backend and Web only. Check local dependencies and database configuration, initialize it and start it. Report the access URL and verification results.
+| Stage               | Skill                                 | Expected delivery                                                                                |
+| ------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Create and run      | `hohu-project`                        | Actual component directories, initialization results, service URLs and access checks             |
+| Build a module      | `hohu-business-module`                | Migrations, Service/API, permissions, pages, application AI tools and tests                      |
+| Refine requirements | `hohu-business-module`                | Changes fitting the current implementation, compatibility handling and regression results        |
+| Verify delivery     | Project checks and business scenarios | Working pages, ordinary-user authorization checks, real AI results or explicit verification gaps |
 
-The assistant checks the installed CLI's help. Versions with explicit component options support [non-interactive creation](./cli/index#non-interactive-creation). Existing directories must not be overwritten; inspect retained files after a failed network clone before recovering.
+## 1. Create and run {#create-project}
 
-Initialization involves dependencies, database migrations and seed data. Provide a dedicated development database and Redis, and prepare the environment configuration required by the project. Successful delivery includes actual component directories, initialization results, service URLs and page access checks. Creating a directory alone does not make the project ready.
+Ask from the parent workspace:
 
-## Build a business module
+> Use hohu-project to create equipment with Backend and Web only. Check local dependencies and database configuration, initialize it and start it. Report component paths, access URLs and verification results.
 
-Use `hohu-business-module` in an existing project. Describe operations and data visibility, for example:
+The assistant should inspect the actual CLI version and help. Versions with explicit component selection support [non-interactive creation](./cli/create#examples). Do not overwrite existing directories; inspect retained files before recovering a failed clone.
 
-> Add equipment borrowing with borrow, return and list operations. Ordinary users may only view and return their own loans, and the same equipment cannot be borrowed twice concurrently. Use Chinese-only business content.
+Initialization installs dependencies, applies migrations and synchronizes seeds. Prepare the project's own environment and preserve existing credentials and settings. Distinguish directory creation, initialization, HTTP availability and verified sign-in; the final CLI message alone does not prove every stage succeeded.
 
-The assistant checks project conventions and compatibility, then implements migrations, Service/API layers, feature permissions, pages and application AI tools. New modules follow the target project's standard layout; extensions follow the existing module layout.
+## 2. Build equipment borrowing {#build-module}
 
-Business modules include application AI queries and required write tools by default, using the platform confirmation flow. Internationalization follows your explicit request, otherwise the target project's module conventions, without changing HoHu's built-in internationalization. Feature permissions, tenant isolation and data scope use the existing authorization system according to business requirements; no separate generic capability selection is needed.
+Ask in the running project:
 
-For implementation details, read [Add a module](./development/module), [Feature permissions](./auth), [Data scope](./data-permission) and [Connect business tools](./development/ai-tools).
+> Use hohu-business-module to build equipment borrowing. Equipment has a name, identifier and availability state. Support borrowing, returns and loan history. Prevent concurrent duplicate borrowing. Ordinary users may only view and return their own loans. Add Web pages, application AI queries, and borrowing and returns after confirmation. Use Chinese-only business content.
 
-## Verify the result
+Describe objects, operations, constraints and visibility for verifiable results. Resolve material gaps such as return rules, administrator access and compatibility with existing records before implementation.
 
-1. Review migrations and code changes, then run the target repository's static checks, tests and coverage gates.
-2. Operate and refresh pages as an ordinary user. Check records, pagination and button permissions; unauthorized direct API requests must also be refused.
-3. Verify that other users' and tenants' data cannot be accessed outside the declared business scope.
-4. Use a real model to query page-created records and inspect actual tool calls. Writes should display a confirmation card and persist only after approval; test cancellation, replay and revocation as required by the business flow.
+The assistant inspects conventions and compatibility, then implements migrations, Service/API, feature permissions, pages and application AI tools. New modules follow the target project's standard layout; existing modules retain theirs. Application AI is included by default. Language scope follows your explicit request, otherwise module conventions, without changing HoHu's built-in internationalization.
 
-Application model configuration is separate from the coding assistant's model configuration. Without an available application model, source changes and deterministic tests can proceed, but real AI scenarios remain unverified. See [Configuration and operations](./operations/ai).
+Business Services must enforce authorization and concurrency constraints. Hidden buttons and prompts do not replace backend checks. See [Add a module](./development/module), [Feature permissions](./auth), [Data scope](./data-permission) and [Connect business tools](./development/ai-tools).
 
-Update the relevant manuals with delivered behavior and operating steps. Keep drafts, plans and one-off acceptance records locally; follow the project workflow separately for commits, pushes and deployment.
+## 3. Refine a requirement {#iterate}
+
+Continue from the delivered implementation with a focused change:
+
+> Add a borrowing note of up to 200 characters to the existing module. Support it in the page, API and AI tools. Existing records may have an empty note. Preserve permissions and duplicate-borrowing rules, and include migration and regression checks.
+
+Review data compatibility, interfaces, pages and tools, then verify both the new requirement and existing flows. Do not rebuild the project or overwrite existing data for a small refinement.
+
+## 4. Verify delivery {#verification}
+
+| Check                  | Completion evidence                                                                                                                    |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Source and migrations  | Reviewed changes; static checks, tests and coverage gates pass                                                                         |
+| Page flow              | Ordinary users borrow and return; results persist after refresh; lists and pagination are correct                                      |
+| Business rules         | No duplicate borrowing; pages and direct APIs enforce permissions                                                                      |
+| Data visibility        | Other users' and tenants' data remain outside unauthorized access                                                                      |
+| Application AI queries | A real tool record returns the same objects created on the page                                                                        |
+| Application AI writes  | Confirmation precedes execution; rejection does not write; approval updates the page; test replay, expiry and revocation as applicable |
+
+Application model configuration is separate from the coding assistant. Without an application model, source changes and deterministic tests can proceed, but real AI usage remains unverified. See [First AI setup](./operations/ai#first-setup). Available tools do not guarantee every natural-language request is handled correctly; inspect actual results.
+
+Delivery should include changed behavior, executed checks, URLs, start/stop instructions and remaining setup. Update manuals with current behavior and keep drafts, plans and one-off reports locally. Follow separate project workflows for commits, pushes and deployment.

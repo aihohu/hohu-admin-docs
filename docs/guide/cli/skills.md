@@ -7,6 +7,34 @@ description: 'Install HoHu project and business development Skills with npx or t
 
 HoHu Skills guides coding assistants through CLI project creation, initialization and startup, then business module development using your project's conventions: migrations, APIs, permissions, pages, AI tools and validation. Agents share the same skill content; the installer places it where each host can discover it.
 
+## Quick start {#quick-start}
+
+Run in the workspace where you will open your coding assistant:
+
+```bash
+npx skills@latest add aihohu/hohu-skills
+```
+
+1. Select `hohu-project`, `hohu-business-module`, your coding assistant and installation scope.
+2. Start or reopen the assistant there and verify both skills are discovered. For a new project, install in its parent workspace or explicitly choose user scope.
+3. Ask “Use hohu-project to create equipment with Backend and Web only, initialize it and start it.” Continue with [AI-assisted development](../ai-coding) for modules.
+
+Prepare the prerequisites below first. Installation provides workflows, not HoHu CLI, databases or application models. Select only the business module skill if you do not need project creation.
+
+## Command reference {#command-reference}
+
+| Task                              | Command                                                                                       |
+| --------------------------------- | --------------------------------------------------------------------------------------------- |
+| Install official Skills           | `npx skills@latest add aihohu/hohu-skills`                                                    |
+| Install both skills for Codex     | `npx skills@latest add aihohu/hohu-skills --skill hohu-project hohu-business-module -a codex` |
+| Install through HoHu CLI          | `hohu skills install --agent codex`                                                           |
+| List workspace installations      | `npx skills@latest list`                                                                      |
+| List user installations           | `npx skills@latest list --global`                                                             |
+| Update the project business skill | `npx skills@latest update hohu-business-module --project`                                     |
+| Remove the project business skill | `npx skills@latest remove hohu-business-module`                                               |
+
+Install and remove default to project scope; add `--global` for user scope. Use explicit `--project` when updating project skills. Replace the name with `hohu-project` to update that workflow. Back up customizations before updates or repeat installs, and verify host discovery afterwards.
+
 ## Prerequisites
 
 - Stable Node.js **22.20.0 or later**, including npm/npx, as required by the paired installer version 1.7.0.
@@ -17,10 +45,6 @@ HoHu Skills guides coding assistants through CLI project creation, initializatio
 For a new project, install `hohu-project` in the parent workspace where you will start the assistant, verify host discovery, or explicitly choose user scope. For an existing project, start in the business project directory where you will use your assistant. For a CLI-created project, install and launch from the common Backend/Web parent. When launching inside a component Git repository, check that the host can discover the installation.
 
 ## Option 1: npx
-
-```bash
-npx skills@latest add aihohu/hohu-skills
-```
 
 Follow the installer to select skills, agents, scope and installation method. Terminal and agent environments affect whether prompts appear; specify an agent for a predictable target:
 
@@ -61,7 +85,7 @@ This calls `skills@1.7.0` with the same source and installation records. It disp
 
 `--yes` skips confirmation, and repeated installation may overwrite existing skills. Back up customizations first. Upstream prompts retain their own wording; HoHu help and error messages support English and Chinese.
 
-## Verify and use
+## Verify and use {#verify}
 
 The installer should list the selected skills and their destinations. `hohu-project` contains the project lifecycle workflow; `hohu-business-module` also includes `references/` and `scripts/`. Inspect installed skills with:
 
