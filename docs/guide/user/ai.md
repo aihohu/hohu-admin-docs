@@ -42,6 +42,8 @@ An action requiring approval displays a confirmation card or drawer:
 
 After a confirmation error or disconnect, restore connectivity, refresh the conversation and inspect execution status before retrying a write. Authorized users can inspect AI Trace when an operation remains running. Approval does not guarantee completion after the browser disconnects.
 
+For single-user creation, the current tenant's **System Settings → Require a primary department** option determines whether a department is mandatory. When disabled, you can ask to create an ordinary user without a department; when enabled, the assistant requests a valid department after preflight validation. Assigning a department requires department lookup permission and access to that department. Creation still requires approval. This does not change the department-column requirements for file imports.
+
 ## Read results {#results}
 
 | Interface element               | Meaning                                                                                                                  |
