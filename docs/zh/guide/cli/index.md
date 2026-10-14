@@ -62,6 +62,8 @@ hohu --help
 uv tool upgrade hohu
 ```
 
+使用统一的 `--source` / `-s` 参数选择来源，各命令支持的值见[按命令选择来源](./configuration#sources)。
+
 升级 CLI 不会自动更新已创建项目的源码、依赖或部署镜像。组件发布记录见[更新说明](../reference/versions)。如果已安装版本缺少本文中的参数，先检查该命令的 `--help`，再升级到支持所需功能的版本。
 
 CLI 的 Python 要求与应用不同。开发 Backend/Web 还需 Git、后端 Python、Node.js、pnpm、PostgreSQL 和 Redis；版本要求见[开发环境](../quick-start)。构建和部署还需 Docker，部署与监控需 Docker Compose。

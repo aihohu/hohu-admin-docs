@@ -49,6 +49,8 @@ Run subsequent project commands inside `my-project`. If `hohu` is not found, reo
 hohu init
 ```
 
+By default, the CLI retries public package download timeouts once through a mirror in mainland China. Use `hohu init -s official` to use only official registries, or `hohu init -s mirror` to select the mirrors directly. Choose based on your network connectivity. Components need valid lockfiles, installation keeps uv/pnpm, and logs are under each component's `.local/reports/`. See [`hohu init`](./cli/init#sources) for conditions and custom sources.
+
 The CLI installs dependencies, creates the backend `.env`, generates an application secret and initial administrator password, then runs migrations and seed initialization.
 
 On a first installation, the example connection usually needs adjustment. If initialization reports a connection failure, edit `hohu-admin/.env`, configure your database and Redis, then run `hohu init` again. Existing configuration and user passwords are preserved.

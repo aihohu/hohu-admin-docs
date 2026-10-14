@@ -29,13 +29,13 @@ Repeated initialization fills missing templates. Template version changes prompt
 
 ```bash
 hohu deploy
-hohu deploy --image-source acr
+hohu deploy -s acr
 ```
 
-| Option           | Description                                                                   | Default                                          |
-| ---------------- | ----------------------------------------------------------------------------- | ------------------------------------------------ |
-| `--image-source` | Image source: `auto`, `official`, `acr`                                       | Resolved by source precedence, ultimately `auto` |
-| `--no-migrate`   | Skip migrations and their seed synchronization; only when no update is needed | Off                                              |
+| Option            | Description                                                                   | Default                                          |
+| ----------------- | ----------------------------------------------------------------------------- | ------------------------------------------------ |
+| `--source` / `-s` | Image source: `auto`, `official`, `acr`                                       | Resolved by source precedence, ultimately `auto` |
+| `--no-migrate`    | Skip migrations and their seed synchronization; only when no update is needed | Off                                              |
 
 Order: prepare images → start enabled infrastructure → migrate and synchronize seeds → start application services and enabled Nginx. Image, migration or seed failures block subsequent normal startup.
 
@@ -84,10 +84,10 @@ Stop and remove Compose containers and associated networks without a volume remo
 
 ```bash
 hohu deploy pull
-hohu deploy pull --image-source acr
+hohu deploy pull -s acr
 ```
 
-Accepts `--image-source` with the same resolution as `hohu deploy`. It prepares images, starts infrastructure, migrates and synchronizes seeds, then starts or updates application containers. It is not download-only and does not accept `--no-migrate`.
+Accepts `--source` / `-s` with the same resolution as `hohu deploy`. It prepares images, starts infrastructure, migrates and synchronizes seeds, then starts or updates application containers. It is not download-only and does not accept `--no-migrate`.
 
 To change versions, first set deployment `IMAGE_TAG` to an available, matching release. `pull` does not rebuild local source images.
 
@@ -98,11 +98,11 @@ hohu deploy upgrade
 hohu deploy upgrade --no-cache
 ```
 
-| Option           | Description                                       | Default           |
-| ---------------- | ------------------------------------------------- | ----------------- |
-| `--no-cache`     | Disable source image build cache                  | Off               |
-| `--no-migrate`   | Skip migrations and their seed synchronization    | Off               |
-| `--image-source` | Deployment image source, resolved as for `deploy` | Ultimately `auto` |
+| Option            | Description                                       | Default           |
+| ----------------- | ------------------------------------------------- | ----------------- |
+| `--no-cache`      | Disable source image build cache                  | Off               |
+| `--no-migrate`    | Skip migrations and their seed synchronization    | Off               |
+| `--source` / `-s` | Deployment image source, resolved as for `deploy` | Ultimately `auto` |
 
 Requires a project marker, Backend/Web source, deployment configuration and **a pullable Git repository at the project root**. It runs one `git pull` at that root and does not update independent component repositories separately. `hohu create` does not create a root repository. For its generated layout, update component source yourself, then use `hohu build` and `hohu deploy`.
 
@@ -111,6 +111,8 @@ Order: root `git pull` → build both `source` images → update deployment imag
 See [`hohu migrate`](./migrate) for standalone migrations and their limitations.
 
 ## Image sources
+
+`deploy`, `deploy pull` and `deploy upgrade` accept `--source` / `-s`; `--image-source` remains a compatibility alias. The `HOHU_IMAGE_SOURCE` environment and deployment `.env` setting is unchanged. This option does not select Git repositories or Python/frontend package sources.
 
 | Source     | Behavior                                                                                                                     |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------- |

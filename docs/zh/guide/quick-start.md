@@ -49,6 +49,8 @@ my-project/
 hohu init
 ```
 
+公共依赖源下载超时时，CLI 默认自动尝试一次中国大陆镜像。可使用 `hohu init -s official` 仅使用官方包源，或使用 `hohu init -s mirror` 直接选择镜像，请根据实际网络连通性选择。安装要求组件锁文件有效，始终保留 uv/pnpm；日志位于各组件 `.local/reports/`。详细条件和自定义源处理见 [`hohu init`](./cli/init#sources)。
+
 CLI 安装依赖，然后在后端创建 `.env`、生成应用密钥与首次管理员密码，并执行数据库迁移和基础数据初始化。
 
 首次使用时，示例数据库连接通常需要调整。如果命令报告连接失败，打开 `hohu-admin/.env`，修改数据库与 Redis 连接，再运行一次 `hohu init`。已经存在的配置和用户密码会保留。

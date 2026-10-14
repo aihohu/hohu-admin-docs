@@ -22,7 +22,7 @@ hohu create [PROJECT_NAME] [OPTIONS]
 | `PROJECT_NAME`       | 当前目录下的项目文件夹名，不接受路径        | `hohu-admin`                           |
 | `--component` / `-c` | 可重复：`backend`、`frontend`、`web`、`app` | 逐项交互选择                           |
 | `--non-interactive`  | 禁止组件选择交互，必须指定 `--component`    | 关闭                                   |
-| `--source`           | 官方源码来源：`auto`、`github`、`gitee`     | 全局配置的 `source`，未配置则为 `auto` |
+| `--source` / `-s`    | 官方源码来源：`auto`、`github`、`gitee`     | 全局配置的 `source`，未配置则为 `auto` |
 | `--repo` / `-r`      | 自定义仓库，统一用于所有所选组件            | 组件配置的仓库                         |
 
 组件名大小写不敏感，`web` 是 `frontend` 的别名，重复项会去重。`create` 不接受 `be`、`fe` 等开发命令的简称。
@@ -37,7 +37,7 @@ hohu create my-project
 hohu create my-project --component backend --component web --non-interactive
 
 # 指定官方 Gitee 来源
-hohu create my-project --component backend --component web --source gitee
+hohu create my-project --component backend --component web -s gitee
 
 # 仅创建来自自定义仓库的 Backend
 hohu create my-project --component backend --repo https://example.com/team/backend.git
@@ -75,7 +75,7 @@ my-project/
 | 现象               | 处理方式                                                                     |
 | ------------------ | ---------------------------------------------------------------------------- |
 | 同名路径已存在     | 使用新名称，或先确认已有目录内容；命令不会覆盖                               |
-| 无法克隆           | 核对网络、Git 凭据与地址；官方源网络不通时可使用 `--source gitee`            |
+| 无法克隆           | 核对网络、Git 凭据与地址；官方源网络不通时可使用 `-s gitee`                  |
 | 只创建了部分组件   | 检查项目标记与实际目录；没有自动续传命令，可用新名称重建，或人工恢复缺失组件 |
 | 非交互模式要求组件 | 指定至少一个 `--component`                                                   |
 | 参数不被识别       | 查看 `hohu create --help`，确认安装版本支持                                  |

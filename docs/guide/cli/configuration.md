@@ -67,18 +67,31 @@ For separate custom component repositories, add `backend_repo`, `frontend_repo` 
 
 `create --repo` overrides component settings; custom components override official sources without fallback. Do not embed passwords or tokens in URLs; use Git credential management. See [`hohu create`](./create) for creation and [`hohu deploy`](./deploy) for Docker image sources.
 
+## Select sources by command {#sources}
+
+Use `--source` / `-s` consistently; each command selects a different resource:
+
+| Command                          | Values                 | Example                           |
+| -------------------------------- | ---------------------- | --------------------------------- |
+| `hohu create`                    | `auto/github/gitee`    | `hohu create my-project -s gitee` |
+| `hohu init`                      | `auto/official/mirror` | `hohu init -s mirror`             |
+| `hohu deploy`, `pull`, `upgrade` | `auto/official/acr`    | `hohu deploy pull -s acr`         |
+
+All default to `auto`, but creation can read global `source` and deployment can read `HOHU_IMAGE_SOURCE`. Initialization preserves package manager configuration, does not read creation's global `source`, and does not save the current `-s` choice. Deployment retains `--image-source` as an alias. See [package sources](./init#sources) and [container images](./deploy) for recovery conditions.
+
 ## Common problems
 
-| Symptom                         | Check first                            | Next action                                                                            |
-| ------------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------- |
-| `hohu` not found                | Installation and PATH                  | Run `uv tool update-shell` and refresh the terminal as instructed                      |
-| Command or option missing       | `hohu --version` and command `--help`  | Check support and upgrade the CLI                                                      |
-| Project not found               | `.hohu/project.json`                   | Enter the right project; inspect creation if the marker is missing                     |
-| Deployment not initialized      | `.hohu/deploy/` and directory          | Initialize in the intended directory and check configuration                           |
-| Repository network fails        | Git source                             | Use `create --source gitee` for official sources; maintain existing remotes separately |
-| Image network fails             | Deployment references and tags         | Use deployment `--image-source acr` and check availability                             |
-| Initialization connection fails | Development `.env` and databases/Redis | Fix and rerun `hohu init`                                                              |
-| Global settings ignored         | JSON syntax and `hohu info`            | Preserve settings and fix invalid JSON; read failures fall back to defaults            |
+| Symptom                         | Check first                                                             | Next action                                                                        |
+| ------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `hohu` not found                | Installation and PATH                                                   | Run `uv tool update-shell` and refresh the terminal as instructed                  |
+| Command or option missing       | `hohu --version` and command `--help`                                   | Check support and upgrade the CLI                                                  |
+| Project not found               | `.hohu/project.json`                                                    | Enter the right project; inspect creation if the marker is missing                 |
+| Deployment not initialized      | `.hohu/deploy/` and directory                                           | Initialize in the intended directory and check configuration                       |
+| Repository network fails        | Git source                                                              | Use `create -s gitee` for official sources; maintain existing remotes separately   |
+| Image network fails             | Deployment references and tags                                          | Use deployment `--source acr` and check availability                               |
+| Package download fails          | Component `.local/reports/install-*.log`, source settings and lockfiles | Use `hohu init -s mirror` for public packages or `auto` to preserve custom sources |
+| Initialization connection fails | Development `.env` and databases/Redis                                  | Fix and rerun `hohu init`                                                          |
+| Global settings ignored         | JSON syntax and `hohu info`                                             | Preserve settings and fix invalid JSON; read failures fall back to defaults        |
 
 ## Report a problem
 

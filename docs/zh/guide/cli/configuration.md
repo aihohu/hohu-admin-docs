@@ -67,18 +67,31 @@ hohu lang
 
 `create --repo` 优先于组件仓库配置；组件自定义仓库优先于官方来源且不自动回退。地址不要嵌入密码或令牌，使用 Git 凭据管理。创建细节见 [`hohu create`](./create)，Docker 镜像换源见 [`hohu deploy`](./deploy)。
 
+## 按命令选择来源 {#sources}
+
+统一使用 `--source` / `-s`，不同命令选择的资源不同：
+
+| 命令                             | 来源值                 | 示例                              |
+| -------------------------------- | ---------------------- | --------------------------------- |
+| `hohu create`                    | `auto/github/gitee`    | `hohu create my-project -s gitee` |
+| `hohu init`                      | `auto/official/mirror` | `hohu init -s mirror`             |
+| `hohu deploy`、`pull`、`upgrade` | `auto/official/acr`    | `hohu deploy pull -s acr`         |
+
+默认均为 `auto`，但创建命令可读取全局 `source`，部署命令可读取 `HOHU_IMAGE_SOURCE`。初始化保留包管理器已有配置，不读取创建命令的全局 `source`，也不保存本次 `-s` 选择。部署旧参数 `--image-source` 保留兼容。具体回退条件见[依赖来源](./init#sources)和[部署镜像](./deploy)。
+
 ## 常见问题
 
-| 现象             | 先检查                             | 下一步                                                     |
-| ---------------- | ---------------------------------- | ---------------------------------------------------------- |
-| 找不到 `hohu`    | 安装与 PATH                        | `uv tool update-shell` 后按提示刷新终端                    |
-| 命令或参数不存在 | `hohu --version` 与子命令 `--help` | 核对支持情况并升级 CLI                                     |
-| 找不到项目       | `.hohu/project.json`               | 进入正确项目；缺失标记时先核查创建结果                     |
-| 提示未初始化部署 | `.hohu/deploy/` 与运行目录         | 在预期目录初始化并检查部署配置                             |
-| 源码网络不通     | Git 仓库来源                       | 官方源可使用 `create --source gitee`；已有项目单独维护远端 |
-| 镜像网络不通     | 部署镜像地址与标签                 | 使用部署 `--image-source acr`，核对镜像是否可用            |
-| 初始化连接失败   | 开发后端 `.env` 和数据库/Redis     | 修复后重新执行 `hohu init`                                 |
-| 全局配置没有生效 | JSON 格式及 `hohu info` 输出       | 保留已有配置，修正无效 JSON；读取失败会回退默认值          |
+| 现象             | 先检查                                                    | 下一步                                                           |
+| ---------------- | --------------------------------------------------------- | ---------------------------------------------------------------- |
+| 找不到 `hohu`    | 安装与 PATH                                               | `uv tool update-shell` 后按提示刷新终端                          |
+| 命令或参数不存在 | `hohu --version` 与子命令 `--help`                        | 核对支持情况并升级 CLI                                           |
+| 找不到项目       | `.hohu/project.json`                                      | 进入正确项目；缺失标记时先核查创建结果                           |
+| 提示未初始化部署 | `.hohu/deploy/` 与运行目录                                | 在预期目录初始化并检查部署配置                                   |
+| 源码网络不通     | Git 仓库来源                                              | 官方源可使用 `create -s gitee`；已有项目单独维护远端             |
+| 镜像网络不通     | 部署镜像地址与标签                                        | 使用部署 `--source acr`，核对镜像是否可用                        |
+| 依赖下载失败     | 出错组件的 `.local/reports/install-*.log`、源配置和锁文件 | 公共包可使用 `hohu init -s mirror`；自定义源使用 `auto` 保留配置 |
+| 初始化连接失败   | 开发后端 `.env` 和数据库/Redis                            | 修复后重新执行 `hohu init`                                       |
+| 全局配置没有生效 | JSON 格式及 `hohu info` 输出                              | 保留已有配置，修正无效 JSON；读取失败会回退默认值                |
 
 ## 提交问题
 

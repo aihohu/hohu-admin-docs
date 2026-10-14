@@ -22,7 +22,7 @@ hohu create [PROJECT_NAME] [OPTIONS]
 | `PROJECT_NAME`       | A folder name under the current directory; paths are not accepted | `hohu-admin`                        |
 | `--component` / `-c` | Repeat for `backend`, `frontend`, `web`, `app`                    | Interactive selection               |
 | `--non-interactive`  | Disable component prompts; requires `--component`                 | Off                                 |
-| `--source`           | Official source: `auto`, `github`, `gitee`                        | Global `source`, or `auto` if unset |
+| `--source` / `-s`    | Official source: `auto`, `github`, `gitee`                        | Global `source`, or `auto` if unset |
 | `--repo` / `-r`      | One custom repository used for every selected component           | Configured component repositories   |
 
 Names are case-insensitive; `web` aliases `frontend`, and duplicates are removed. `create` does not accept development aliases such as `be` or `fe`.
@@ -37,7 +37,7 @@ hohu create my-project
 hohu create my-project --component backend --component web --non-interactive
 
 # Use official Gitee repositories
-hohu create my-project --component backend --component web --source gitee
+hohu create my-project --component backend --component web -s gitee
 
 # Create only Backend from a custom repository
 hohu create my-project --component backend --repo https://example.com/team/backend.git
@@ -75,7 +75,7 @@ Check that selected directories exist, enter the project, prepare configuration 
 | Symptom                                  | Action                                                                                                                                 |
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | Target already exists                    | Choose another name or inspect the directory; creation never overwrites it                                                             |
-| Clone fails                              | Check network, Git credentials and URLs; use `--source gitee` for an unavailable official GitHub source                                |
+| Clone fails                              | Check network, Git credentials and URLs; use `-s gitee` for an unavailable official GitHub source                                      |
 | Only some components were created        | Check the marker and directories; there is no automatic resume command. Create under a new name or restore missing components manually |
 | Non-interactive mode requires components | Supply at least one `--component`                                                                                                      |
 | Option is not recognized                 | Check `hohu create --help` and use a version that supports it                                                                          |

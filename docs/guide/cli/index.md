@@ -62,6 +62,8 @@ Upgrade the CLI:
 uv tool upgrade hohu
 ```
 
+Use the unified `--source` / `-s` options to select sources. See [sources by command](./configuration#sources) for accepted values.
+
 Upgrading the CLI does not update an existing project's source, dependencies or deployment images. See [release notes](../reference/versions) for component releases. If an installed version lacks an option documented here, check the command's `--help` and upgrade to a version that provides it.
 
 The CLI and application have different Python requirements. Backend/Web development also needs Git, the backend Python runtime, Node.js, pnpm, PostgreSQL and Redis; see [development setup](../quick-start) for versions. Building and deploying require Docker; deployment and monitoring also require Docker Compose.
