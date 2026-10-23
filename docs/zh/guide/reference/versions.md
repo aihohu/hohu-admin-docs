@@ -15,7 +15,15 @@ description: '查阅 HoHu 各组件的发布记录，了解升级前需要检查
 | 移动端         | [hohu-admin-app Releases](https://github.com/aihohu/hohu-admin-app/releases)         |
 | 桌面端         | [hohu-admin-desktop Releases](https://github.com/aihohu/hohu-admin-desktop/releases) |
 
-各组件独立管理版本号。按发布说明选择配套组件，不要求它们具有相同的版本号。通过 `hohu --version` 查看本机 CLI 版本。
+本站维护 **0.1 产品系列**文档。Backend 与 Web 使用相同的产品完整版本号，但同号仍须通过组合验收。CLI 独立版本，通过 `hohu --version` 查看本机版本。移动端和桌面端在本产品系列中尚无正式发布。
+
+## 0.1.6 候选状态
+
+目前 Backend/Web 最新已发布版本为 **0.1.5**。**0.1.6 正在冻结，尚未成为取得组合资格的正式产品版本**。候选修复 AI 用户创建与统计的租户范围、写入原子完成、确认回执丢失恢复，以及未知、取消和预检拒绝动作的安全显示。不能为解除会话阻塞而重放结果未知的操作。
+
+候选固定产物新装、原 0.1.5 镜像升级及恢复流程已用 **CLI 0.1.16、linux/amd64** 演练。最终发布 digest 必须重新验收，其他平台仍未经验证。步骤见[固定产物与恢复](../operations/upgrade#fixed-artifacts)。
+
+产品取得资格后，从同号 Backend Release 获取经过校验的 `release.json`，据此选择 Backend/Web digest、CLI 版本、支持平台和已审阅文档快照。组件公告本身不代表组合通过。0.1.6 发布流程不推进系列或 `latest` 别名，不能假设它们会指向 0.1.6。
 
 ## 升级前检查
 
