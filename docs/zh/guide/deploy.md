@@ -7,6 +7,8 @@ description: 使用 HoHu CLI 和 Docker Compose 部署应用，配置镜像、�
 
 本页提供首次部署流程。命令参数见 [CLI 部署参考](./cli/deploy)，已有实例先看[升级、备份与恢复](./operations/upgrade)。
 
+需要可复现的产品组合时，使用[固定产物流程](./operations/upgrade#fixed-artifacts)：核验产品清单、为四个应用服务固定 digest、预检最终配置，并在验收期间暂停调度。下文的标签默认路径本身不构成这一资格。
+
 ## 1. 准备服务器
 
 安装 Git、uv、HoHu CLI、Docker 和 Docker Compose，确认 Docker 服务已启动，服务器能访问所选镜像仓库。镜像部署不需要安装应用源码依赖。
