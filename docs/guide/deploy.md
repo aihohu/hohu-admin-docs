@@ -7,6 +7,8 @@ description: Deploy a HoHu application with CLI and Docker Compose, configuring 
 
 This page covers a first installation. See [CLI deployment reference](./cli/deploy) for options and [upgrade, backup, and recovery](./operations/upgrade) for existing instances.
 
+For a reproducible product combination, use the [fixed artifact workflow](./operations/upgrade#fixed-artifacts): verify the product manifest, pin all four application services by digest, preflight the final configuration, and keep scheduling paused through acceptance. Tag-based defaults below do not establish that qualification.
+
 ## 1. Prepare the server
 
 Install Git, uv, HoHu CLI, Docker, and Docker Compose. Start Docker and verify access to the selected image registry. Image deployment does not require application source dependencies.

@@ -39,6 +39,8 @@ hohu deploy -s acr
 
 执行顺序：准备镜像 → 启动启用的基础服务 → 迁移与种子同步 → 启动应用及启用的 Nginx。镜像、迁移或种子同步失败会阻断后续正常启动。
 
+CLI 不会在此次迁移前停止旧应用写者、校验产品清单或为验收暂停调度。[固定产物与恢复流程](../operations/upgrade#fixed-artifacts) 说明 CLI 0.1.16 所需的人工前置步骤。该版本实际使用 `hohu deploy`，没有 `hohu admin deploy` 命令组。
+
 默认部署已包含基础数据同步，不使用 `hohu deploy --init`。重复同步保留已有密码、自定义内容和授权。启动后执行 `hohu deploy ps`、查看日志并登录验证；命令完成不等于业务功能已验收。
 
 ## 状态与日志 {#ps}

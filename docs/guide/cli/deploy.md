@@ -39,6 +39,8 @@ hohu deploy -s acr
 
 Order: prepare images → start enabled infrastructure → migrate and synchronize seeds → start application services and enabled Nginx. Image, migration or seed failures block subsequent normal startup.
 
+CLI does not stop old application writers before this migration, validate a product manifest, or pause scheduled jobs for acceptance. The [fixed artifact and recovery workflow](../operations/upgrade#fixed-artifacts) documents those operator prerequisites for CLI 0.1.16. Use `hohu deploy`; there is no `hohu admin deploy` command group in that release.
+
 Deployment includes built-in data synchronization; do not use `hohu deploy --init`. Repeated synchronization preserves existing passwords, customizations and permissions. Check `hohu deploy ps`, read logs and sign in afterwards; completion does not constitute business acceptance.
 
 ## Status and logs {#ps}
