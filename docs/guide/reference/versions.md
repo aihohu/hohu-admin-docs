@@ -17,13 +17,26 @@ Before upgrading, read the target release notes for new features, behavior chang
 
 This documentation covers the **0.1 product series**. Backend and Web releases use the same complete product version; matching numbers still require a verified combination. CLI versions are independent; run `hohu --version` to inspect yours. Mobile and desktop clients have no formal release in this product series.
 
+## Current version status
+
+This page is the single maintained entry point for public product status. Component Releases retain component history; the [versioning policy](https://github.com/aihohu/hohu-admin/blob/main/docs/VERSIONING.md) defines the rules.
+
+| Component                     | Status as of 2026-10-24                                                                                                 |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Product / Backend / Web 0.1.6 | Released; the non-overwritable product manifest is public and validated                                                 |
+| Docs                          | Maintained for the 0.1 series; the manifest pins the release-time snapshot, which later prose corrections do not change |
+| CLI                           | Independently versioned; 0.1.16 was tested with this product                                                            |
+| App / Desktop                 | Not formally released and outside this delivery                                                                         |
+
+Product release and acceptance of a particular deployment are separate records. A later installation does not make the product release incomplete, and this page does not claim that every deployment has been tested. Later corrections update current guidance without replacing historical tags, images, evidence, or manifests.
+
 ## 0.1.6 release and compatibility
 
 The **Backend/Web 0.1.6 components have been delivered, and the final linux/amd64 combination has passed acceptance and independent review**. This patch fixes tenant-scoped AI user creation/counting, atomic write completion, lost acknowledgement recovery, and safe display of unknown, cancelled, and preflight-rejected actions. Unknown outcomes must not be replayed merely to clear a conversation.
 
 The final published digests have passed fresh installation, upgrade from original 0.1.5 images, and recovery to the original artifacts with **CLI 0.1.16 on linux/amd64**. Upgrades require a maintenance window and target database revision `d01010100101`. Recovery must cover the database, public and private files, original keys, and authorization revocations together. See [fixed artifacts and recovery](../operations/upgrade#fixed-artifacts).
 
-The product release is complete when the single [0.1.6 release.json](https://github.com/aihohu/hohu-admin/releases/download/v0.1.6/release.json) is publicly readable and passes validation. Download this non-overwritable manifest to select Backend/Web digests, the CLI version, supported platforms, evidence, and the pinned documentation snapshot. If it cannot be read or validated, stop the upgrade; component announcements alone do not establish product availability.
+The single [0.1.6 release.json](https://github.com/aihohu/hohu-admin/releases/download/v0.1.6/release.json) is public and validated: **the 0.1.6 product release is complete**. Download this non-overwritable manifest to select Backend/Web digests, the CLI version, supported platforms, evidence, and the pinned documentation snapshot. If it cannot be read or validated, stop the upgrade; component announcements alone do not establish product availability.
 
 | Scope              | 0.1.6 compatibility and limitations                                                                                                                                                                                                                                  |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
