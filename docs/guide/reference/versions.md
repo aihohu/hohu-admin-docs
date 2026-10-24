@@ -17,13 +17,24 @@ Before upgrading, read the target release notes for new features, behavior chang
 
 This documentation covers the **0.1 product series**. Backend and Web releases use the same complete product version; matching numbers still require a verified combination. CLI versions are independent; run `hohu --version` to inspect yours. Mobile and desktop clients have no formal release in this product series.
 
-## 0.1.6 candidate status
+## 0.1.6 release and compatibility
 
-The latest published Backend/Web version is **0.1.5**. Version **0.1.6 is being frozen and is not yet a qualified product release**. Its candidate fixes tenant-scoped AI user creation/counting, atomic write completion, lost acknowledgement recovery, and safe display of unknown, cancelled, and preflight-rejected actions. Unknown outcomes must not be replayed merely to clear a conversation.
+The **Backend/Web 0.1.6 components have been delivered, and the final linux/amd64 combination has passed acceptance and independent review**. This patch fixes tenant-scoped AI user creation/counting, atomic write completion, lost acknowledgement recovery, and safe display of unknown, cancelled, and preflight-rejected actions. Unknown outcomes must not be replayed merely to clear a conversation.
 
-The candidate's fixed-artifact installation, upgrade from original 0.1.5 images, and recovery procedure has been exercised with **CLI 0.1.16 on linux/amd64**. Final published digests must repeat that acceptance; other platforms remain unverified. See [fixed artifacts and recovery](../operations/upgrade#fixed-artifacts).
+The final published digests have passed fresh installation, upgrade from original 0.1.5 images, and recovery to the original artifacts with **CLI 0.1.16 on linux/amd64**. Upgrades require a maintenance window and target database revision `d01010100101`. Recovery must cover the database, public and private files, original keys, and authorization revocations together. See [fixed artifacts and recovery](../operations/upgrade#fixed-artifacts).
 
-Once the product is qualified, use its validated `release.json` from the matching Backend Release to select Backend/Web digests, the CLI version, supported platforms, and the reviewed documentation snapshot. Component announcements alone do not establish this qualification. Series and `latest` aliases are not promoted by the 0.1.6 release flow and must not be assumed to select 0.1.6.
+The product release is complete when the single [0.1.6 release.json](https://github.com/aihohu/hohu-admin/releases/download/v0.1.6/release.json) is publicly readable and passes validation. Download this non-overwritable manifest to select Backend/Web digests, the CLI version, supported platforms, evidence, and the pinned documentation snapshot. If it cannot be read or validated, stop the upgrade; component announcements alone do not establish product availability.
+
+| Scope              | 0.1.6 compatibility and limitations                                                                                                                                                                                                                                  |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend / Web      | [Backend v0.1.6](https://github.com/aihohu/hohu-admin/releases/tag/v0.1.6) and [Web v0.1.6](https://github.com/aihohu/hohu-admin-web/releases/tag/v0.1.6), using the pinned digests from the original builds in the manifest                                         |
+| Supported platform | `linux/amd64`; `linux/arm64` images and manifests were verified, but full runtime acceptance was not performed                                                                                                                                                       |
+| Upgrade source     | Only the tested `0.1.5`; other starting versions are outside this upgrade commitment                                                                                                                                                                                 |
+| CLI                | Only `0.1.16` was tested; manual digest pinning, without automatic manifest parsing or generic backup/restore commands                                                                                                                                               |
+| Mobile / desktop   | `not_released`, with no compatible client release declared for this product                                                                                                                                                                                          |
+| AI and recovery    | Actual tools, confirmation endpoints, transaction faults, and cold recovery were tested; external model content quality is not promised. Disable old AI write routes during recovery, and prove the complete authorization-version high-watermark in your deployment |
+
+The 0.1.6 release flow preserves existing series and `latest` aliases; do not assume they select 0.1.6. Product qualification does not deploy your production environment. Verify networking, model configuration, credentials, backups, and recovery conditions in that environment.
 
 ## Before upgrading
 
