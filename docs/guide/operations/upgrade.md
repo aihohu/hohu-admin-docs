@@ -44,7 +44,7 @@ Do not use `--no-migrate` to skip required structure or seed updates. See [migra
 
 ## Fixed artifacts with CLI 0.1.16 {#fixed-artifacts}
 
-This manual path uses the actual `hohu deploy` command in CLI 0.1.16. It has been exercised on `linux/amd64` with a fresh installation and the original 0.1.5 images as the upgrade source. A candidate rehearsal does not qualify a later release build: repeat acceptance against the exact published Backend/Web combination. Other platforms require their own evidence.
+This manual path uses the actual `hohu deploy` command in CLI 0.1.16. The final Backend/Web 0.1.6 digests passed fresh installation, upgrade from original 0.1.5 images, and recovery on `linux/amd64`. Use the pinned sources, platform, and limitations in the [single product manifest](https://github.com/aihohu/hohu-admin/releases/download/v0.1.6/release.json); stop if it cannot be read or validated. Full runtime acceptance was not performed on `linux/arm64`, and other starting versions are outside this upgrade scope.
 
 1. Obtain the verified product `release.json` and its component build records. Record the product version, Backend/Web source commits, registry, index digest, platform manifest digest, CLI version, and infrastructure digests. CLI 0.1.16 does not read or validate `release.json`. Do not infer a product combination from `latest` or a series tag.
 2. Run `hohu deploy init` in a dedicated directory. Set a unique `HOHU_DEPLOY_NAME`, access topology, and credentials in `.hohu/deploy/.env`. Keep PostgreSQL and Redis private. In hosted mode, set `RELEASE_BUILD_SHA` to the selected Backend's full source commit. Preserve existing `SECRET_KEY` and storage paths during upgrades.

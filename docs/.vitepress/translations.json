@@ -52,8 +52,8 @@
     "zh": "917f249587a2eed956e262feaa8efb5f4c27c3d5435a453ea2fac3f16085354e"
   },
   "operations/upgrade": {
-    "en": "5f048907eb2e839625cf8cc6e89613aefff0f5ec85844c0605e2eccb3af82a20",
-    "zh": "2de394014eb59f1256115ae1bc4b490f95e58f9a0495fbad8c45c7865b799931"
+    "en": "ef4c0afd57939906554174dced53f0ba543c263c0c8d93b1b6f67a8d4b379d31",
+    "zh": "ec25e7c6db696515ecc9f6185688db7094514032ad75ffdacfdc498e61669c56"
   },
   "operations/tenants": {
     "en": "4abb131897ffd5d2b529b838651c4eba0f810dbcc167e43ea53d01fb55b45fbc",
@@ -136,8 +136,8 @@
     "zh": "14077cab8a0bc2d88d5fed3fe23fa02a884350199207143f961d1f1792ced0d2"
   },
   "reference/versions": {
-    "en": "1d2e69de6e820116a4464de6c8aaef3333985f91bf8d1c0f0d60356058de5a71",
-    "zh": "c416904342890d7e5bd4630aa7d14e4f6c13c95ae3ed663b97cf88d3412a0ded"
+    "en": "54912c466fd6a2e0a3632b98befaa6988e1c1091b2adcb9f436330ae8b1e8746",
+    "zh": "f7cac4ce2f02d90c8c8188fdf53db8a4efaa01f1b7d98d34d82b88f50f4b0632"
   },
   "reference/configuration": {
     "en": "65bc0421b30caa208273beea865509e60e0c30e9e7e15a21c56ba3e03807bd1e",

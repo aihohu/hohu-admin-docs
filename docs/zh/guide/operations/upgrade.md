@@ -44,7 +44,7 @@ description: 记录 HoHu 版本，备份数据库、持久文件与密钥，演�
 
 ## CLI 0.1.16 的固定产物路径 {#fixed-artifacts}
 
-本人工路径使用 CLI 0.1.16 实际提供的 `hohu deploy`，已在 `linux/amd64` 演练全新安装及以原 0.1.5 镜像为来源的升级。候选演练不能替代后续正式构建的资格：必须针对实际发布的 Backend/Web 组合重验。其他平台需要独立证据。
+本人工路径使用 CLI 0.1.16 实际提供的 `hohu deploy`，已针对最终 Backend/Web 0.1.6 digest 在 `linux/amd64` 完成新装、原 0.1.5 镜像升级及恢复验收。适用固定来源、平台和限制以[唯一产品清单](https://github.com/aihohu/hohu-admin/releases/download/v0.1.6/release.json)为准；清单不可读取或校验失败时停止。`linux/arm64` 未完成运行验收，其他来源版本也未纳入本次升级范围。
 
 1. 取得已核验的产品 `release.json` 和组件构建记录。登记产品版本、Backend/Web 源码提交、registry、index digest、平台 manifest digest、CLI 版本和基础设施摘要。CLI 0.1.16 不读取或校验 `release.json`，不能从 `latest` 或系列标签推断产品组合。
 2. 在独立目录运行 `hohu deploy init`，在 `.hohu/deploy/.env` 设置唯一的 `HOHU_DEPLOY_NAME`、入口拓扑和凭据。保持 PostgreSQL、Redis 私有。hosted 模式的 `RELEASE_BUILD_SHA` 填所选 Backend 的完整源码提交。升级时保留原 `SECRET_KEY` 与存储路径。
