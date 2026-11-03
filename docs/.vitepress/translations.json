@@ -242,5 +242,9 @@
   "operations/monitoring": {
     "en": "950913f73ed5d7ff2e13ed3a3e4446f6cd42747a43389f96eba3b42469f8aa05",
     "zh": "ffa4cd5a9850e9681c358bb939fd6cab975ecadea73b45adaf99a19570485942"
+  },
+  "reference/v020-candidate": {
+    "en": "046ead051f2a5e8c740ca57367cabce325ee2d714d3f46e7205a398121c0eceb",
+    "zh": "88a7137bb7c455a6454e0ab033ab9857d8945d5f249ecc70ec3ce25235887645"
   }
 }

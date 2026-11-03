@@ -94,6 +94,7 @@ export const sections = [
     pages: [
       ['reference/index', 'Reference overview', '参考入口'],
       ['reference/versions', 'Release notes', '更新说明'],
+      ['reference/v020-candidate', '0.2 candidate: field policies', '0.2 候选：字段策略'],
       ['reference/configuration', 'Configuration reference', '配置参考'],
       ['reference/settings', 'Settings API', '设置接口与上传策略'],
       ['reference/api', 'API reference', 'API 参考'],
