@@ -18,8 +18,8 @@ description: 'HoHu 0.2 候选文档范围、用户字段策略、升级恢复边
 
 ## 候选来源与发布条件
 
-- [Backend 固定源码](https://github.com/aihohu/hohu-admin/tree/20cb459eb71d8b95b114bbb1bdb6c7c41e9558c2)：`20cb459eb71d8b95b114bbb1bdb6c7c41e9558c2`。
-- [Web 固定源码](https://github.com/aihohu/hohu-admin-web/tree/0994bab24d549a7b72cfb9469ddab9540d3d8ca2)：`0994bab24d549a7b72cfb9469ddab9540d3d8ca2`。
+- [Backend 固定源码](https://github.com/aihohu/hohu-admin/tree/fb0edbd7879a7ff14df7f010eea7dc4e7faddba5)：`fb0edbd7879a7ff14df7f010eea7dc4e7faddba5`。
+- [Web 固定源码](https://github.com/aihohu/hohu-admin-web/tree/9bb48f3cb6427bc2b4836372b9e6b6e1818d329f)：`9bb48f3cb6427bc2b4836372b9e6b6e1818d329f`。
 - 候选验收覆盖空库和正式 0.1.6 来源；最终平台、镜像、CLI 配套及升级承诺仍须正式产品清单确认。本页没有 0.2 `release.json` 下载入口，因为尚无正式清单。
 - App/Desktop 仍未发布；CLI 不会自动解析产品清单，不能把从 main 创建的源码项目当作固定稳定组合。
 

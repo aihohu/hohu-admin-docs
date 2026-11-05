@@ -60,7 +60,7 @@ test('legacy candidate links retain section anchors and point to one fixed-sourc
     for (const anchor of anchors) assert.ok(old.includes(`{#${anchor}}`));
     const policy = await read('series/0.2/field-policies');
     const upgrade = await read('series/0.2/upgrade');
-    assert.match(policy, /20cb459eb71d8b95b114bbb1bdb6c7c41e9558c2/);
+    assert.match(policy, /fb0edbd7879a7ff14df7f010eea7dc4e7faddba5/);
     assert.doesNotMatch(policy + upgrade, /blob\/(?:main|feat\/)/);
     assert.match(upgrade, /0\.1\.6/);
     assert.match(upgrade, /Ctrl\+C/);
