@@ -6,7 +6,7 @@ import { pagePaths } from '../docs/.vitepress/navigation.mjs';
 import { checkInventory } from './docs-policy.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const dist = resolve(root, 'docs/.vitepress/dist');
+const dist = resolve(root, process.env.DOCS_DIST_DIR ?? 'docs/.vitepress/dist');
 async function walk(directory) {
   const files = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {

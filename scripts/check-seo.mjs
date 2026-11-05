@@ -6,7 +6,7 @@ import { pagePaths } from '../docs/.vitepress/navigation.mjs';
 import { canonicalUrl, siteOrigin } from '../docs/.vitepress/seo.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const dist = resolve(root, 'docs/.vitepress/dist');
+const dist = resolve(root, process.env.DOCS_DIST_DIR ?? 'docs/.vitepress/dist');
 const errors = [];
 const titles = new Set();
 const descriptions = new Set();

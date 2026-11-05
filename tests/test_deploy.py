@@ -28,6 +28,7 @@ class DeploymentTest(unittest.TestCase):
         self.unhealthy = False
         self.wrong_marker = False
         self.block_health = False
+        self.failed_path = None
         self.health_entered = threading.Event()
         self.health_continue = threading.Event()
         fixture = self
@@ -41,7 +42,11 @@ class DeploymentTest(unittest.TestCase):
                 file = fixture.base / "current" / path.lstrip("/")
                 if file.is_dir():
                     file = file / "index.html"
-                if fixture.unhealthy or not file.is_file():
+                if (
+                    fixture.unhealthy
+                    or path == fixture.failed_path
+                    or not file.is_file()
+                ):
                     self.send_error(503)
                     return
                 self.send_response(200)
@@ -85,6 +90,15 @@ class DeploymentTest(unittest.TestCase):
             "sitemap.xml": b"<urlset />",
             f"assets/app.{number}.js": str(number).encode(),
         }
+        for prefix in ("", "zh/"):
+            for page in (
+                "index",
+                "0.1/index",
+                "0.2/index",
+                "0.2/field-policies",
+                "0.2/upgrade",
+            ):
+                files[f"{prefix}guide/series/{page}.html"] = b"Series manual"
         files.pop(missing, None)
         if extra:
             files.update(extra)
@@ -199,6 +213,21 @@ class DeploymentTest(unittest.TestCase):
         self.run_command(self.command(0, rollback=True), success=False)
         self.assertEqual(self.current(), self.release(2))
         self.assertEqual((self.base / "previous").resolve().name, self.release(1))
+
+    def test_missing_series_page_never_replaces_the_live_archive(self):
+        self.run_command(self.command(1))
+        for number, page in enumerate(
+            ("guide/series/0.1/index.html", "zh/guide/series/0.2/upgrade.html"), 2
+        ):
+            with self.subTest(page=page):
+                self.run_command(self.command(number, missing=page), success=False)
+                self.assertEqual(self.current(), self.release(1))
+
+    def test_series_http_failure_restores_the_previous_site(self):
+        self.run_command(self.command(1))
+        self.failed_path = "/zh/guide/series/0.2/upgrade.html"
+        self.run_command(self.command(2), success=False)
+        self.assertEqual(self.current(), self.release(1))
 
     def test_failed_first_publish_leaves_no_current(self):
         self.unhealthy = True

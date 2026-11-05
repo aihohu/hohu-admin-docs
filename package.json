@@ -17,7 +17,7 @@
     "lint": "oxlint && eslint .",
     "lint:fix": "oxlint --fix && eslint --fix .",
     "preview": "vitepress preview docs",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test --experimental-test-coverage --test-coverage-lines=70 --test-coverage-branches=70 --test-coverage-functions=70 tests/*.test.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

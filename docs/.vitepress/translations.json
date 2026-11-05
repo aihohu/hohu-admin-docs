@@ -136,8 +136,8 @@
     "zh": "14077cab8a0bc2d88d5fed3fe23fa02a884350199207143f961d1f1792ced0d2"
   },
   "reference/versions": {
-    "en": "098341f874d61479ca314f86e67d7494669c54145f2f27faaf0fc68c4dd2542d",
-    "zh": "bf0dab53f2e45bc4a73cee834e594e71edf49c2bc51113ea4a1e9b015417b420"
+    "en": "ebc01d84a628c703d4b5246abe78ca8079ecb7a03511f496d7cee6dc76e6c236",
+    "zh": "aa632d5aef3fb9a7809be7ede4dce5dcca1c1a37cfde25e6b56e5d933870c1e8"
   },
   "reference/configuration": {
     "en": "65bc0421b30caa208273beea865509e60e0c30e9e7e15a21c56ba3e03807bd1e",
@@ -242,5 +242,29 @@
   "operations/monitoring": {
     "en": "950913f73ed5d7ff2e13ed3a3e4446f6cd42747a43389f96eba3b42469f8aa05",
     "zh": "ffa4cd5a9850e9681c358bb939fd6cab975ecadea73b45adaf99a19570485942"
+  },
+  "reference/v020-candidate": {
+    "en": "bc27799d210acf38b1ef40a6e2f2149587f56f1b26630c36082f4c8ff230a57d",
+    "zh": "a611ff25e1238b19af789333337c627aa2946296bf228d37bf45e6c4065c53f0"
+  },
+  "series/index": {
+    "en": "5ac4e1106624c70a6e4c71c4e239c5e838d72b5dd9ce2c41de010ca6afa2717e",
+    "zh": "d6b51ac244b6557ed413b70b4efd46940a05db0b1082e3860338b77c62219bc2"
+  },
+  "series/0.1/index": {
+    "en": "91a1915f19c0b8af20a1f6b0b61bcb5c6e05623284aaec7d27e308f7ced239b6",
+    "zh": "6d6fdb38497584e35b65e0ba0ef361e1b0e6d4408b4d6c6562b7886c25d79bc5"
+  },
+  "series/0.2/index": {
+    "en": "692a5aa916e67f53b859dccc1fba25aef355a6158c15156bb80841e5405e8238",
+    "zh": "eaea710d1d0cef308efeb128a8de29a7df0ad2e9da9311035f6436a335c2f6d6"
+  },
+  "series/0.2/field-policies": {
+    "en": "a33d14602fcf9e476b529507e4907d047e4e3997796056d495e97886fb0df77d",
+    "zh": "731fbfb224b27d3be6f78e3a68dd4f0b423309c4a003024f396b26d2ce623514"
+  },
+  "series/0.2/upgrade": {
+    "en": "1e4cb2592bf511928b4025ecb8eb11cd12020c937812e9a5c0a2e80ae70427ab",
+    "zh": "f6d4b308b77f51e35cf10b30380fcfc5955da061751d51ae95cc84e2af2742c0"
   }
 }

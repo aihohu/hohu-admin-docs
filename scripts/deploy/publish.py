@@ -18,6 +18,11 @@ from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
 
 RELEASE_PATTERN = re.compile(r"[0-9a-f]{40}-[0-9]+-[0-9]+")
+SERIES_FILES = tuple(
+    f"{prefix}guide/series/{page}.html"
+    for prefix in ("", "zh/")
+    for page in ("index", "0.1/index", "0.2/index", "0.2/field-policies", "0.2/upgrade")
+)
 REQUIRED_FILES = (
     "index.html",
     "zh/index.html",
@@ -25,6 +30,7 @@ REQUIRED_FILES = (
     "zh/guide/user/index.html",
     "404.html",
     "sitemap.xml",
+    *SERIES_FILES,
 )
 
 
@@ -145,6 +151,7 @@ def check_health(url, release, attempts):
                 "/zh/",
                 "/guide/user/",
                 "/zh/guide/user/",
+                *(f"/{file}" for file in SERIES_FILES),
             ):
                 query = urlencode({"release": release.name})
                 request = Request(

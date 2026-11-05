@@ -5,6 +5,8 @@ description: 'Find HoHu component releases and review behavior changes, migratio
 
 # Release notes
 
+Choose manuals in the [series directory](../series/index.md): [0.1 is maintained](../series/0.1/index.md); [0.2 remains unreleased](../series/0.2/index.md).
+
 Before upgrading, read the target release notes for new features, behavior changes, database migrations and configuration updates.
 
 | Component                 | Releases                                                                             |

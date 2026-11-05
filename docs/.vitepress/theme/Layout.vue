@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useData, Content } from 'vitepress';
 import DefaultTheme from 'vitepress/theme';
 import { useGuideAnalytics } from './composables/useGuideAnalytics';
+import SeriesNotice from './components/SeriesNotice.vue';
 useGuideAnalytics();
 const { Layout } = DefaultTheme;
 const { page } = useData();
@@ -11,5 +12,7 @@ const isHome = computed(() => ['index.md', 'zh/index.md'].includes(page.value.re
 
 <template>
   <Content v-if="isHome" />
-  <Layout v-else />
+  <Layout v-else>
+    <template #doc-before><SeriesNotice /></template>
+  </Layout>
 </template>
