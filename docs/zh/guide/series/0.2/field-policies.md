@@ -22,7 +22,7 @@ description: '了解尚未发布的 0.2 候选中的用户字段策略、表单�
 
 策略管理需要 `R_SUPER` 和相应的 `system:user:field-policy-view`、`system:user:field-policy-edit`、`system:user:field-policy-activate` 权限。升级后的既有角色需显式授权。部署者还必须提供绑定当前构建的资格文件，不能仅靠角色权限启用功能。版本冲突时重新加载、核对再提交；不要自动重试发布或激活。
 
-激活不可逆：已激活租户不能退回 `legacy` 或 `ready`。具体接口及部署资格格式见固定候选源码中的[后端字段契约](https://github.com/aihohu/hohu-admin/blob/20cb459eb71d8b95b114bbb1bdb6c7c41e9558c2/docs/USER-FIELD-PROJECTION.md)。正式发布后应使用产品清单绑定的文档快照。
+激活不可逆：已激活租户不能退回 `legacy` 或 `ready`。具体接口及部署资格格式见固定候选源码中的[后端字段契约](https://github.com/aihohu/hohu-admin/blob/fb0edbd7879a7ff14df7f010eea7dc4e7faddba5/docs/USER-FIELD-PROJECTION.md)。正式发布后应使用产品清单绑定的文档快照。
 
 ## 编辑、查询和下载
 

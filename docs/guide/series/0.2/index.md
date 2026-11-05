@@ -18,8 +18,8 @@ This directory covers 0.2 changes and operational boundaries; it is not yet a co
 
 ## Candidate sources and release conditions
 
-- [Fixed Backend source](https://github.com/aihohu/hohu-admin/tree/20cb459eb71d8b95b114bbb1bdb6c7c41e9558c2): `20cb459eb71d8b95b114bbb1bdb6c7c41e9558c2`.
-- [Fixed Web source](https://github.com/aihohu/hohu-admin-web/tree/0994bab24d549a7b72cfb9469ddab9540d3d8ca2): `0994bab24d549a7b72cfb9469ddab9540d3d8ca2`.
+- [Fixed Backend source](https://github.com/aihohu/hohu-admin/tree/fb0edbd7879a7ff14df7f010eea7dc4e7faddba5): `fb0edbd7879a7ff14df7f010eea7dc4e7faddba5`.
+- [Fixed Web source](https://github.com/aihohu/hohu-admin-web/tree/9bb48f3cb6427bc2b4836372b9e6b6e1818d329f): `9bb48f3cb6427bc2b4836372b9e6b6e1818d329f`.
 - Candidate acceptance covers fresh databases and formal 0.1.6. Final platforms, images, CLI combinations and upgrade commitments require the formal product manifest. There is no 0.2 `release.json` download here because no formal manifest exists yet.
 - App/Desktop remain unreleased. CLI does not automatically parse product manifests; a source project created from main is not a reproducible stable combination.
 

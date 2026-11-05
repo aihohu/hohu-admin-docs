@@ -22,7 +22,7 @@ Open “User field policy” in role management, select fields, operations, and 
 
 Policy management requires `R_SUPER` plus the relevant `system:user:field-policy-view`, `system:user:field-policy-edit`, and `system:user:field-policy-activate` permissions. Existing roles need explicit grants after upgrade. The operator must also supply qualification bound to the current build; role permissions alone cannot enable the feature. On version conflicts, reload, review, and submit again. Do not automatically retry publication or activation.
 
-Activation is irreversible: an activated tenant cannot return to `legacy` or `ready`. See the fixed candidate source’s [backend field contract](https://github.com/aihohu/hohu-admin/blob/20cb459eb71d8b95b114bbb1bdb6c7c41e9558c2/docs/USER-FIELD-PROJECTION.md) for APIs and deployment qualification. After release, use the documentation snapshot bound by the product manifest.
+Activation is irreversible: an activated tenant cannot return to `legacy` or `ready`. See the fixed candidate source’s [backend field contract](https://github.com/aihohu/hohu-admin/blob/fb0edbd7879a7ff14df7f010eea7dc4e7faddba5/docs/USER-FIELD-PROJECTION.md) for APIs and deployment qualification. After release, use the documentation snapshot bound by the product manifest.
 
 ## Editing, querying, and downloading
 
