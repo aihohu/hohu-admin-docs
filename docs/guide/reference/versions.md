@@ -9,6 +9,8 @@ Choose manuals in the [series directory](../series/index.md): [0.1 is maintained
 
 Before upgrading, read the target release notes for new features, behavior changes, database migrations and configuration updates.
 
+0.2 is an unreleased system field-permission candidate covering ordinary/relation objects, configuration/jobs, transfer/files, AI, audit and background delivery. See the [0.2 series](../series/0.2/index.md) for qualification, default denial and controlled installation/recovery. Combination acceptance is ongoing; no formal 0.2 immutable artifact or production upgrade authorization is established.
+
 | Component                 | Releases                                                                             |
 | ------------------------- | ------------------------------------------------------------------------------------ |
 | Backend and platform core | [hohu-admin Releases](https://github.com/aihohu/hohu-admin/releases)                 |
