@@ -18,8 +18,8 @@ description: 'HoHu 0.2全系统字段权限、受控升级恢复范围及配套�
 
 ## 配套候选来源
 
-- [Backend固定源码](https://github.com/aihohu/hohu-admin/tree/1e66e33de62056bbcb81729b8ee065c8c5b70b53)：`1e66e33de62056bbcb81729b8ee065c8c5b70b53`，组件目标0.2.0。
-- [Web固定源码](https://github.com/aihohu/hohu-admin-web/tree/15597f548cbfd3b8b9fa32a60b606f94d8f7412e)：`15597f548cbfd3b8b9fa32a60b606f94d8f7412e`，组件目标0.2.0。
+- [Backend固定源码](https://github.com/aihohu/hohu-admin/tree/e43460a921cab4ab95b59e8bdba8d6bfc0afff79)：`e43460a921cab4ab95b59e8bdba8d6bfc0afff79`，组件目标0.2.0。
+- [Web固定源码](https://github.com/aihohu/hohu-admin-web/tree/59c6b77d59481b9ad7dae1d95e2468a506ee990d)：`59c6b77d59481b9ad7dae1d95e2468a506ee990d`，组件目标0.2.0。
 - CLI使用已发布0.1.16进行人工受控交接；App/Desktop未纳入正式发布。
 - 候选安装目标为linux/amd64、PG15/Redis7。最终镜像、平台、升级来源与文档快照须由正式不可变清单固定；当前没有0.2正式release.json下载入口，也没有main集成或生产部署声明。
 

@@ -59,11 +59,11 @@ description: '全系统字段权限的对象范围、菜单与角色关系、六
 
 部署方还须提供绑定精确Backend构建、当前目录和全部入口验收证据的服务端资格。缺失或过期时可以修复候选，不能ready/activate。两步分别确认完整候选；候选、授权、目录或epoch变化使旧就绪水位失效。首次激活后不能退回旧兼容状态。未知提交结果保留requestId，只核对回执，不自动重提。切换登录身份清除草稿，旧对话框和迟到响应不能操作新身份的策略。
 
-API、封闭请求与资格格式见固定源码的[管理契约](https://github.com/aihohu/hohu-admin/blob/1e66e33de62056bbcb81729b8ee065c8c5b70b53/docs/FIELD-POLICY-MANAGEMENT.md)及[存储契约](https://github.com/aihohu/hohu-admin/blob/1e66e33de62056bbcb81729b8ee065c8c5b70b53/docs/FIELD-POLICY-STORAGE.md)。新管理协议的ID、版本与epoch均为十进制字符串；浏览器不能提交租户、actor或资格声明。
+API、封闭请求与资格格式见固定源码的[管理契约](https://github.com/aihohu/hohu-admin/blob/e43460a921cab4ab95b59e8bdba8d6bfc0afff79/docs/FIELD-POLICY-MANAGEMENT.md)及[存储契约](https://github.com/aihohu/hohu-admin/blob/e43460a921cab4ab95b59e8bdba8d6bfc0afff79/docs/FIELD-POLICY-STORAGE.md)。新管理协议的ID、版本与epoch均为十进制字符串；浏览器不能提交租户、actor或资格声明。
 
 ## 列表、关系、导入与下载 {#编辑、查询和下载}
 
-隐藏字段从DTO中省略，`null` 表示实际空值。Web按实际投影生成业务列；没有该字段许可时不显示整列“无权限”占位，按记录范围存在差异时也不补原值。导出隐藏列不写入文件。只写字段不回填原值；空白替换默认不修改，明确的清空操作才提交可空值。
+隐藏字段从DTO中省略，`null` 表示实际空值。Web按实际投影生成业务列；没有该字段许可时不显示整列“无权限”占位，按记录范围存在差异时也不补原值。导出隐藏列不写入文件。只写字段不回填原值；未操作的替换输入不提交，显式编辑为空值时按该字段的空字符串或 null 契约处理。
 
 新Web只提交实际变更字段。旧整对象表单每个携带字段都须可写，包括值未变化的字段；旧页面被拒绝后应换用配套Web核对修改，不能循环重发或靠版本Header豁免。关系集合须完整可见且允许替换，不能把部分结果写回整个集合。派生的负责人、部门或角色名称还要满足其来源字段权限。查询检查完整作用域，不能仅验证本页数据；筛选、排序与total也受用途约束。
 
