@@ -59,7 +59,7 @@ Saving a candidate leaves the active policy unchanged. Preview shows abstract ru
 
 The deployment must also supply a server-owned qualification bound to the exact Backend build, catalog and complete surface evidence. Missing or expired qualification permits candidate repair but blocks ready/activate. Confirm both steps separately. Candidate, authority, catalog or epoch changes invalidate readiness. An enforced policy cannot revert to legacy compatibility. Preserve the request ID for an unknown outcome and check its receipt without resubmitting. Identity handoff clears drafts; old dialogs and late responses cannot act on the new identity.
 
-See the pinned [management contract](https://github.com/aihohu/hohu-admin/blob/98e3cb55367738e1f56a939445196d2590a60833/docs/FIELD-POLICY-MANAGEMENT.md) and [storage contract](https://github.com/aihohu/hohu-admin/blob/98e3cb55367738e1f56a939445196d2590a60833/docs/FIELD-POLICY-STORAGE.md) for APIs and qualification format. New management IDs, versions and epochs are decimal strings. A browser cannot supply tenant, actor or qualification assertions.
+See the pinned [management contract](https://github.com/aihohu/hohu-admin/blob/1e66e33de62056bbcb81729b8ee065c8c5b70b53/docs/FIELD-POLICY-MANAGEMENT.md) and [storage contract](https://github.com/aihohu/hohu-admin/blob/1e66e33de62056bbcb81729b8ee065c8c5b70b53/docs/FIELD-POLICY-STORAGE.md) for APIs and qualification format. New management IDs, versions and epochs are decimal strings. A browser cannot supply tenant, actor or qualification assertions.
 
 ## Lists, relations, import and downloads {#editing-querying-and-downloading}
 

@@ -18,8 +18,8 @@ This directory maintains 0.2 changes and current operating boundaries. Other use
 
 ## Matching candidate sources
 
-- [Pinned Backend source](https://github.com/aihohu/hohu-admin/tree/98e3cb55367738e1f56a939445196d2590a60833): `98e3cb55367738e1f56a939445196d2590a60833`, component target 0.2.0.
-- [Pinned Web source](https://github.com/aihohu/hohu-admin-web/tree/4bb12b606341b01d5584724419e7e69295b0d67d): `4bb12b606341b01d5584724419e7e69295b0d67d`, component target 0.2.0.
+- [Pinned Backend source](https://github.com/aihohu/hohu-admin/tree/1e66e33de62056bbcb81729b8ee065c8c5b70b53): `1e66e33de62056bbcb81729b8ee065c8c5b70b53`, component target 0.2.0.
+- [Pinned Web source](https://github.com/aihohu/hohu-admin-web/tree/15597f548cbfd3b8b9fa32a60b606f94d8f7412e): `15597f548cbfd3b8b9fa32a60b606f94d8f7412e`, component target 0.2.0.
 - Published CLI 0.1.16 provides manual controlled handoff. App/Desktop are outside the formal release scope.
 - The candidate targets linux/amd64 and PG15/Redis7. A formal immutable manifest must pin final images, platforms, upgrade sources and documentation. No formal 0.2 release.json is available, and this page makes no main-integration or production-deployment claim.
 

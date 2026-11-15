@@ -21,9 +21,11 @@ description: '全系统字段权限候选的版本、停写、资格、受控安
 
 直接启动支持开发API/scheduler合并，以及API与独立scheduler；Docker Compose沿用同一维护协议，不强制新部署平台。旧Web写保护在服务端执行。过程失败、取消、提交未知或文件记录丢失均保持停写，不自动重试业务。stop保留策略准备要求，删除marker或替换旧回执不能绕过；完成后的原记录按周期归档，后续维护必须使用新的停写记录。
 
-具体命令和资格说明见固定源码的[受控安装协议](https://github.com/aihohu/hohu-admin/blob/98e3cb55367738e1f56a939445196d2590a60833/docs/CONTROLLED-INSTALL.md)、[维护协议](https://github.com/aihohu/hohu-admin/blob/98e3cb55367738e1f56a939445196d2590a60833/docs/AUTHORIZATION-MAINTENANCE.md)及[字段管理](https://github.com/aihohu/hohu-admin/blob/98e3cb55367738e1f56a939445196d2590a60833/docs/FIELD-POLICY-MANAGEMENT.md)。
+具体命令和资格说明见固定源码的[受控安装协议](https://github.com/aihohu/hohu-admin/blob/1e66e33de62056bbcb81729b8ee065c8c5b70b53/docs/CONTROLLED-INSTALL.md)、[维护协议](https://github.com/aihohu/hohu-admin/blob/1e66e33de62056bbcb81729b8ee065c8c5b70b53/docs/AUTHORIZATION-MAINTENANCE.md)及[字段管理](https://github.com/aihohu/hohu-admin/blob/1e66e33de62056bbcb81729b8ee065c8c5b70b53/docs/FIELD-POLICY-MANAGEMENT.md)。
 
 ## CLI 0.1.16 的受控交接
+
+Web 镜像默认是 `single` 模式。hosted 部署须使用 `--build-arg VITE_TENANT_MODE=hosted` 自编译对应Web，并固定其独立digest；运行时设置Nginx环境变量不会重编译界面。Backend另行配置hosted模式，界面模式不授予租户权限。
 
 安装并固定已发布的CLI 0.1.16及其依赖，不使用有本地修改的源码替代。`hohu deploy init` 后，人工override API、scheduler及db-migrator为同一Backend digest，并固定Web、PG15和Redis7。CLI默认PG18/Redis8.6是另一组合，不能继承本候选证据；也不要把完整digest填入仍拼接 `:IMAGE_TAG` 的变量。
 
@@ -33,4 +35,4 @@ description: '全系统字段权限候选的版本、停写、资格、受控安
 
 激活前的原备份恢复也必须匹配原版本、数据库、文件和密钥。激活后不能直接接回0.1.6 Backend，或恢复旧库后开放读取、下载与AI。先隔离入口，以独立于备份的记录证明撤权及策略连续性，核对故障后的已完成/未知副作用，再由支持当前策略的版本向前恢复。
 
-缺文件、缺密钥、只有数据库备份或撤权事实不完整时，受影响入口继续关闭。增加旧备份的epoch不能补证明；不重签旧确认、不重执unknown，也不为无来源历史或旧链接补认领。数据库中存在通用策略事实时，DDL downgrade拒绝执行，不能以删表或回退空库替代一致恢复。具体约束见[数据库迁移手册](https://github.com/aihohu/hohu-admin/blob/98e3cb55367738e1f56a939445196d2590a60833/docs/DATABASE-MIGRATIONS.md)。
+缺文件、缺密钥、只有数据库备份或撤权事实不完整时，受影响入口继续关闭。增加旧备份的epoch不能补证明；不重签旧确认、不重执unknown，也不为无来源历史或旧链接补认领。数据库中存在通用策略事实时，DDL downgrade拒绝执行，不能以删表或回退空库替代一致恢复。具体约束见[数据库迁移手册](https://github.com/aihohu/hohu-admin/blob/1e66e33de62056bbcb81729b8ee065c8c5b70b53/docs/DATABASE-MIGRATIONS.md)。

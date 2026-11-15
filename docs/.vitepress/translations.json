@@ -256,15 +256,15 @@
     "zh": "6d6fdb38497584e35b65e0ba0ef361e1b0e6d4408b4d6c6562b7886c25d79bc5"
   },
   "series/0.2/index": {
-    "en": "4d592cc45470db6af902bb00513b4fade50ff642a3b3a16b97b95b63ee27d77b",
-    "zh": "15fe95456bdb817c5636d4683c78229dfd60ca41a8024214258eec49af853ad6"
+    "en": "225ad9322041d1fe0d9387c3164c64e77ee02214ca594c1c480cfce244bea3ec",
+    "zh": "09ccf7c79d03124be8c71a62f3bbaed56eb1ef22f3ea6cd7927fedf4883fc11b"
   },
   "series/0.2/field-policies": {
-    "en": "06b55d6faed27a8da4ecde20e99c5a37560aa3d7e67cf1bdd08a2f0b2d91097a",
-    "zh": "a9dceedd3ae2ce73cd300a29967cde4cce049b7d6bfabd2065e2528a1bdbce8d"
+    "en": "8e524fed271e89dccc81048d198d4d5c16c1e6c884d2d3487cb1f4d1dc944e5a",
+    "zh": "006722f90bd8750d9fe1c4c66eaa16efd05c6f5152bbb7d2d7753de1d4d82167"
   },
   "series/0.2/upgrade": {
-    "en": "7a7dad59f47559af3b6f8e9f23efec17cad67e412b8ad6f78e47c8cdb2d89c0f",
-    "zh": "81edd5359c581d21688093ba1d451ac4141f27bd5839dc3235da4c4dd7fa838a"
+    "en": "d3bd3667f200acfd781c72b91ad0b7cd9135605b8ca5ef3c901a184b015c7a86",
+    "zh": "91c3bc26a2dc4d370698ac661e2ed80748b9ad1d9b31cfc36c7882e55897d46c"
   }
 }
