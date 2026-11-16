@@ -59,7 +59,7 @@ description: '全系统字段权限的对象范围、菜单与角色关系、六
 
 部署方还须提供绑定精确Backend构建、当前目录和全部入口验收证据的服务端资格。缺失或过期时可以修复候选，不能ready/activate。两步分别确认完整候选；候选、授权、目录或epoch变化使旧就绪水位失效。首次激活后不能退回旧兼容状态。未知提交结果保留requestId，只核对回执，不自动重提。切换登录身份清除草稿，旧对话框和迟到响应不能操作新身份的策略。
 
-API、封闭请求与资格格式见固定源码的[管理契约](https://github.com/aihohu/hohu-admin/blob/e43460a921cab4ab95b59e8bdba8d6bfc0afff79/docs/FIELD-POLICY-MANAGEMENT.md)及[存储契约](https://github.com/aihohu/hohu-admin/blob/e43460a921cab4ab95b59e8bdba8d6bfc0afff79/docs/FIELD-POLICY-STORAGE.md)。新管理协议的ID、版本与epoch均为十进制字符串；浏览器不能提交租户、actor或资格声明。
+API、封闭请求与资格格式见固定源码的[管理契约](https://github.com/aihohu/hohu-admin/blob/4f3829d7f754f2920ec5c2b233bdbf6b562206af/docs/FIELD-POLICY-MANAGEMENT.md)及[存储契约](https://github.com/aihohu/hohu-admin/blob/4f3829d7f754f2920ec5c2b233bdbf6b562206af/docs/FIELD-POLICY-STORAGE.md)。新管理协议的ID、版本与epoch均为十进制字符串；浏览器不能提交租户、actor或资格声明。
 
 ## 列表、关系、导入与下载 {#编辑、查询和下载}
 
