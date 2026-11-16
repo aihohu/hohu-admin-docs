@@ -61,7 +61,7 @@ test('legacy candidate links retain section anchors and point to one fixed-sourc
     const policy = await read('series/0.2/field-policies');
     for (const anchor of anchors.slice(0, 3)) assert.ok(policy.includes(`{#${anchor}}`));
     const upgrade = await read('series/0.2/upgrade');
-    assert.match(policy, /d7e428cd986eab4c071e35a9f38690ca3ca235aa/);
+    assert.match(policy, /1b6abcd85ae800047b72d97d15ff07b52a8aafd0/);
     const overview = await read('series/0.2/index');
     assert.match(overview, /59c6b77d59481b9ad7dae1d95e2468a506ee990d/);
     assert.match(policy, /23/);
