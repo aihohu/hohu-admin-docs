@@ -97,7 +97,7 @@ export const sections = [
       ['series/index', 'Documentation series', '文档系列目录'],
       ['series/0.1/index', '0.1: maintained manuals', '0.1：维护与归档'],
       ['series/0.2/index', '0.2: unreleased candidate', '0.2：未发布候选'],
-      ['series/0.2/field-policies', '0.2: user field policies', '0.2：用户字段策略'],
+      ['series/0.2/field-policies', '0.2: system field permissions', '0.2：全系统字段权限'],
       ['series/0.2/upgrade', '0.2: upgrade and recovery', '0.2：升级与恢复'],
       ['reference/v020-candidate', '0.2 candidate: field policies', '0.2 候选：字段策略'],
       ['reference/configuration', 'Configuration reference', '配置参考'],
