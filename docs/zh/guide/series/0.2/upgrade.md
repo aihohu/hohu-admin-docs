@@ -13,15 +13,15 @@ description: '全系统字段权限候选的版本、停写、资格、受控安
 
 1. 清点全部写者、旧确认、未知执行、历史文件与撤权事实。为每个已初始化或启用租户显式配置三个字段策略管理权限，禁用租户也须检查。
 2. 一致备份数据库、公开/私有文件、加密密钥、配置及独立撤权记录。隔离用户入口，停止旧API、scheduler及API内AI恢复/过期任务，禁止旧进程或旧凭据重新进入，核验所有数据库会话和prepared事务。Ctrl+C本身不是证明。
-3. 使用真实维护inventory运行 `controlled_install policy-prepare`；空库另需bootstrap证明。新数据库连接保持关闭，以保留连接执行固定迁移与种子。迁移失败不继续初始化，不裸跑 `init_db` 或 `stamp head`。普通 `prepare` 只安装结构与种子，不启用通用字段策略。
+3. 使用真实维护 inventory 执行 `controlled_install prepare`，通过 `--policy-web-directory` 和 `--policy-web-commit` 指定普通 Web 构建及完整提交。空库提供 bootstrap 证明。控制器在同一业务库的保留连接执行迁移及种子，并持续禁止新业务连接。
 4. 部署方提供服务端 `FIELD_POLICY_QUALIFICATION_FILE`：schema 2、最大1MiB、最长24小时，绑定精确Backend SHA、当前迁移 `e020f3b00001`、完整目录/动作/适配器及验收证据。角色权限或浏览器JSON不能代替。
-5. 准备服务仅监听loopback，使用已核验的Web准备构建和短期管理会话。逐租户保存候选、封存完整清单、ready并单独确认activate。活跃租户全部对象须生效；禁用/prepared租户可按完整未授予状态隔离，不自动授权。
+5. 管理员在原后台地址登录，从“系统管理 → 角色管理 → 字段权限”预览、保存、封存、标记就绪并显式激活。直接启动时控制器接管原 Web 端口。已有 HTTPS 代理时，使用 `--console-origin` 固定外部地址，保留 Host 并将原入口临时转发至 loopback 控制器。活跃租户均须完成激活，禁用或 prepared 租户可按完整未授予状态隔离。
 6. 显式finish再次核验完整租户集合与活动摘要。监听结束、数据库静止后才可生成 `qualified-stopped` 和字节绑定安装回执。无有效资格时finish只关闭编辑，不能恢复。
 7. 独立恢复进程核验当前资格、构建/数据库OID/部署绑定、准备进程退出、原始回执与数据库静止及等待窗口，再显式 `controlled_install resume`。这只恢复admission，不启动进程或开放流量。验证成功后由部署方启动配套组合并完成验收。
 
 直接启动支持开发API/scheduler合并，以及API与独立scheduler；Docker Compose沿用同一维护协议，不强制新部署平台。旧Web写保护在服务端执行。过程失败、取消、提交未知或文件记录丢失均保持停写，不自动重试业务。stop保留策略准备要求，删除marker或替换旧回执不能绕过；完成后的原记录按周期归档，后续维护必须使用新的停写记录。
 
-具体命令和资格说明见固定源码的[受控安装协议](https://github.com/aihohu/hohu-admin/blob/1b6abcd85ae800047b72d97d15ff07b52a8aafd0/docs/CONTROLLED-INSTALL.md)、[维护协议](https://github.com/aihohu/hohu-admin/blob/1b6abcd85ae800047b72d97d15ff07b52a8aafd0/docs/AUTHORIZATION-MAINTENANCE.md)及[字段管理](https://github.com/aihohu/hohu-admin/blob/1b6abcd85ae800047b72d97d15ff07b52a8aafd0/docs/FIELD-POLICY-MANAGEMENT.md)。
+具体命令和资格说明见固定源码的[受控安装协议](https://github.com/aihohu/hohu-admin/blob/806635404fc98b7621897274414abd194a9dc7a6/docs/CONTROLLED-INSTALL.md)、[维护协议](https://github.com/aihohu/hohu-admin/blob/806635404fc98b7621897274414abd194a9dc7a6/docs/AUTHORIZATION-MAINTENANCE.md)及[字段管理](https://github.com/aihohu/hohu-admin/blob/806635404fc98b7621897274414abd194a9dc7a6/docs/FIELD-POLICY-MANAGEMENT.md)。
 
 ## CLI 0.1.16 的受控交接
 
